@@ -44,6 +44,17 @@ class ShiftSyncRequestHandler(http.server.SimpleHTTPRequestHandler):
         cursor = conn.cursor()
 
         try:
+            # 0. Health Check Endpoint
+            if path == "/api/health":
+                self.send_json_response({
+                    "status": "healthy",
+                    "system": "ShiftSync Operational Handover Engine",
+                    "timestamp": datetime.now().isoformat(),
+                    "database": "connected",
+                    "models_loaded": nlp_engine is not None
+                })
+                return
+
             # 1. Dashboard Stats
             if path == "/api/dashboard-stats":
                 cursor.execute("SELECT COUNT(*) FROM handover_reports WHERE status = 'Pending Review'")

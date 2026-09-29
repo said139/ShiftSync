@@ -117,6 +117,14 @@ class TestShiftSyncAPI(unittest.TestCase):
         with urllib.request.urlopen(req) as resp:
             return resp.status, json.loads(resp.read().decode("utf-8"))
 
+    def test_api_00_health_check(self):
+        t0 = time.perf_counter()
+        status, body = self.api_get("/api/health")
+        elapsed = (time.perf_counter() - t0) * 1000
+        passed = (status == 200 and body.get("status") == "healthy" and body.get("database") == "connected")
+        record_test("TC-API-00", "REST API", "System health and telemetry check", "/api/health", "HTTP 200 + healthy status", f"HTTP {status} (healthy)", passed, elapsed)
+        self.assertTrue(passed)
+
     def test_api_01_dashboard_stats(self):
         t0 = time.perf_counter()
         status, body = self.api_get("/api/dashboard-stats")
