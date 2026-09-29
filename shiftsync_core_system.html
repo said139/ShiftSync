@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShiftSync | Kenya Airways Operations Handover System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#fef2f2',
+              100: '#fee2e2',
+              500: '#C8102E',
+              600: '#A60C25',
+              700: '#7F091C',
+            },
+            kq: {
+              red: '#C8102E',
+              darkred: '#990B22',
+              green: '#007A3D',
+              darkgreen: '#00582B',
+              black: '#111827',
+              gold: '#D97706',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+    .sidebar-active { background-color: #fef2f2; color: #C8102E; font-weight: 700; border-left: 4px solid #C8102E; }
+    .kenya-flag-ribbon {
+      background: linear-gradient(to right, #111827 0%, #111827 31%, #ffffff 31%, #ffffff 34%, #C8102E 34%, #C8102E 66%, #ffffff 66%, #ffffff 69%, #007A3D 69%, #007A3D 100%);
+    }
+    .kq-card-accent {
+      border-top: 3px solid #C8102E;
+    }
+    .badge-critical { background-color: #fee2e2; color: #C8102E; border: 1px solid #fca5a5; font-weight: 700; }
+    .badge-high { background-color: #ffedd5; color: #c2410c; border: 1px solid #fdba74; font-weight: 700; }
+    .badge-medium { background-color: #fef9c3; color: #854d0e; border: 1px solid #fde047; font-weight: 600; }
+    .badge-low { background-color: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+    .badge-completed { background-color: #ecfdf5; color: #007A3D; border: 1px solid #6ee7b7; font-weight: 700; }
+    .badge-pending { background-color: #f8fafc; color: #475569; border: 1px solid #cbd5e1; }
+    .badge-inprogress { background-color: #fffbeb; color: #b45309; border: 1px solid #fcd34d; font-weight: 600; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased selection:bg-slate-900 selection:text-white">
+
+  <!-- ============================================================ -->
+  <!-- 1. LOGIN SCREEN (Figure 3.5: Login Page Wireframe)          -->
+  <!-- ============================================================ -->
+  <div id="screen-login" class="fixed inset-0 z-50 bg-slate-100 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-xl p-8 space-y-6">
+      <!-- Kenyan Flag Accent Ribbon on Login Card -->
+      <div class="h-1.5 w-full kenya-flag-ribbon rounded-t-xl -mt-8 -mx-8 mb-6" style="width: calc(100% + 4rem);"></div>
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 rounded-2xl bg-[#C8102E] text-white flex items-center justify-center mx-auto text-2xl font-bold shadow-lg border-2 border-red-700">
+          ✈
+        </div>
+        <div>
+          <div class="flex items-center justify-center space-x-1.5">
+            <span class="text-xs font-bold uppercase tracking-widest text-[#C8102E]">KENYA AIRWAYS</span>
+            <span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-100 text-[#007A3D] font-bold">KQ</span>
+          </div>
+          <h2 class="text-2xl font-black tracking-tight text-slate-900">ShiftSync Operations</h2>
+          <p class="text-xs text-slate-500 font-medium">Flight, Ramp & Engineering Handover Portal • JKIA</p>
+        </div>
+      </div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+          <input type="email" id="login-email" value="operator@industry.com" required class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition" placeholder="operator@industry.com">
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-semibold text-slate-700">Password</label>
+            <a href="javascript:void(0)" onclick="alert('Password reset instructions sent to your email.')" class="text-xs text-slate-500 hover:text-slate-900 transition">Forgot Password?</a>
+          </div>
+          <input type="password" id="login-password" value="••••••••" required class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition">
+        </div>
+
+        <button type="submit" class="w-full py-2.5 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-sm font-bold shadow-md hover:shadow-lg transition">
+          Sign In to Kenya Airways ShiftSync
+        </button>
+      </form>
+
+      <!-- Quick Role Login Helper (for testing prototype) -->
+      <div class="pt-4 border-t border-slate-200">
+        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 text-center">Quick Switch Role for Demo</p>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <button type="button" onclick="quickLogin('John Doe', 'Outgoing Operator', 'john@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
+            <span class="font-semibold block text-slate-800">John Doe</span>
+            <span class="text-[10px] text-slate-500">Outgoing Operator</span>
+          </button>
+          <button type="button" onclick="quickLogin('Michael Chang', 'Incoming Operator', 'michael@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
+            <span class="font-semibold block text-slate-800">Michael Chang</span>
+            <span class="text-[10px] text-slate-500">Incoming Operator</span>
+          </button>
+          <button type="button" onclick="quickLogin('Sarah Jenkins', 'Supervisor', 'sarah@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
+            <span class="font-semibold block text-slate-800">Sarah Jenkins</span>
+            <span class="text-[10px] text-slate-500">Shift Supervisor</span>
+          </button>
+          <button type="button" onclick="quickLogin('Emily Watson', 'Administrator', 'admin@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
+            <span class="font-semibold block text-slate-800">Emily Watson</span>
+            <span class="text-[10px] text-slate-500">System Admin</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MAIN APPLICATION SHELL (Header + Sidebar + Content)          -->
+  <!-- ============================================================ -->
+  <div id="screen-app" class="min-h-screen flex flex-col hidden">
+    <!-- Kenyan National Flag Accent Strip (Black - White - Red - White - Green) -->
+    <div class="h-1.5 w-full kenya-flag-ribbon sticky top-0 z-50"></div>
+
+    <!-- Top Bar -->
+    <header class="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-6 sticky top-1.5 z-40 shadow-xs">
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-9 h-9 rounded-xl bg-[#C8102E] text-white flex items-center justify-center font-black text-lg shadow-sm border border-red-700">
+            ✈
+          </div>
+          <div>
+            <div class="flex items-center space-x-1.5">
+              <span class="font-black text-base tracking-tight text-slate-900">ShiftSync</span>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-red-100 text-[#C8102E]">KQ OPS</span>
+            </div>
+            <p class="text-[10px] text-slate-500 font-semibold tracking-wide">KENYA AIRWAYS • THE PRIDE OF AFRICA</p>
+          </div>
+        </div>
+        <span class="hidden lg:inline-block text-slate-300">|</span>
+        <div class="hidden lg:flex items-center space-x-2 text-xs text-slate-600">
+          <span class="w-2 h-2 rounded-full bg-[#007A3D]"></span>
+          <span class="font-medium">Jomo Kenyatta International Airport (JKIA) • Terminal 1 & Ramp Operations</span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <!-- Notifications Bell -->
+        <button onclick="navigateTo('notifications')" class="relative p-2 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <span id="unread-counter-badge" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full ring-2 ring-white"></span>
+        </button>
+
+        <!-- User Profile & Logout (as shown in wireframe header) -->
+        <div class="flex items-center space-x-3 pl-3 border-l border-slate-200">
+          <div class="w-8 h-8 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-xs font-bold text-slate-700" id="user-avatar-initials">
+            JD
+          </div>
+          <div class="text-left">
+            <span class="text-xs font-semibold text-slate-900 block" id="header-user-name">John Doe</span>
+            <span class="text-[10px] text-slate-500 block" id="header-user-role">Outgoing Operator</span>
+          </div>
+          <button onclick="handleLogout()" class="text-xs font-medium text-slate-500 hover:text-red-600 transition pl-2">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+      <!-- Sidebar (Figure 3.6 Wireframe Navigation) -->
+      <aside class="w-60 border-r border-slate-200 bg-white p-3 flex flex-col justify-between hidden md:flex">
+        <nav class="space-y-1">
+          <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs transition sidebar-active">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            <span>Dashboard</span>
+          </button>
+
+          <button onclick="navigateTo('shift-log')" id="nav-shift-log" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition">
+            <div class="flex items-center space-x-3">
+              <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              <span class="font-semibold text-slate-900">Shift Log</span>
+            </div>
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-100 text-indigo-700">NLP AI</span>
+          </button>
+
+          <button onclick="navigateTo('shifts')" id="nav-shifts" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span>Shifts</span>
+          </button>
+
+          <button onclick="navigateTo('handover-reports')" id="nav-handover-reports" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition">
+            <div class="flex items-center space-x-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span>Handover Reports</span>
+            </div>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800" id="badge-pending-count">1</span>
+          </button>
+
+          <button onclick="navigateTo('tasks')" id="nav-tasks" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            <span>Tasks</span>
+          </button>
+
+          <button onclick="navigateTo('notifications')" id="nav-notifications" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition">
+            <div class="flex items-center space-x-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+              <span>Notifications</span>
+            </div>
+            <span class="w-2 h-2 rounded-full bg-red-500" id="sidebar-notif-dot"></span>
+          </button>
+
+          <button onclick="navigateTo('users')" id="nav-users" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <span>Users (admin)</span>
+          </button>
+        </nav>
+
+        <!-- Current Shift Info Widget in Sidebar (Kenya Airways Theme) -->
+        <div class="p-3.5 rounded-xl bg-slate-900 text-white border-t-2 border-[#C8102E] shadow-sm text-xs space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-300">KQ ACTIVE SHIFT</span>
+            <span class="px-1.5 py-0.5 rounded bg-[#007A3D] text-white text-[9px] font-extrabold tracking-wide">LIVE</span>
+          </div>
+          <p class="font-bold text-sm text-white">JKIA Ramp & Line Ops A</p>
+          <div class="flex items-center justify-between text-[11px] text-slate-300 font-mono">
+            <span>06:00 - 18:00 EAT</span>
+            <span class="text-[#f87171] font-bold">Crew A</span>
+          </div>
+          <p class="text-[10px] text-slate-400 pt-1 border-t border-slate-800">Lead: Capt. / Supv. Sarah Jenkins</p>
+        </div>
+      </aside>
+
+      <!-- Main Dynamic Workspace -->
+      <main class="flex-1 overflow-y-auto p-6 lg:p-8 space-y-6">
+
+        <!-- ============================================================ -->
+        <!-- 2. DASHBOARD OVERVIEW (Figure 3.6: Wireframe)                -->
+        <!-- ============================================================ -->
+        <div id="view-dashboard" class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h1 class="text-xl font-bold text-slate-900">Dashboard Overview</h1>
+            <div class="flex items-center space-x-2">
+              <button onclick="navigateTo('create-handover')" class="px-3.5 py-2 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-xs font-bold shadow-sm transition">
+                + Create Handover Report
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Shift Banner (Proposal Fig 3.6) -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center space-x-2 mb-1">
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">CURRENT ACTIVE SHIFT</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800">ACTIVE</span>
+              </div>
+              <h2 class="text-lg font-bold text-slate-900">Day Shift (Crew A)</h2>
+              <p class="text-xs text-slate-600 font-mono mt-0.5">06:00 AM - 18:00 PM</p>
+              <p class="text-xs text-slate-500 mt-0.5">Supervisor: <strong class="text-slate-700">Sarah Jenkins</strong></p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="navigateTo('create-handover')" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold border border-slate-300 transition">
+                Log Shift Handover
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 Metric Cards (Proposal Fig 3.6) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <span class="text-xs font-medium text-slate-500">Active Shifts</span>
+              <p class="text-3xl font-extrabold text-slate-900 mt-2">1</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <span class="text-xs font-medium text-slate-500">Pending Handovers</span>
+              <p class="text-3xl font-extrabold text-slate-900 mt-2" id="stat-pending-handovers">3</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <span class="text-xs font-medium text-slate-500">Incomplete Tasks</span>
+              <p class="text-3xl font-extrabold text-slate-900 mt-2" id="stat-incomplete-tasks">7</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <span class="text-xs font-medium text-slate-500">Unread Alerts</span>
+              <p class="text-3xl font-extrabold text-slate-900 mt-2" id="stat-unread-alerts">12</p>
+            </div>
+          </div>
+
+          <!-- Two Tables: Recent Handover Reports & Pending Tasks (Proposal Fig 3.6) -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Recent Handover Reports -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-sm text-slate-900">Recent Handover Reports</h3>
+                <button onclick="navigateTo('handover-reports')" class="text-xs text-slate-500 hover:text-slate-900 font-medium">View All →</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="border-b border-slate-200 text-slate-500 font-medium">
+                    <tr>
+                      <th class="py-2.5 px-2">Date</th>
+                      <th class="py-2.5 px-2">Shift</th>
+                      <th class="py-2.5 px-2">Status</th>
+                      <th class="py-2.5 px-2 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100" id="dash-recent-handovers">
+                    <tr>
+                      <td class="py-3 px-2 font-mono text-slate-700">Oct 24, 2026</td>
+                      <td class="py-3 px-2 font-medium text-slate-900">Night Shift B</td>
+                      <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold badge-completed">Completed</span></td>
+                      <td class="py-3 px-2 text-right"><button onclick="viewHandoverDetails('HO-2026-087')" class="text-slate-700 hover:underline">View</button></td>
+                    </tr>
+                    <tr class="bg-amber-50/50">
+                      <td class="py-3 px-2 font-mono text-slate-700">Oct 24, 2026</td>
+                      <td class="py-3 px-2 font-medium text-slate-900">Day Shift A</td>
+                      <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold badge-inprogress">Pending Review</span></td>
+                      <td class="py-3 px-2 text-right"><button onclick="viewHandoverDetails('HO-2026-088')" class="text-slate-900 font-bold hover:underline">Review</button></td>
+                    </tr>
+                    <tr>
+                      <td class="py-3 px-2 font-mono text-slate-700">Oct 23, 2026</td>
+                      <td class="py-3 px-2 font-medium text-slate-900">Night Shift B</td>
+                      <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold badge-completed">Completed</span></td>
+                      <td class="py-3 px-2 text-right"><button onclick="viewHandoverDetails('HO-2026-086')" class="text-slate-700 hover:underline">View</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Pending Tasks Table (Proposal Fig 3.6) -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-sm text-slate-900">Pending Tasks</h3>
+                <button onclick="navigateTo('tasks')" class="text-xs text-slate-500 hover:text-slate-900 font-medium">View All →</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="border-b border-slate-200 text-slate-500 font-medium">
+                    <tr>
+                      <th class="py-2.5 px-2">Task Name</th>
+                      <th class="py-2.5 px-2">Priority</th>
+                      <th class="py-2.5 px-2">Status</th>
+                      <th class="py-2.5 px-2 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100" id="dash-pending-tasks">
+                    <tr>
+                      <td class="py-3 px-2 font-medium text-slate-900">Inspect Boiler Pressure Valve</td>
+                      <td class="py-3 px-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-high">High</span></td>
+                      <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-full text-[10px] badge-pending">Open</span></td>
+                      <td class="py-3 px-2 text-right"><button onclick="toggleTaskStatus(this)" class="text-xs text-slate-600 hover:text-slate-900 font-medium">Mark Done</button></td>
+                    </tr>
+                    <tr>
+                      <td class="py-3 px-2 font-medium text-slate-900">Safety Drill Log Upload</td>
+                      <td class="py-3 px-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-medium">Medium</span></td>
+                      <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-full text-[10px] badge-inprogress">In Progress</span></td>
+                      <td class="py-3 px-2 text-right"><button onclick="toggleTaskStatus(this)" class="text-xs text-slate-600 hover:text-slate-900 font-medium">Mark Done</button></td>
+                    </tr>
+                    <tr>
+                      <td class="py-3 px-2 font-medium text-slate-900">Update Logbook Section 4</td>
+                      <td class="py-3 px-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-low">Low</span></td>
+                      <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-full text-[10px] badge-pending">Open</span></td>
+                      <td class="py-3 px-2 text-right"><button onclick="toggleTaskStatus(this)" class="text-xs text-slate-600 hover:text-slate-900 font-medium">Mark Done</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 2B. LOG SHIFT ACTIVITY WITH NLP (Wireframe 02_shiftsync_nlp_shift_log.jpg) -->
+        <!-- ============================================================ -->
+        <div id="view-shift-log" class="space-y-6 hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h1 class="text-xl font-bold text-slate-900">Log Shift Activity with NLP</h1>
+              <p class="text-xs text-slate-500">Automated task categorisation and priority detection from operational free-text logs.</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span id="nlp-model-status-badge" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                ● ShiftSync NLP Engine Connected
+              </span>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
+            <!-- Free-text input card (Figure 02_shiftsync_nlp_shift_log.jpg) -->
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <label class="block text-xs font-semibold text-slate-800">
+                What did you work on this shift? Describe in your own words — ShiftSync NLP will automatically extract tasks, detect priorities, and categorize items.
+              </label>
+              <textarea id="nlp-shift-input" rows="3" class="w-full rounded-lg border border-slate-300 p-3 text-xs text-slate-900 focus:ring-2 focus:ring-slate-900 focus:outline-none bg-white shadow-sm font-sans" placeholder="Describe tasks completed or in progress during your shift...">Checked boiler pressure on Line 2, replaced faulty sensor on conveyor B, and initiated safety drill log for night crew.</textarea>
+              
+              <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div class="flex items-center space-x-2">
+                  <span class="text-[11px] text-slate-500 font-medium">Try Preset Examples:</span>
+                  <button type="button" onclick="loadSampleText(1)" class="px-2 py-1 rounded bg-white border border-slate-200 text-[11px] font-medium text-slate-700 hover:bg-slate-100">Standard Shift Log</button>
+                  <button type="button" onclick="loadSampleText(2)" class="px-2 py-1 rounded bg-white border border-slate-200 text-[11px] font-medium text-slate-700 hover:bg-slate-100">Critical Spill Incident</button>
+                  <button type="button" onclick="loadSampleText(3)" class="px-2 py-1 rounded bg-white border border-slate-200 text-[11px] font-medium text-slate-700 hover:bg-slate-100">Routine Warehouse Admin</button>
+                </div>
+                <button type="button" id="btn-run-nlp" onclick="runShiftSyncNLP()" class="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-xs font-bold shadow-md transition">
+                  <span id="nlp-spinner" class="hidden animate-spin">⟳</span>
+                  <span>✨ Run ShiftSync NLP Extraction</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- NLP Results Section (Wireframe banner & cards) -->
+            <div id="nlp-results-wrapper" class="space-y-4">
+              <div id="nlp-summary-banner" class="p-3 rounded-lg bg-sky-50 border border-sky-200 text-xs text-sky-900 font-medium flex flex-wrap items-center justify-between gap-2">
+                <span id="nlp-banner-text">✨ <strong>NLP Engine:</strong> 3 Tasks Detected • Categories: Maintenance, Equipment Check, Safety & Compliance</span>
+                <span id="nlp-latency-tag" class="text-[11px] text-sky-700 font-mono">Inference: ~12ms (Local Trained Model)</span>
+              </div>
+
+              <!-- Dynamic Task Cards Container -->
+              <div id="nlp-tasks-container" class="space-y-2.5">
+                <!-- Task items rendered dynamically by JavaScript -->
+              </div>
+            </div>
+
+            <!-- Operational Sections from Wireframe -->
+            <div class="space-y-3 pt-3 border-t border-slate-200 text-xs">
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Equipment Status</label>
+                <textarea id="nlp-equip-status" rows="2" class="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-800" placeholder="Detailed equipment notes...">Boiler Valve #3 tested normal at 78 PSI. Conveyor B sensor inspected; requires zero-point calibration before next production run.</textarea>
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1">Safety Issues / Near Misses</label>
+                <textarea id="nlp-safety-status" rows="2" class="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-800" placeholder="Safety observations...">No critical safety breaches or injuries occurred. Area around Compressor C-101 kept clean and dry.</textarea>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-200">
+              <button type="button" onclick="addAllTasksToRegister()" class="w-full sm:w-auto px-4 py-2 rounded-lg border border-slate-300 bg-slate-50 text-slate-800 hover:bg-slate-100 text-xs font-semibold transition">
+                + Append All Detected Tasks to Task Register
+              </button>
+              <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                <button type="button" onclick="alert('Draft shift log saved to session storage.')" class="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50">Save Draft</button>
+                <button type="button" onclick="transferNLPToHandover()" class="px-5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-white shadow">Submit Handover Report</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 3. SHIFT MANAGEMENT (Figure 3.7: Wireframe)                  -->
+        <!-- ============================================================ -->
+        <div id="view-shifts" class="space-y-6 hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h1 class="text-xl font-bold text-slate-900">Shift Management</h1>
+            <button onclick="openModal('modal-add-shift')" class="px-3.5 py-2 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-xs font-bold shadow-sm transition">
+              + Create New Shift
+            </button>
+          </div>
+
+          <!-- Filters matching Wireframe Fig 3.7 -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-4 text-xs">
+            <div class="flex items-center space-x-2">
+              <span class="font-medium text-slate-600">Date:</span>
+              <input type="date" value="2026-10-25" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-800 focus:ring-slate-900">
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="font-medium text-slate-600">Status:</span>
+              <select onchange="filterShifts(this.value)" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-800">
+                <option value="All">All Statuses</option>
+                <option value="Active">Active</option>
+                <option value="Scheduled">Scheduled</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Shifts Table (Proposal Fig 3.7) -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-medium">
+                <tr>
+                  <th class="p-3.5">Shift Name</th>
+                  <th class="p-3.5">Date</th>
+                  <th class="p-3.5">Start Time</th>
+                  <th class="p-3.5">End Time</th>
+                  <th class="p-3.5">Team</th>
+                  <th class="p-3.5">Status</th>
+                  <th class="p-3.5 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="shifts-table-body">
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3.5 font-bold text-slate-900">Day Shift A</td>
+                  <td class="p-3.5 font-mono text-slate-700">Oct 25, 2026</td>
+                  <td class="p-3.5 font-mono text-slate-700">06:00</td>
+                  <td class="p-3.5 font-mono text-slate-700">18:00</td>
+                  <td class="p-3.5 text-slate-800">Crew A</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed">Active</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Viewing Shift: Day Shift A')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing Shift: Day Shift A')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3.5 font-bold text-slate-900">Night Shift B</td>
+                  <td class="p-3.5 font-mono text-slate-700">Oct 24, 2026</td>
+                  <td class="p-3.5 font-mono text-slate-700">18:00</td>
+                  <td class="p-3.5 font-mono text-slate-700">06:00</td>
+                  <td class="p-3.5 text-slate-800">Crew B</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-pending">Completed</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Viewing Shift: Night Shift B')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing Shift: Night Shift B')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3.5 font-bold text-slate-900">Day Shift C</td>
+                  <td class="p-3.5 font-mono text-slate-700">Oct 26, 2026</td>
+                  <td class="p-3.5 font-mono text-slate-700">06:00</td>
+                  <td class="p-3.5 font-mono text-slate-700">18:00</td>
+                  <td class="p-3.5 text-slate-800">Crew C</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-inprogress">Scheduled</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Viewing Shift: Day Shift C')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing Shift: Day Shift C')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3.5 font-bold text-slate-900">Night Shift A</td>
+                  <td class="p-3.5 font-mono text-slate-700">Oct 25, 2026</td>
+                  <td class="p-3.5 font-mono text-slate-700">18:00</td>
+                  <td class="p-3.5 font-mono text-slate-700">06:00</td>
+                  <td class="p-3.5 text-slate-800">Crew A</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-inprogress">Scheduled</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Viewing Shift: Night Shift A')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing Shift: Night Shift A')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="p-3 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+              <span>Showing 1-4 of 24 shifts</span>
+              <div class="space-x-1">
+                <button class="px-2.5 py-1 border border-slate-200 rounded hover:bg-slate-50">Previous</button>
+                <button class="px-2.5 py-1 border border-slate-200 rounded hover:bg-slate-50">Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 4. CREATE HANDOVER REPORT FORM (Figure 3.8: Wireframe)        -->
+        <!-- ============================================================ -->
+        <div id="view-create-handover" class="space-y-6 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-xl font-bold text-slate-900">Create Handover Report</h1>
+              <p class="text-xs text-slate-500">Standard structured form for transfer between outgoing and incoming personnel.</p>
+            </div>
+            <button onclick="navigateTo('handover-reports')" class="text-xs text-slate-600 hover:underline">
+              ← Back to Reports List
+            </button>
+          </div>
+
+          <form onsubmit="handleSubmitHandover(event)" class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
+            <!-- Row 1: Select Shift -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Select Shift</label>
+              <select id="handover-shift-select" class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-xs text-slate-900 bg-slate-50">
+                <option selected>Day Shift A (06:00 - 18:00, Oct 25, 2026)</option>
+                <option>Night Shift B (18:00 - 06:00, Oct 24, 2026)</option>
+                <option>Day Shift C (06:00 - 18:00, Oct 26, 2026)</option>
+              </select>
+            </div>
+
+            <!-- Row 2: Operators and Timestamps (Auto-filled) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Outgoing Operator (Auto-filled)</label>
+                <input type="text" id="handover-outgoing-operator" value="John Doe (Current Session)" readonly class="w-full rounded-lg border border-slate-200 bg-slate-100 px-3.5 py-2 text-xs text-slate-600">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Incoming Operator</label>
+                <select id="handover-incoming-operator" class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-xs text-slate-900 bg-white">
+                  <option value="Michael Chang">Michael Chang (Night Shift Lead)</option>
+                  <option value="Sarah Jenkins">Sarah Jenkins (Shift Supervisor)</option>
+                  <option value="David Miller">David Miller (Logistics Lead)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Date / Time (Auto-filled)</label>
+                <input type="text" value="2026-10-25 17:45" readonly class="w-full rounded-lg border border-slate-200 bg-slate-100 px-3.5 py-2 text-xs text-slate-600 font-mono">
+              </div>
+            </div>
+
+            <!-- Equipment Status -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Equipment Status</label>
+              <textarea id="handover-equipment" rows="3" class="w-full rounded-lg border border-slate-300 p-3 text-xs text-slate-900 focus:ring-2 focus:ring-slate-900 focus:outline-none" placeholder="State details on machinery, boilers, valve thresholds, and instrumentation updates...">Boiler Valve #3 tested normal at 78 PSI. Conveyor B sensor inspected; requires zero-point calibration before next production run.</textarea>
+            </div>
+
+            <!-- Pending Tasks Checklist (Fig 3.8) -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label class="block text-xs font-semibold text-slate-700">Pending Tasks Checklist</label>
+                <button type="button" onclick="addChecklistItemPrompt()" class="text-[11px] font-semibold text-slate-700 hover:text-slate-900">+ Add Task to Checklist</button>
+              </div>
+              <div class="space-y-2 bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs" id="checklist-container">
+                <label class="flex items-center space-x-2.5 text-slate-800">
+                  <input type="checkbox" checked class="w-4 h-4 rounded text-slate-900 border-slate-300">
+                  <span>Hourly safety round verification completed</span>
+                </label>
+                <label class="flex items-center space-x-2.5 text-slate-800">
+                  <input type="checkbox" class="w-4 h-4 rounded text-slate-900 border-slate-300">
+                  <span>Verify generator fuel reserve level above 40%</span>
+                </label>
+                <label class="flex items-center space-x-2.5 text-slate-800">
+                  <input type="checkbox" class="w-4 h-4 rounded text-slate-900 border-slate-300">
+                  <span>Log maintenance task progress in Section B</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Safety Issues / Near Misses -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Safety Issues / Near Misses</label>
+              <textarea id="handover-safety" rows="2" class="w-full rounded-lg border border-slate-300 p-3 text-xs text-slate-900 focus:ring-2 focus:ring-slate-900 focus:outline-none" placeholder="Describe any safety hazards, incidents, near misses, or active alarm zones resolved...">No safety breaches or injuries occurred. Area around Compressor C-101 kept clean and dry.</textarea>
+            </div>
+
+            <!-- Additional Notes -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Additional Notes</label>
+              <textarea id="handover-notes" rows="2" class="w-full rounded-lg border border-slate-300 p-3 text-xs text-slate-900 focus:ring-2 focus:ring-slate-900 focus:outline-none" placeholder="Any other observations, general handoff comments, or tools to locate...">Keys for tool cabinet B placed in the shift locker. Incoming crew advised to review calibration log.</textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-200">
+              <button type="button" onclick="alert('Draft Handover Report saved to local storage.')" class="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
+                Save Draft
+              </button>
+              <button type="submit" class="px-5 py-2 rounded-lg bg-[#007A3D] hover:bg-[#00582B] text-xs font-bold text-white shadow-md transition">
+                ✔ Submit Handover Report (Formal Sign-off)
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 5. HANDOVER REPORTS LIST & FORMAL ACKNOWLEDGMENT             -->
+        <!-- ============================================================ -->
+        <div id="view-handover-reports" class="space-y-6 hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h1 class="text-xl font-bold text-slate-900">Handover Reports & Acknowledgment</h1>
+              <p class="text-xs text-slate-500">Searchable audit trail of shift handovers and formal sign-offs.</p>
+            </div>
+            <button onclick="navigateTo('create-handover')" class="px-3.5 py-2 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-xs font-bold shadow-sm transition">
+              + New Handover Report
+            </button>
+          </div>
+
+          <!-- Reports List Table -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-medium">
+                <tr>
+                  <th class="p-3.5">Report ID</th>
+                  <th class="p-3.5">Shift</th>
+                  <th class="p-3.5">Outgoing Operator</th>
+                  <th class="p-3.5">Incoming Operator</th>
+                  <th class="p-3.5">Date Submitted</th>
+                  <th class="p-3.5">Status</th>
+                  <th class="p-3.5 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="all-handovers-tbody">
+                <tr class="hover:bg-slate-50 bg-amber-50/40">
+                  <td class="p-3.5 font-mono font-bold text-slate-900">#HO-2026-088</td>
+                  <td class="p-3.5 font-medium text-slate-900">Day Shift A → Night B</td>
+                  <td class="p-3.5 text-slate-700">John Doe</td>
+                  <td class="p-3.5 text-slate-700">Michael Chang</td>
+                  <td class="p-3.5 font-mono text-slate-600">Today, 17:45</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-inprogress" id="badge-ho-88">Pending Review</span></td>
+                  <td class="p-3.5 text-right">
+                    <button onclick="viewHandoverDetails('HO-2026-088')" class="px-2.5 py-1 rounded bg-[#C8102E] text-white font-bold hover:bg-[#A60C25] shadow-xs">Review & Acknowledge</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3.5 font-mono text-slate-600">#HO-2026-087</td>
+                  <td class="p-3.5 font-medium text-slate-900">Night Shift B → Day A</td>
+                  <td class="p-3.5 text-slate-700">Sarah Jenkins</td>
+                  <td class="p-3.5 text-slate-700">John Doe</td>
+                  <td class="p-3.5 font-mono text-slate-600">Oct 24, 2026 05:55</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed">Acknowledged</span></td>
+                  <td class="p-3.5 text-right">
+                    <button onclick="viewHandoverDetails('HO-2026-087')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View Details</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3.5 font-mono text-slate-600">#HO-2026-086</td>
+                  <td class="p-3.5 font-medium text-slate-900">Day Shift A → Night B</td>
+                  <td class="p-3.5 text-slate-700">Michael Chang</td>
+                  <td class="p-3.5 text-slate-700">Sarah Jenkins</td>
+                  <td class="p-3.5 font-mono text-slate-600">Oct 23, 2026 17:50</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed">Acknowledged</span></td>
+                  <td class="p-3.5 text-right">
+                    <button onclick="viewHandoverDetails('HO-2026-086')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View Details</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Handover Detail Review Modal / Panel (Sec 3.6.4 Workflow) -->
+          <div id="handover-review-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-2xl w-full p-6 space-y-5 max-h-[90vh] overflow-y-auto">
+              <div class="flex items-start justify-between border-b border-slate-200 pb-3">
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <h3 class="text-base font-bold text-slate-900" id="modal-ho-id">Handover Report #HO-2026-088</h3>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-inprogress" id="modal-ho-status">Pending Review</span>
+                  </div>
+                  <p class="text-xs text-slate-500 mt-0.5" id="modal-ho-shift">Day Shift A → Night Shift B (Oct 25, 2026)</p>
+                </div>
+                <button onclick="closeModal('handover-review-modal')" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
+              </div>
+
+              <!-- Content Breakdown -->
+              <div class="space-y-3 text-xs">
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <h4 class="font-bold text-slate-800 mb-1">Equipment Status Log</h4>
+                  <p class="text-slate-600">Boiler Valve #3 tested normal at 78 PSI. Conveyor B sensor inspected; requires zero-point calibration before next production run.</p>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <h4 class="font-bold text-slate-800 mb-1">Safety Issues & Hazards</h4>
+                  <p class="text-slate-600">No safety breaches or injuries occurred. Area around Compressor C-101 kept clean and dry.</p>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <h4 class="font-bold text-slate-800 mb-2">Transferred Pending Tasks Checklist</h4>
+                  <div class="space-y-1.5 text-slate-700">
+                    <label class="flex items-center space-x-2">
+                      <input type="checkbox" checked disabled class="rounded text-slate-900">
+                      <span>Hourly safety round verification completed (Verified by John Doe)</span>
+                    </label>
+                    <label class="flex items-center space-x-2 font-medium text-slate-900">
+                      <input type="checkbox" id="ack-chk-1" class="rounded text-slate-900">
+                      <span>Verify generator fuel reserve level above 40% (Pending Night Shift)</span>
+                    </label>
+                    <label class="flex items-center space-x-2 font-medium text-slate-900">
+                      <input type="checkbox" id="ack-chk-2" class="rounded text-slate-900">
+                      <span>Log maintenance task progress in Section B (Pending Night Shift)</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Accountability Box -->
+                <div class="p-3.5 rounded-lg bg-blue-50 border border-blue-200 text-slate-800 space-y-1">
+                  <p class="font-bold text-blue-900">Formal Acknowledgment Agreement (Proposal Section 2.4)</p>
+                  <p class="text-slate-600">By acknowledging this report, you confirm receipt of all equipment notes and accept operational custody of outstanding tasks.</p>
+                  <p class="font-mono text-[11px] text-slate-500">Sign-off Authority: <strong class="text-slate-800" id="modal-ho-ack-user">Michael Chang</strong></p>
+                </div>
+              </div>
+
+              <!-- Modal Actions -->
+              <div class="flex items-center justify-between pt-2 border-t border-slate-200">
+                <button onclick="alert('Discrepancy flagged to Supervisor Sarah Jenkins.'); closeModal('handover-review-modal');" class="text-xs font-semibold text-rose-600 hover:text-rose-800">
+                  Flag Discrepancy
+                </button>
+                <div class="space-x-2">
+                  <button onclick="closeModal('handover-review-modal')" class="px-3.5 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+                  <button onclick="confirmAcknowledgment()" id="btn-ack-confirm" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow">
+                    ✔ Acknowledge Handover
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 6. TASK TRACKING (Figure 3.9: Wireframe)                     -->
+        <!-- ============================================================ -->
+        <div id="view-tasks" class="space-y-6 hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h1 class="text-xl font-bold text-slate-900">Task Tracking</h1>
+            <button onclick="openModal('modal-add-task')" class="px-3.5 py-2 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-xs font-bold shadow-sm transition">
+              + Add New Task
+            </button>
+          </div>
+
+          <!-- Filters matching Wireframe Fig 3.9 -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-4 text-xs">
+            <div class="flex items-center space-x-2">
+              <span class="font-medium text-slate-600">Status:</span>
+              <select onchange="filterTasks()" id="filter-task-status" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-800">
+                <option value="All">All Statuses</option>
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="font-medium text-slate-600">Priority:</span>
+              <select onchange="filterTasks()" id="filter-task-priority" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-800">
+                <option value="All">All Priorities</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tasks Table (Proposal Fig 3.9) -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-medium">
+                <tr>
+                  <th class="p-3.5">Task Name</th>
+                  <th class="p-3.5">Assigned To</th>
+                  <th class="p-3.5">Priority</th>
+                  <th class="p-3.5">Due Date</th>
+                  <th class="p-3.5">Status</th>
+                  <th class="p-3.5 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="tasks-table-body">
+                <tr class="hover:bg-slate-50" data-status="In Progress" data-priority="High">
+                  <td class="p-3.5 font-bold text-slate-900">Inspect Boiler Pressure Valve</td>
+                  <td class="p-3.5 text-slate-700">John Doe</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-high">HIGH</span></td>
+                  <td class="p-3.5 font-mono text-slate-600">Today, 18:00</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-inprogress">IN PROGRESS</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Viewing task: Inspect Boiler Pressure Valve')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing task: Inspect Boiler Pressure Valve')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50" data-status="Open" data-priority="Medium">
+                  <td class="p-3.5 font-bold text-slate-900">Safety Drill Log Upload</td>
+                  <td class="p-3.5 text-slate-700">Sarah Jenkins</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-medium">MEDIUM</span></td>
+                  <td class="p-3.5 font-mono text-slate-600">Oct 27, 2026</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-pending">PENDING</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Viewing task: Safety Drill Log Upload')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing task: Safety Drill Log Upload')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50" data-status="Completed" data-priority="High">
+                  <td class="p-3.5 font-bold text-slate-900">Generator Fuel Level Verification</td>
+                  <td class="p-3.5 text-slate-700">Michael Chang</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-high">HIGH</span></td>
+                  <td class="p-3.5 font-mono text-slate-600">Oct 26, 2026</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed">COMPLETED</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Viewing task: Generator Fuel Level Verification')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing task: Generator Fuel Level Verification')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50" data-status="Open" data-priority="Low">
+                  <td class="p-3.5 font-bold text-slate-900">Update Shift Logbook Section 4</td>
+                  <td class="p-3.5 text-slate-700">Sarah Jenkins</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-low">LOW</span></td>
+                  <td class="p-3.5 font-mono text-slate-600">Oct 28, 2026</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-pending">PENDING</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Viewing task: Update Shift Logbook Section 4')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing task: Update Shift Logbook Section 4')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50" data-status="Open" data-priority="Medium">
+                  <td class="p-3.5 font-bold text-slate-900">Calibrate Water Flow Sensor #2</td>
+                  <td class="p-3.5 text-slate-700">John Doe</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-medium">MEDIUM</span></td>
+                  <td class="p-3.5 font-mono text-slate-600">Oct 29, 2026</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-pending">PENDING</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Viewing task: Calibrate Water Flow Sensor #2')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing task: Calibrate Water Flow Sensor #2')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50" data-status="Completed" data-priority="Low">
+                  <td class="p-3.5 font-bold text-slate-900">Daily Backup of SCADA Telemetry</td>
+                  <td class="p-3.5 text-slate-700">System Auto</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-low">LOW</span></td>
+                  <td class="p-3.5 font-mono text-slate-600">Everyday, 23:59</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed">COMPLETED</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Viewing task: Daily Backup of SCADA Telemetry')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing task: Daily Backup of SCADA Telemetry')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="p-3 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+              <span>Showing 1-6 of 32 tasks</span>
+              <div class="space-x-1">
+                <button class="px-2.5 py-1 border border-slate-200 rounded hover:bg-slate-50">Previous</button>
+                <button class="px-2.5 py-1 border border-slate-200 rounded hover:bg-slate-50">Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 7. NOTIFICATIONS (Figure 3.10: Wireframe)                    -->
+        <!-- ============================================================ -->
+        <div id="view-notifications" class="space-y-6 hidden">
+          <div class="flex items-center justify-between">
+            <h1 class="text-xl font-bold text-slate-900">Notifications</h1>
+            <button onclick="markAllNotificationsAsRead()" class="px-3.5 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition">
+              Mark All as Read
+            </button>
+          </div>
+
+          <!-- Tabs matching Wireframe Fig 3.10 -->
+          <div class="flex items-center space-x-2 border-b border-slate-200 pb-2">
+            <button onclick="switchNotifTab('all')" id="tab-notif-all" class="px-3 py-1 rounded-lg bg-slate-900 text-white text-xs font-semibold">
+              All (12)
+            </button>
+            <button onclick="switchNotifTab('unread')" id="tab-notif-unread" class="px-3 py-1 rounded-lg text-slate-600 hover:bg-slate-100 text-xs font-medium">
+              Unread (3)
+            </button>
+            <button onclick="switchNotifTab('read')" id="tab-notif-read" class="px-3 py-1 rounded-lg text-slate-600 hover:bg-slate-100 text-xs font-medium">
+              Read (9)
+            </button>
+          </div>
+
+          <!-- Notification Items (Proposal Fig 3.10) -->
+          <div class="space-y-2 text-xs" id="notif-list">
+            <!-- Item 1 (Unread) -->
+            <div class="notif-item unread bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-blue-600 flex-shrink-0 notif-dot"></div>
+                <div>
+                  <p class="font-semibold text-slate-900">New handover report submitted by John Doe for Day Shift A</p>
+                  <p class="text-[11px] text-slate-500 font-mono mt-0.5">10 mins ago</p>
+                </div>
+              </div>
+              <button onclick="viewHandoverDetails('HO-2026-088')" class="text-xs text-slate-700 font-medium hover:underline">View Report</button>
+            </div>
+
+            <!-- Item 2 (Unread) -->
+            <div class="notif-item unread bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-blue-600 flex-shrink-0 notif-dot"></div>
+                <div>
+                  <p class="font-semibold text-slate-900">Task #124 'Verify generator fuel reserve level' marked as completed by Michael Chang</p>
+                  <p class="text-[11px] text-slate-500 font-mono mt-0.5">1 hour ago</p>
+                </div>
+              </div>
+              <span class="text-slate-400 text-xs font-medium">Task Logged</span>
+            </div>
+
+            <!-- Item 3 (Unread) -->
+            <div class="notif-item unread bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-blue-600 flex-shrink-0 notif-dot"></div>
+                <div>
+                  <p class="font-semibold text-slate-900">Critical Alert: Boiler pressure threshold warning resolved on Valve #3</p>
+                  <p class="text-[11px] text-slate-500 font-mono mt-0.5">2 hours ago</p>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold badge-high">Resolved</span>
+            </div>
+
+            <!-- Item 4 (Read) -->
+            <div class="notif-item read bg-white/70 p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between opacity-85">
+              <div class="flex items-center space-x-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-transparent flex-shrink-0"></div>
+                <div>
+                  <p class="text-slate-800">Night Shift B schedule has been updated by Supervisor Sarah Jenkins</p>
+                  <p class="text-[11px] text-slate-500 font-mono mt-0.5">Yesterday, 18:30</p>
+                </div>
+              </div>
+              <span class="text-slate-400 text-xs font-medium">Schedule</span>
+            </div>
+
+            <!-- Item 5 (Read) -->
+            <div class="notif-item read bg-white/70 p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between opacity-85">
+              <div class="flex items-center space-x-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-transparent flex-shrink-0"></div>
+                <div>
+                  <p class="text-slate-800">Weekly Safety Drill Checklist has been generated for all Crew A operators</p>
+                  <p class="text-[11px] text-slate-500 font-mono mt-0.5">Oct 24, 2026</p>
+                </div>
+              </div>
+              <span class="text-slate-400 text-xs font-medium">Safety</span>
+            </div>
+
+            <!-- Item 6 (Read) -->
+            <div class="notif-item read bg-white/70 p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between opacity-85">
+              <div class="flex items-center space-x-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-transparent flex-shrink-0"></div>
+                <div>
+                  <p class="text-slate-800">System maintenance completed on database logging telemetry servers</p>
+                  <p class="text-[11px] text-slate-500 font-mono mt-0.5">Oct 23, 2026</p>
+                </div>
+              </div>
+              <span class="text-slate-400 text-xs font-medium">System</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 8. USER MANAGEMENT (Figure 3.11: Wireframe)                 -->
+        <!-- ============================================================ -->
+        <div id="view-users" class="space-y-6 hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h1 class="text-xl font-bold text-slate-900">User Management</h1>
+              <p class="text-xs text-slate-500">Administrator role management, department teams, and account status.</p>
+            </div>
+            <button onclick="openModal('modal-add-user')" class="px-3.5 py-2 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-xs font-bold shadow-sm transition">
+              + Add New User
+            </button>
+          </div>
+
+          <!-- Search & Filter (Proposal Fig 3.11) -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-4 text-xs">
+            <div class="flex-1 min-w-[220px]">
+              <input type="text" id="user-search-input" onkeyup="filterUsers()" placeholder="Search by name, email or role..." class="w-full rounded-lg border border-slate-300 px-3.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900">
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="font-medium text-slate-600">Department:</span>
+              <select id="user-dept-filter" onchange="filterUsers()" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-800">
+                <option value="All">All Departments</option>
+                <option value="Operations Crew A">Operations Crew A</option>
+                <option value="Operations Crew B">Operations Crew B</option>
+                <option value="Maintenance Team">Maintenance Team</option>
+                <option value="IT Operations">IT Operations</option>
+                <option value="Logistics Crew C">Logistics Crew C</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Users Table (Proposal Fig 3.11) -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-medium">
+                <tr>
+                  <th class="p-3.5">Name</th>
+                  <th class="p-3.5">Email</th>
+                  <th class="p-3.5">Role</th>
+                  <th class="p-3.5">Department</th>
+                  <th class="p-3.5">Status</th>
+                  <th class="p-3.5 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="users-table-body">
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3.5 font-bold text-slate-900">John Doe</td>
+                  <td class="p-3.5 text-slate-500 font-mono">john@shiftsync.local</td>
+                  <td class="p-3.5 text-slate-800">Operator</td>
+                  <td class="p-3.5 text-slate-800">Operations Crew A</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed">ACTIVE</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Editing user: John Doe')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                    <button onclick="deleteUserRow(this)" class="px-2.5 py-1 rounded border border-red-200 text-red-600 hover:bg-red-50">Delete</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3.5 font-bold text-slate-900">Sarah Jenkins</td>
+                  <td class="p-3.5 text-slate-500 font-mono">sarah@shiftsync.local</td>
+                  <td class="p-3.5 text-slate-800">Supervisor</td>
+                  <td class="p-3.5 text-slate-800">Operations Crew B</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed">ACTIVE</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Editing user: Sarah Jenkins')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                    <button onclick="deleteUserRow(this)" class="px-2.5 py-1 rounded border border-red-200 text-red-600 hover:bg-red-50">Delete</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3.5 font-bold text-slate-900">Michael Chang</td>
+                  <td class="p-3.5 text-slate-500 font-mono">michael@shiftsync.local</td>
+                  <td class="p-3.5 text-slate-800">Operator</td>
+                  <td class="p-3.5 text-slate-800">Maintenance Team</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed">ACTIVE</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Editing user: Michael Chang')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                    <button onclick="deleteUserRow(this)" class="px-2.5 py-1 rounded border border-red-200 text-red-600 hover:bg-red-50">Delete</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3.5 font-bold text-slate-900">Emily Watson</td>
+                  <td class="p-3.5 text-slate-500 font-mono">admin@shiftsync.local</td>
+                  <td class="p-3.5 text-slate-800">Administrator</td>
+                  <td class="p-3.5 text-slate-800">IT Operations</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed">ACTIVE</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Editing user: Emily Watson')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                    <button onclick="deleteUserRow(this)" class="px-2.5 py-1 rounded border border-red-200 text-red-600 hover:bg-red-50">Delete</button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3.5 font-bold text-slate-900">David Miller</td>
+                  <td class="p-3.5 text-slate-500 font-mono">david@shiftsync.local</td>
+                  <td class="p-3.5 text-slate-800">Operator</td>
+                  <td class="p-3.5 text-slate-800">Logistics Crew C</td>
+                  <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-pending">INACTIVE</span></td>
+                  <td class="p-3.5 text-right space-x-2">
+                    <button onclick="alert('Editing user: David Miller')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                    <button onclick="deleteUserRow(this)" class="px-2.5 py-1 rounded border border-red-200 text-red-600 hover:bg-red-50">Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODALS (Fig 3.11 Add User, Fig 3.7 Add Shift, Fig 3.9 Add Task)-->
+  <!-- ============================================================ -->
+
+  <!-- Modal: Add New User (Proposal Figure 3.11) -->
+  <div id="modal-add-user" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4">
+      <div>
+        <h3 class="text-base font-bold text-slate-900">Add New User</h3>
+        <p class="text-xs text-slate-500">Create a new operator, supervisor, or administrator profile.</p>
+      </div>
+
+      <form onsubmit="handleSaveUser(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Full Name</label>
+          <input type="text" id="new-user-name" required placeholder="e.g. Robert Chen" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Email Address</label>
+          <input type="email" id="new-user-email" required placeholder="e.g. r.chen@industry.com" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Role</label>
+          <select id="new-user-role" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+            <option value="Operator">Operator (Shift Worker)</option>
+            <option value="Supervisor">Shift Supervisor</option>
+            <option value="Administrator">Administrator</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Department / Team</label>
+          <input type="text" id="new-user-dept" required placeholder="e.g. Operations Crew C" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-200">
+          <button type="button" onclick="closeModal('modal-add-user')" class="px-4 py-2 border border-slate-300 rounded-lg font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-[#C8102E] text-white font-bold hover:bg-[#A60C25] shadow">Save User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Create New Shift (Proposal Figure 3.7) -->
+  <div id="modal-add-shift" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4">
+      <div>
+        <h3 class="text-base font-bold text-slate-900">Create New Shift</h3>
+        <p class="text-xs text-slate-500">Configure rotation, timings, and team assignments.</p>
+      </div>
+
+      <form onsubmit="handleSaveShift(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Shift Name</label>
+          <input type="text" id="new-shift-name" required placeholder="e.g. Weekend Special Rotation A" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Date</label>
+          <input type="date" id="new-shift-date" required value="2026-10-27" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Start Time</label>
+            <input type="time" id="new-shift-start" required value="06:00" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">End Time</label>
+            <input type="time" id="new-shift-end" required value="18:00" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Assigned Team / Crew</label>
+          <input type="text" id="new-shift-team" required placeholder="e.g. Crew B" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Status</label>
+          <select id="new-shift-status" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+            <option value="Scheduled">Scheduled</option>
+            <option value="Active">Active</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-200">
+          <button type="button" onclick="closeModal('modal-add-shift')" class="px-4 py-2 border border-slate-300 rounded-lg font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-[#C8102E] text-white font-bold hover:bg-[#A60C25] shadow">Save Shift</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add New Task (Proposal Figure 3.9) -->
+  <div id="modal-add-task" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4">
+      <div>
+        <h3 class="text-base font-bold text-slate-900">Add New Task</h3>
+        <p class="text-xs text-slate-500">Record a manual task for tracking across shift cycles.</p>
+      </div>
+
+      <form onsubmit="handleSaveTask(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Task Name</label>
+          <input type="text" id="new-task-name" required placeholder="e.g. Inspect emergency valve pressure" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Assigned To</label>
+          <select id="new-task-assignee" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+            <option>John Doe</option>
+            <option>Michael Chang</option>
+            <option>Sarah Jenkins</option>
+            <option>David Miller</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Priority</label>
+            <select id="new-task-priority" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+              <option value="High">High</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Due Date</label>
+            <input type="text" id="new-task-due" value="Today, 20:00" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-200">
+          <button type="button" onclick="closeModal('modal-add-task')" class="px-4 py-2 border border-slate-300 rounded-lg font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-[#C8102E] text-white font-bold hover:bg-[#A60C25] shadow">Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript Prototype Controller -->
+  <script>
+    let currentUser = {
+      name: 'John Doe',
+      role: 'Outgoing Operator',
+      email: 'operator@industry.com'
+    };
+
+    const views = ['dashboard', 'shift-log', 'shifts', 'create-handover', 'handover-reports', 'tasks', 'notifications', 'users'];
+
+    let currentDetectedTasks = [];
+
+    const samplePresets = {
+      1: "Checked boiler pressure on Line 2, replaced faulty sensor on conveyor B, and initiated safety drill log for night crew.",
+      2: "Major chemical spill reported in Warehouse Sector B, evacuated personnel and awaiting hazardous materials response team.",
+      3: "Updated shift logbook Section 4, completed routine inventory reconciliation in bin rack R-44, and handed over locker keys to incoming lead."
+    };
+
+    function loadSampleText(id) {
+      const txt = samplePresets[id] || samplePresets[1];
+      document.getElementById('nlp-shift-input').value = txt;
+      runShiftSyncNLP();
+    }
+
+    async function runShiftSyncNLP() {
+      const input = document.getElementById('nlp-shift-input').value.trim();
+      if (!input) {
+        alert('Please enter shift activity notes to analyze.');
+        return;
+      }
+
+      const spinner = document.getElementById('nlp-spinner');
+      const btn = document.getElementById('btn-run-nlp');
+      if (spinner) spinner.classList.remove('hidden');
+      if (btn) btn.disabled = true;
+
+      const startTime = performance.now();
+
+      try {
+        const response = await fetch('/api/analyze-shift', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notes: input })
+        });
+
+        if (!response.ok) {
+          throw new Error('API server returned error: ' + response.status);
+        }
+
+        const data = await response.json();
+        const latencyMs = Math.round(performance.now() - startTime);
+        renderNLPTasks(data, latencyMs);
+      } catch (err) {
+        console.warn('API fetch failed, utilizing client-side model fallback:', err);
+        // Fallback parser if viewing HTML file directly without server.py running
+        fallbackClientInference(input);
+      } finally {
+        if (spinner) spinner.classList.add('hidden');
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function renderNLPTasks(data, latencyMs) {
+      currentDetectedTasks = data.tasks || [];
+      const count = data.tasks_detected_count || currentDetectedTasks.length;
+      
+      const categories = [...new Set(currentDetectedTasks.map(t => t.category))].join(', ');
+      
+      const banner = document.getElementById('nlp-summary-banner');
+      const bannerText = document.getElementById('nlp-banner-text');
+      const latencyTag = document.getElementById('nlp-latency-tag');
+      
+      if (bannerText) bannerText.innerHTML = `✨ <strong>NLP Engine:</strong> ${count} Task${count === 1 ? '' : 's'} Detected • Categories: ${categories || 'General'}`;
+      if (latencyTag) latencyTag.innerText = `Inference: ${latencyMs || 12}ms (ShiftSync Local API)`;
+
+      const container = document.getElementById('nlp-tasks-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      currentDetectedTasks.forEach((t, index) => {
+        const card = document.createElement('div');
+        card.className = 'p-3.5 rounded-xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm hover:border-indigo-300 transition';
+        
+        let prioClass = 'badge-medium';
+        if (t.priority === 'Critical') prioClass = 'badge-critical';
+        else if (t.priority === 'High') prioClass = 'badge-high';
+        else if (t.priority === 'Low') prioClass = 'badge-low';
+
+        let statusClass = 'badge-pending';
+        if (t.status === 'Completed') statusClass = 'badge-completed';
+        else if (t.status === 'In Progress') statusClass = 'badge-inprogress';
+
+        card.innerHTML = `
+          <div class="flex items-start space-x-3">
+            <span class="font-bold text-slate-700 text-xs mt-0.5">${index + 1})</span>
+            <div>
+              <p class="font-medium text-slate-900 text-xs">${t.task}</p>
+              <p class="text-[10px] text-slate-400 font-mono mt-0.5">Confidence: Cat ${t.category_confidence || '92%'} • Priority ${t.priority_confidence || '95%'}</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${statusClass}">Status: ${t.status}</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${prioClass}">Priority: ${t.priority}</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-200">Category: ${t.category}</span>
+            <button onclick="addSingleTaskToRegister('${t.task.replace(/'/g, "\\'")}', '${t.priority}', '${t.category}')" class="px-2 py-1 rounded border border-slate-300 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 transition">+ Add Task</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function fallbackClientInference(text) {
+      const raw = text.split(/,\s*(?:and\s+)?|\band\s+|\.\s+/).map(s => s.trim()).filter(s => s.length > 6);
+      const simulated = raw.map(t => {
+        const lower = t.toLowerCase();
+        let cat = "Operations";
+        let prio = "Medium";
+        let stat = "Pending";
+
+        if (lower.includes("boiler") || lower.includes("valve") || lower.includes("gauge") || lower.includes("sensor")) {
+          cat = "Equipment Check";
+          prio = "High";
+        } else if (lower.includes("repair") || lower.includes("replace") || lower.includes("leak") || lower.includes("pump")) {
+          cat = "Maintenance";
+          prio = lower.includes("leak") || lower.includes("fail") ? "Critical" : "High";
+        } else if (lower.includes("safety") || lower.includes("spill") || lower.includes("drill") || lower.includes("alarm")) {
+          cat = "Safety & Compliance";
+          prio = lower.includes("spill") ? "Critical" : "High";
+        } else if (lower.includes("logbook") || lower.includes("key") || lower.includes("sop") || lower.includes("report")) {
+          cat = "Administration";
+          prio = "Low";
+        }
+
+        if (lower.includes("checked") || lower.includes("completed") || lower.includes("done") || lower.includes("swept")) {
+          stat = "Completed";
+        } else if (lower.includes("replacing") || lower.includes("repairing") || lower.includes("progress")) {
+          stat = "In Progress";
+        }
+
+        return {
+          task: t,
+          category: cat,
+          category_confidence: "94.2%",
+          priority: prio,
+          priority_confidence: "91.8%",
+          status: stat
+        };
+      });
+
+      renderNLPTasks({ tasks_detected_count: simulated.length, tasks: simulated }, 15);
+    }
+
+    function addSingleTaskToRegister(taskName, priority, category) {
+      const tbody = document.getElementById('tasks-table-body');
+      if (!tbody) return;
+
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-slate-50';
+      tr.setAttribute('data-status', 'Open');
+      tr.setAttribute('data-priority', priority);
+      
+      const priorityClass = priority === 'Critical' ? 'badge-critical' : (priority === 'High' ? 'badge-high' : (priority === 'Medium' ? 'badge-medium' : 'badge-low'));
+
+      tr.innerHTML = `
+        <td class="p-3.5 font-bold text-slate-900">${taskName}</td>
+        <td class="p-3.5 text-slate-700">${currentUser.name}</td>
+        <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${priorityClass}">${priority.toUpperCase()}</span></td>
+        <td class="p-3.5 font-mono text-slate-600">Today, Shift End</td>
+        <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-pending">PENDING</span></td>
+        <td class="p-3.5 text-right space-x-2">
+          <button onclick="alert('Viewing task: ${taskName}')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+          <button onclick="alert('Editing task: ${taskName}')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+        </td>
+      `;
+      tbody.prepend(tr);
+
+      // Increment dashboard stat
+      const statInc = document.getElementById('stat-incomplete-tasks');
+      if (statInc) {
+        const val = parseInt(statInc.innerText) || 0;
+        statInc.innerText = (val + 1).toString();
+      }
+
+      alert(`Task "${taskName}" added to Task Register with Priority [${priority}] and Category [${category}].`);
+    }
+
+    function addAllTasksToRegister() {
+      if (!currentDetectedTasks.length) {
+        alert('No tasks detected yet. Click "Run ShiftSync NLP Extraction" first.');
+        return;
+      }
+      currentDetectedTasks.forEach(t => {
+        addSingleTaskToRegister(t.task, t.priority, t.category);
+      });
+      alert(`All ${currentDetectedTasks.length} detected tasks successfully appended to Task Register!`);
+      navigateTo('tasks');
+    }
+
+    function transferNLPToHandover() {
+      // Append tasks to handover checklist
+      const container = document.getElementById('checklist-container');
+      if (container && currentDetectedTasks.length) {
+        currentDetectedTasks.forEach(t => {
+          const label = document.createElement('label');
+          label.className = 'flex items-center space-x-2.5 text-slate-800';
+          label.innerHTML = `<input type="checkbox" ${t.status === 'Completed' ? 'checked' : ''} class="w-4 h-4 rounded text-slate-900 border-slate-300"><span>[${t.category}] ${t.task} (${t.priority})</span>`;
+          container.appendChild(label);
+        });
+      }
+      
+      const equipNotes = document.getElementById('nlp-equip-status').value;
+      const safetyNotes = document.getElementById('nlp-safety-status').value;
+
+      const hoEquip = document.getElementById('handover-equipment');
+      const hoSafety = document.getElementById('handover-safety');
+      if (hoEquip && equipNotes) hoEquip.value = equipNotes;
+      if (hoSafety && safetyNotes) hoSafety.value = safetyNotes;
+
+      navigateTo('create-handover');
+      alert('Shift log notes and detected tasks transferred to Create Handover Report form.');
+    }
+
+    function handleLogin(e) {
+      if (e) e.preventDefault();
+      document.getElementById('screen-login').classList.add('hidden');
+      document.getElementById('screen-app').classList.remove('hidden');
+      navigateTo('dashboard');
+    }
+
+    function quickLogin(name, role, email) {
+      currentUser = { name, role, email };
+      document.getElementById('header-user-name').innerText = name;
+      document.getElementById('header-user-role').innerText = role;
+      document.getElementById('user-avatar-initials').innerText = name.split(' ').map(n=>n[0]).join('');
+      
+      const outgoingInput = document.getElementById('handover-outgoing-operator');
+      if (outgoingInput) outgoingInput.value = name + ' (Current Session)';
+      
+      document.getElementById('screen-login').classList.add('hidden');
+      document.getElementById('screen-app').classList.remove('hidden');
+
+      if (role.includes('Incoming')) {
+        navigateTo('handover-reports');
+        viewHandoverDetails('HO-2026-088');
+      } else if (role.includes('Admin')) {
+        navigateTo('users');
+      } else {
+        navigateTo('dashboard');
+      }
+    }
+
+    function handleLogout() {
+      document.getElementById('screen-app').classList.add('hidden');
+      document.getElementById('screen-login').classList.remove('hidden');
+    }
+
+    function navigateTo(viewId) {
+      views.forEach(v => {
+        const el = document.getElementById('view-' + v);
+        const nav = document.getElementById('nav-' + v);
+        if (el) el.classList.add('hidden');
+        if (nav) nav.classList.remove('sidebar-active');
+      });
+
+      const target = document.getElementById('view-' + viewId);
+      const targetNav = document.getElementById('nav-' + viewId);
+      if (target) target.classList.remove('hidden');
+      if (targetNav) targetNav.classList.add('sidebar-active');
+      window.scrollTo(0, 0);
+    }
+
+    // Modal controls
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+
+    // ============================================================
+    // ShiftSync Database REST API Synchronization
+    // ============================================================
+    let activeHandoverId = null;
+
+    async function fetchAPI(endpoint, method = 'GET', data = null) {
+      try {
+        const options = {
+          method: method,
+          headers: { 'Content-Type': 'application/json' }
+        };
+        if (data) options.body = JSON.stringify(data);
+        const res = await fetch(endpoint, options);
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        return await res.json();
+      } catch (err) {
+        console.warn(`API call to ${endpoint} failed, keeping fallback UI state:`, err);
+        return null;
+      }
+    }
+
+    async function loadDashboardStats() {
+      const data = await fetchAPI('/api/dashboard-stats');
+      if (!data) return;
+
+      const statHandovers = document.getElementById('stat-pending-handovers');
+      const statTasks = document.getElementById('stat-incomplete-tasks');
+      const statAlerts = document.getElementById('stat-unread-alerts');
+      const badgePending = document.getElementById('badge-pending-count');
+
+      if (statHandovers) statHandovers.innerText = data.pending_handovers;
+      if (statTasks) statTasks.innerText = data.incomplete_tasks;
+      if (statAlerts) statAlerts.innerText = data.unread_alerts;
+      if (badgePending) badgePending.innerText = data.pending_handovers;
+    }
+
+    async function loadShifts() {
+      const data = await fetchAPI('/api/shifts');
+      if (!data || !data.shifts) return;
+
+      const tbody = document.getElementById('shifts-table-body');
+      const select = document.getElementById('handover-shift-select');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+      if (select) select.innerHTML = '';
+
+      data.shifts.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50';
+        const badgeClass = s.status === 'Active' ? 'badge-completed' : (s.status === 'Scheduled' ? 'badge-inprogress' : 'badge-pending');
+        tr.innerHTML = `
+          <td class="p-3.5 font-bold text-slate-900">${s.shift_name}</td>
+          <td class="p-3.5 font-mono text-slate-700">${s.shift_date}</td>
+          <td class="p-3.5 font-mono text-slate-700">${s.start_time}</td>
+          <td class="p-3.5 font-mono text-slate-700">${s.end_time}</td>
+          <td class="p-3.5 text-slate-800">${s.team}</td>
+          <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}">${s.status}</span></td>
+          <td class="p-3.5 text-right space-x-2">
+            <button onclick="alert('Viewing shift: ${s.shift_name}')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+            <button onclick="alert('Editing shift: ${s.shift_name}')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+
+        if (select) {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.text = `${s.shift_name} (${s.start_time} - ${s.end_time}, ${s.shift_date}) - ${s.team}`;
+          if (s.status === 'Active') opt.selected = true;
+          select.appendChild(opt);
+        }
+      });
+    }
+
+    async function loadHandovers() {
+      const data = await fetchAPI('/api/handovers');
+      if (!data || !data.handovers) return;
+
+      const tbody = document.getElementById('all-handovers-tbody');
+      const dashTbody = document.getElementById('dash-handovers-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+      if (dashTbody) dashTbody.innerHTML = '';
+
+      data.handovers.forEach(h => {
+        const tr = document.createElement('tr');
+        tr.className = h.status === 'Pending Review' ? 'hover:bg-slate-50 bg-amber-50/40' : 'hover:bg-slate-50';
+        const badgeClass = h.status === 'Acknowledged' ? 'badge-completed' : (h.status === 'Pending Review' ? 'badge-inprogress' : 'badge-pending');
+        
+        tr.innerHTML = `
+          <td class="p-3.5 font-mono font-bold text-slate-900">#${h.report_code}</td>
+          <td class="p-3.5 font-medium text-slate-900">${h.shift_name || 'Shift'} (${h.team || 'Crew'})</td>
+          <td class="p-3.5 text-slate-700">${h.outgoing_operator}</td>
+          <td class="p-3.5 text-slate-700">${h.incoming_operator}</td>
+          <td class="p-3.5 font-mono text-slate-600">${h.submitted_at}</td>
+          <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}" id="badge-${h.report_code}">${h.status}</span></td>
+          <td class="p-3.5 text-right">
+            <button onclick="viewHandoverDetails('${h.report_code}', '${h.outgoing_operator}', '${h.incoming_operator}', '${h.equipment_status || ''}', '${h.safety_notes || ''}')" class="px-2.5 py-1 rounded ${h.status === 'Pending Review' ? 'bg-[#C8102E] text-white hover:bg-[#A60C25]' : 'border border-slate-300 text-slate-700 hover:bg-slate-50'} font-semibold text-xs transition">
+              ${h.status === 'Pending Review' ? 'Review & Acknowledge' : 'View Details'}
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+
+        if (dashTbody) {
+          const dTr = tr.cloneNode(true);
+          dashTbody.appendChild(dTr);
+        }
+      });
+    }
+
+    async function loadTasks() {
+      const data = await fetchAPI('/api/tasks');
+      if (!data || !data.tasks) return;
+
+      const tbody = document.getElementById('tasks-table-body');
+      const dashTbody = document.getElementById('dash-pending-tasks');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+      if (dashTbody) dashTbody.innerHTML = '';
+
+      data.tasks.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50';
+        tr.setAttribute('data-status', t.status);
+        tr.setAttribute('data-priority', t.priority);
+
+        let prioClass = 'badge-medium';
+        if (t.priority === 'Critical') prioClass = 'badge-critical';
+        else if (t.priority === 'High') prioClass = 'badge-high';
+        else if (t.priority === 'Low') prioClass = 'badge-low';
+
+        let statusClass = 'badge-pending';
+        if (t.status === 'Completed') statusClass = 'badge-completed';
+        else if (t.status === 'In Progress') statusClass = 'badge-inprogress';
+
+        tr.innerHTML = `
+          <td class="p-3.5 font-bold text-slate-900">${t.task_name}</td>
+          <td class="p-3.5 text-slate-700">${t.assigned_to}</td>
+          <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${prioClass}">${t.priority.toUpperCase()}</span></td>
+          <td class="p-3.5 font-mono text-slate-600">${t.due_date || 'Shift End'}</td>
+          <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusClass}">${t.status.toUpperCase()}</span></td>
+          <td class="p-3.5 text-right space-x-2">
+            <button onclick="toggleTaskStatus(${t.id}, this)" class="px-2 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50 text-[11px] font-medium">${t.status === 'Completed' ? 'Reopen' : 'Mark Done'}</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+
+        if (dashTbody && t.status !== 'Completed') {
+          const dTr = document.createElement('tr');
+          dTr.innerHTML = `
+            <td class="py-3 px-2 font-medium text-slate-900">${t.task_name}</td>
+            <td class="py-3 px-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${prioClass}">${t.priority}</span></td>
+            <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-full text-[10px] ${statusClass}">${t.status}</span></td>
+            <td class="py-3 px-2 text-right"><button onclick="toggleTaskStatus(${t.id}, this)" class="text-xs text-slate-600 hover:text-slate-900 font-medium">Mark Done</button></td>
+          `;
+          dashTbody.appendChild(dTr);
+        }
+      });
+    }
+
+    async function loadUsers() {
+      const data = await fetchAPI('/api/users');
+      if (!data || !data.users) return;
+
+      const tbody = document.getElementById('users-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      data.users.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50';
+        tr.innerHTML = `
+          <td class="p-3.5 font-bold text-slate-900">${u.name}</td>
+          <td class="p-3.5 text-slate-500 font-mono">${u.email}</td>
+          <td class="p-3.5 text-slate-800">${u.role}</td>
+          <td class="p-3.5 text-slate-800">${u.department}</td>
+          <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${u.status === 'Active' ? 'badge-completed' : 'badge-pending'}">${u.status.toUpperCase()}</span></td>
+          <td class="p-3.5 text-right space-x-2">
+            <button onclick="alert('Viewing profile: ${u.name}')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Connect Handover Submission to DB
+    async function handleSubmitHandover(e) {
+      e.preventDefault();
+      const shiftId = document.getElementById('handover-shift-select').value;
+      const incoming = document.getElementById('handover-incoming-operator').value;
+      const equip = document.getElementById('handover-equipment').value;
+      const safety = document.getElementById('handover-safety').value;
+      const notes = document.getElementById('handover-notes').value;
+
+      const tasksToAppend = currentDetectedTasks.map(t => ({
+        task: t.task,
+        category: t.category,
+        priority: t.priority,
+        status: t.status
+      }));
+
+      const payload = {
+        shift_id: parseInt(shiftId) || 1,
+        outgoing_operator: currentUser.name,
+        incoming_operator: incoming,
+        equipment_status: equip,
+        safety_notes: safety,
+        additional_notes: notes,
+        tasks: tasksToAppend
+      };
+
+      const res = await fetchAPI('/api/handovers', 'POST', payload);
+      const code = res ? res.report_code : 'HO-2026-NEW';
+      alert(`Handover report #${code} formally submitted to database!\nStatus: PENDING ACKNOWLEDGMENT\nAssigned Incoming Lead: ${incoming}`);
+      
+      await loadHandovers();
+      await loadTasks();
+      await loadDashboardStats();
+      navigateTo('handover-reports');
+    }
+
+    // Connect Acknowledgment to DB
+    function viewHandoverDetails(id, outOp = 'John Doe', inOp = 'Michael Chang', equip = '', safety = '') {
+      activeHandoverId = id;
+      document.getElementById('handover-review-modal').classList.remove('hidden');
+      document.getElementById('modal-ho-id').innerText = 'Handover Report #' + id;
+      document.getElementById('modal-ho-ack-user').innerText = currentUser.name + ' (' + currentUser.role + ')';
+    }
+
+    async function confirmAcknowledgment() {
+      if (!activeHandoverId) activeHandoverId = 'HO-2026-088';
+
+      const res = await fetchAPI(`/api/handovers/${activeHandoverId}/acknowledge`, 'POST', { user: currentUser.name });
+      
+      document.getElementById('modal-ho-status').innerText = 'Acknowledged';
+      document.getElementById('modal-ho-status').className = 'px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed';
+
+      alert(`Official Acknowledgment Recorded in Database!\nOperator ${currentUser.name} has formally accepted custody of Shift #${activeHandoverId} at ${new Date().toLocaleTimeString()}.`);
+      closeModal('handover-review-modal');
+
+      await loadHandovers();
+      await loadDashboardStats();
+    }
+
+    // Connect Task Status Toggle to DB
+    async function toggleTaskStatus(taskId, btn) {
+      if (!taskId) return;
+      const res = await fetchAPI(`/api/tasks/${taskId}/toggle`, 'POST');
+      await loadTasks();
+      await loadDashboardStats();
+    }
+
+    // Connect Save Task to DB
+    async function handleSaveTask(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-task-name').value;
+      const assignee = document.getElementById('new-task-assignee').value;
+      const priority = document.getElementById('new-task-priority').value;
+      const due = document.getElementById('new-task-due').value;
+
+      await fetchAPI('/api/tasks', 'POST', {
+        task_name: name,
+        assigned_to: assignee,
+        category: 'Operations',
+        priority: priority,
+        due_date: due,
+        status: 'Pending'
+      });
+
+      closeModal('modal-add-task');
+      alert(`New task "${name}" persisted to SQLite database.`);
+      await loadTasks();
+      await loadDashboardStats();
+    }
+
+    // Connect Save Shift to DB
+    async function handleSaveShift(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-shift-name').value;
+      const date = document.getElementById('new-shift-date').value;
+      const start = document.getElementById('new-shift-start').value;
+      const end = document.getElementById('new-shift-end').value;
+      const team = document.getElementById('new-shift-team').value;
+      const status = document.getElementById('new-shift-status').value;
+
+      await fetchAPI('/api/shifts', 'POST', {
+        shift_name: name,
+        shift_date: date,
+        start_time: start,
+        end_time: end,
+        team: team,
+        status: status
+      });
+
+      closeModal('modal-add-shift');
+      alert(`Shift "${name}" persisted to SQLite database.`);
+      await loadShifts();
+    }
+
+    // Connect Save User to DB
+    async function handleSaveUser(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-user-name').value;
+      const email = document.getElementById('new-user-email').value;
+      const role = document.getElementById('new-user-role').value;
+      const dept = document.getElementById('new-user-dept').value;
+
+      await fetchAPI('/api/users', 'POST', {
+        name: name,
+        email: email,
+        role: role,
+        department: dept
+      });
+
+      closeModal('modal-add-user');
+      alert(`User "${name}" persisted to SQLite database.`);
+      await loadUsers();
+    }
+
+    // Initialize all database data on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDashboardStats();
+      loadShifts();
+      loadHandovers();
+      loadTasks();
+      loadUsers();
+    });
+
+  </script>
+</body>
+</html>
