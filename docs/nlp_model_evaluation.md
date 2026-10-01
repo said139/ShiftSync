@@ -1,5 +1,5 @@
 # ShiftSync NLP Machine Learning Pipeline Evaluation Report
-**Evaluation Date**: 2026-09-29 17:21:09  
+**Evaluation Date**: 2026-10-01 10:23:09  
 **Architecture**: Scikit-Learn `Pipeline` (TF-IDF Vectorizer -> Balanced Multi-class Logistic Regression)  
 **Dataset Partitioning**: Stratified 80/20 Split on Deduplicated Ground Truth (513 samples, 0% Train-Test Contamination)  
 
@@ -38,10 +38,10 @@
 
 | Test Input | Predicted Category (Conf.) | Predicted Priority (Conf.) | Latency | Result |
 | :--- | :--- | :--- | :---: | :---: |
-| `Checked boiler pressure valve on Line 2,...` | **Equipment Check** (46.6%) | **High** (49.7%) | 5.67ms | **PASS** |
-| `Major chemical spill reported in Warehou...` | **Safety & Compliance** (67.1%) | **Critical** (61.2%) | 4.54ms | **PASS** |
-| `Replaced faulty sensor and worn conveyor...` | **Maintenance** (29.7%) | **High** (40.8%) | 4.78ms | **PASS** |
-| `Updated shift logbook Section 4 and file...` | **Administration** (87.1%) | **Low** (89.2%) | 6.18ms | **PASS** |
-| `Completed routine inventory reconciliati...` | **Operations** (61.0%) | **Medium** (63.8%) | 6.90ms | **PASS** |
+| `Checked boiler pressure valve on Line 2,...` | **Equipment Check** (46.6%) | **High** (49.7%) | 3.43ms | **PASS** |
+| `Major chemical spill reported in Warehou...` | **Safety & Compliance** (67.1%) | **Critical** (61.2%) | 2.61ms | **PASS** |
+| `Replaced faulty sensor and worn conveyor...` | **Maintenance** (29.7%) | **High** (40.8%) | 2.83ms | **PASS** |
+| `Updated shift logbook Section 4 and file...` | **Administration** (87.1%) | **Low** (89.2%) | 2.37ms | **PASS** |
+| `Completed routine inventory reconciliati...` | **Operations** (61.0%) | **Medium** (63.8%) | 2.18ms | **PASS** |
 
-* **Mean End-to-End Latency**: `5.61 ms` (Ultra-low latency suitable for real-time keystroke suggestions)
+* **Mean End-to-End Latency**: `2.68 ms` (Ultra-low latency suitable for real-time keystroke suggestions)

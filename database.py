@@ -11,6 +11,19 @@ def get_connection():
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
+def log_audit(user_name, user_role, action, details=""):
+    """Helper to record audit trail entries for Administrator monitoring."""
+    try:
+        conn = get_connection()
+        conn.execute(
+            "INSERT INTO audit_logs (user_name, user_role, action, details, created_at) VALUES (?, ?, ?, ?, ?)",
+            (user_name, user_role, action, details, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        )
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"Error logging audit event: {e}")
+
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
@@ -21,12 +34,43 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
-        role TEXT NOT NULL CHECK(role IN ('Outgoing Operator', 'Incoming Operator', 'Supervisor', 'Administrator', 'Operator')),
+        password TEXT DEFAULT 'password123',
+        role TEXT NOT NULL CHECK(role IN ('Outgoing Operator', 'Incoming Operator', 'Supervisor', 'Administrator', 'Operator', 'Worker')),
         department TEXT NOT NULL,
         status TEXT DEFAULT 'Active' CHECK(status IN ('Active', 'Inactive')),
+        current_shift TEXT DEFAULT 'Day Shift A',
+        last_active DATETIME DEFAULT CURRENT_TIMESTAMP,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
     """)
+
+    # Check if existing users table needs schema migration (to allow 'Worker' role and new columns)
+    cursor.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'")
+    row = cursor.fetchone()
+    if row and ("'Worker'" not in row[0] or "password" not in row[0]):
+        print("Migrating users table schema to support Worker role, passwords, and monitoring metadata...")
+        cursor.execute("""
+        CREATE TABLE users_migrated (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT DEFAULT 'password123',
+            role TEXT NOT NULL CHECK(role IN ('Outgoing Operator', 'Incoming Operator', 'Supervisor', 'Administrator', 'Operator', 'Worker')),
+            department TEXT NOT NULL,
+            status TEXT DEFAULT 'Active' CHECK(status IN ('Active', 'Inactive')),
+            current_shift TEXT DEFAULT 'Day Shift A',
+            last_active DATETIME DEFAULT CURRENT_TIMESTAMP,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+        cursor.execute("""
+        INSERT INTO users_migrated (id, name, email, password, role, department, status, created_at)
+        SELECT id, name, email, 'password123', role, department, status, created_at FROM users
+        """)
+        cursor.execute("DROP TABLE users")
+        cursor.execute("ALTER TABLE users_migrated RENAME TO users")
+        conn.commit()
+        print("Users table successfully migrated.")
 
     # 2. Shifts Table
     cursor.execute("""
@@ -89,6 +133,18 @@ def init_db():
     )
     """)
 
+    # 6. Audit & Worker Monitoring Activity Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS audit_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_name TEXT NOT NULL,
+        user_role TEXT NOT NULL,
+        action TEXT NOT NULL,
+        details TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
     conn.commit()
 
     # Seed Initial Data if empty
@@ -98,13 +154,13 @@ def init_db():
         
         # Seed Users
         users_seed = [
-            ("John Doe", "john@shiftsync.local", "Outgoing Operator", "JKIA Ramp Crew A"),
-            ("Michael Chang", "michael@shiftsync.local", "Incoming Operator", "Line Maintenance Crew B"),
-            ("Sarah Jenkins", "sarah@shiftsync.local", "Supervisor", "Ground Operations JKIA"),
-            ("Emily Watson", "admin@shiftsync.local", "Administrator", "KQ IT Systems"),
-            ("David Miller", "david@shiftsync.local", "Operator", "Logistics & Cargo")
+            ("John Doe", "john@shiftsync.local", "password123", "Worker", "JKIA Ramp Crew A"),
+            ("Michael Chang", "michael@shiftsync.local", "password123", "Worker", "Line Maintenance Crew B"),
+            ("Sarah Jenkins", "sarah@shiftsync.local", "password123", "Supervisor", "Ground Operations JKIA"),
+            ("Emily Watson", "admin@shiftsync.local", "password123", "Administrator", "KQ IT Systems"),
+            ("David Miller", "david@shiftsync.local", "password123", "Worker", "Logistics & Cargo")
         ]
-        cursor.executemany("INSERT INTO users (name, email, role, department) VALUES (?, ?, ?, ?)", users_seed)
+        cursor.executemany("INSERT INTO users (name, email, password, role, department) VALUES (?, ?, ?, ?, ?)", users_seed)
 
         # Seed Shifts
         shifts_seed = [
@@ -162,6 +218,19 @@ def init_db():
 
         conn.commit()
         print("Database seeded successfully with initial ShiftSync data.")
+
+    # Seed initial audit logs if empty
+    cursor.execute("SELECT COUNT(*) FROM audit_logs")
+    if cursor.fetchone()[0] == 0:
+        initial_audit = [
+            ("John Doe", "Worker", "Shift Started", "Logged into Day Shift A at JKIA Ramp Sector 1", "2026-10-01 06:05:00"),
+            ("John Doe", "Worker", "NLP AI Analysis", "Processed Boiler valve & conveyor sensor log - 3 tasks detected with 99% confidence", "2026-10-01 07:15:22"),
+            ("Michael Chang", "Worker", "Task Completed", "Completed Task: 'Generator Fuel Level Verification' (APU-04)", "2026-10-01 08:30:10"),
+            ("John Doe", "Worker", "Handover Submitted", "Filed Handover Report HO-2026-088 to incoming operator Michael Chang", "2026-10-01 08:45:00"),
+            ("Emily Watson", "Administrator", "Worker Monitoring", "Inspected Crew A & B active shift task completion rate", "2026-10-01 09:00:15")
+        ]
+        cursor.executemany("INSERT INTO audit_logs (user_name, user_role, action, details, created_at) VALUES (?, ?, ?, ?, ?)", initial_audit)
+        conn.commit()
 
     conn.close()
 

@@ -78,46 +78,142 @@
         </div>
       </div>
 
-      <form onsubmit="handleLogin(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
-          <input type="email" id="login-email" value="operator@industry.com" required class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition" placeholder="operator@industry.com">
-        </div>
-
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label class="block text-xs font-semibold text-slate-700">Password</label>
-            <a href="javascript:void(0)" onclick="alert('Password reset instructions sent to your email.')" class="text-xs text-slate-500 hover:text-slate-900 transition">Forgot Password?</a>
-          </div>
-          <input type="password" id="login-password" value="••••••••" required class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition">
-        </div>
-
-        <button type="submit" class="w-full py-2.5 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-sm font-bold shadow-md hover:shadow-lg transition">
-          Sign In to Kenya Airways ShiftSync
+      <!-- Auth Mode Switcher: Log In vs Sign Up -->
+      <div class="flex p-1 bg-slate-100 rounded-xl border border-slate-200">
+        <button type="button" id="tab-btn-login" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-[#C8102E] text-white shadow transition">
+          Sign In
         </button>
-      </form>
+        <button type="button" id="tab-btn-signup" onclick="switchAuthTab('signup')" class="flex-1 py-2 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition">
+          Create Account (Sign Up)
+        </button>
+      </div>
 
-      <!-- Quick Role Login Helper (for testing prototype) -->
-      <div class="pt-4 border-t border-slate-200">
-        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 text-center">Quick Switch Role for Demo</p>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <button type="button" onclick="quickLogin('John Doe', 'Outgoing Operator', 'john@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
-            <span class="font-semibold block text-slate-800">John Doe</span>
-            <span class="text-[10px] text-slate-500">Outgoing Operator</span>
-          </button>
-          <button type="button" onclick="quickLogin('Michael Chang', 'Incoming Operator', 'michael@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
-            <span class="font-semibold block text-slate-800">Michael Chang</span>
-            <span class="text-[10px] text-slate-500">Incoming Operator</span>
-          </button>
-          <button type="button" onclick="quickLogin('Sarah Jenkins', 'Supervisor', 'sarah@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
-            <span class="font-semibold block text-slate-800">Sarah Jenkins</span>
-            <span class="text-[10px] text-slate-500">Shift Supervisor</span>
-          </button>
-          <button type="button" onclick="quickLogin('Emily Watson', 'Administrator', 'admin@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
-            <span class="font-semibold block text-slate-800">Emily Watson</span>
-            <span class="text-[10px] text-slate-500">System Admin</span>
-          </button>
+      <!-- TAB 1: LOGIN -->
+      <div id="auth-content-login" class="space-y-4">
+        <!-- Prominent Role Quick-Access Buttons -->
+        <div>
+          <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 text-center">Select Role to Sign In</label>
+          <div class="grid grid-cols-2 gap-2.5">
+            <button type="button" onclick="loginAsRole('administrator')" class="p-3 rounded-xl border-2 border-red-200 bg-red-50/50 hover:bg-red-50 hover:border-[#C8102E] text-left transition group shadow-xs">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-lg">🛡️</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-[#C8102E] text-white">ADMIN</span>
+              </div>
+              <span class="font-bold text-xs block text-slate-900 group-hover:text-[#C8102E] transition">Administrator</span>
+              <span class="text-[10px] text-slate-500">Monitor workers & ops</span>
+            </button>
+            <button type="button" onclick="loginAsRole('worker')" class="p-3 rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-400 text-left transition group shadow-xs">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-lg">👷</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-slate-800 text-white">WORKER</span>
+              </div>
+              <span class="font-bold text-xs block text-slate-900 group-hover:text-slate-800 transition">Shift Worker</span>
+              <span class="text-[10px] text-slate-500">Log activity & handovers</span>
+            </button>
+          </div>
         </div>
+
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-slate-200"></div>
+          <span class="flex-shrink mx-2 text-[10px] uppercase font-bold text-slate-400 tracking-wider">or sign in with email</span>
+          <div class="flex-grow border-t border-slate-200"></div>
+        </div>
+
+        <form onsubmit="handleCustomLogin(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+            <input type="email" id="login-email" value="admin@shiftsync.local" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition" placeholder="you@shiftsync.local">
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-semibold text-slate-700">Password</label>
+              <a href="javascript:void(0)" onclick="alert('Demo password is: password123')" class="text-[11px] text-slate-500 hover:text-slate-900 transition">Show default password</a>
+            </div>
+            <input type="password" id="login-password" value="password123" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Access Role Preference</label>
+            <select id="login-role-select" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900">
+              <option value="Administrator">Administrator (Worker Monitoring & Oversight)</option>
+              <option value="Worker">Shift Worker / Operator (Handover Execution)</option>
+            </select>
+          </div>
+
+          <button type="submit" class="w-full py-2.5 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-xs font-bold shadow-md hover:shadow-lg transition">
+            Sign In to Kenya Airways ShiftSync
+          </button>
+        </form>
+
+        <!-- Quick Role Login Helper (for testing prototype) -->
+        <div class="pt-3 border-t border-slate-200">
+          <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2 text-center">Fast Demo Profiles</p>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <button type="button" onclick="quickLogin('Emily Watson', 'Administrator', 'admin@shiftsync.local')" class="p-2 rounded-lg bg-red-50/50 hover:bg-red-50 border border-red-200 text-left transition">
+              <span class="font-bold block text-slate-900 text-xs">Emily Watson</span>
+              <span class="text-[10px] text-[#C8102E] font-bold">🛡️ Administrator</span>
+            </button>
+            <button type="button" onclick="quickLogin('John Doe', 'Worker', 'john@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
+              <span class="font-bold block text-slate-900 text-xs">John Doe</span>
+              <span class="text-[10px] text-slate-600 font-bold">👷 Worker (Ramp Lead)</span>
+            </button>
+            <button type="button" onclick="quickLogin('Sarah Jenkins', 'Supervisor', 'sarah@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
+              <span class="font-semibold block text-slate-800 text-xs">Sarah Jenkins</span>
+              <span class="text-[10px] text-slate-500">Shift Supervisor</span>
+            </button>
+            <button type="button" onclick="quickLogin('Michael Chang', 'Worker', 'michael@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
+              <span class="font-semibold block text-slate-800 text-xs">Michael Chang</span>
+              <span class="text-[10px] text-slate-500">Incoming Maintenance</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: SIGN UP -->
+      <div id="auth-content-signup" class="space-y-4 hidden">
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600">
+          Register a new Worker or Administrator account. User profiles are instantly saved to the operational database.
+        </div>
+
+        <form onsubmit="handleSignup(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+            <input type="text" id="signup-name" required placeholder="e.g. David Kiprono" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#C8102E]">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Work Email Address</label>
+            <input type="email" id="signup-email" required placeholder="e.g. d.kiprono@kq.aero" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#C8102E]">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Password</label>
+            <input type="password" id="signup-password" required value="password123" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#C8102E]">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Account Role</label>
+            <select id="signup-role" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900">
+              <option value="Worker">👷 Worker / Operator (Shift Worker, Ramp & Maintenance)</option>
+              <option value="Administrator">🛡️ Administrator (Monitor Workers, Manage Roster & Audits)</option>
+              <option value="Supervisor">Shift Supervisor</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Department / Station</label>
+            <input type="text" id="signup-dept" required placeholder="e.g. JKIA Ramp Crew B, Line Maintenance" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#C8102E]">
+          </div>
+
+          <button type="submit" class="w-full py-2.5 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-xs font-bold shadow-md hover:shadow-lg transition">
+            Create Account & Access ShiftSync
+          </button>
+        </form>
+
+        <p class="text-center text-[11px] text-slate-500">
+          Already registered? <a href="javascript:void(0)" onclick="switchAuthTab('login')" class="text-[#C8102E] font-bold hover:underline">Sign in here</a>
+        </p>
       </div>
     </div>
   </div>
@@ -164,7 +260,10 @@
             JD
           </div>
           <div class="text-left">
-            <span class="text-xs font-semibold text-slate-900 block" id="header-user-name">John Doe</span>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xs font-semibold text-slate-900 block" id="header-user-name">John Doe</span>
+              <span id="header-role-badge" class="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-slate-100 text-slate-700 border border-slate-300">WORKER</span>
+            </div>
             <span class="text-[10px] text-slate-500 block" id="header-user-role">Outgoing Operator</span>
           </div>
           <button onclick="handleLogout()" class="text-xs font-medium text-slate-500 hover:text-red-600 transition pl-2">
@@ -207,6 +306,14 @@
           <button onclick="navigateTo('tasks')" id="nav-tasks" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
             <span>Tasks</span>
+          </button>
+
+          <button onclick="navigateTo('worker-monitoring')" id="nav-worker-monitoring" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
+            <div class="flex items-center space-x-3">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              <span class="font-bold text-slate-900">Worker Monitoring</span>
+            </div>
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-100 text-emerald-800 tracking-wider">ADMIN</span>
           </button>
 
           <button onclick="navigateTo('notifications')" id="nav-notifications" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition">
@@ -1119,6 +1226,147 @@
           </div>
         </div>
 
+        <!-- ============================================================ -->
+        <!-- 9. WORKER MONITORING (Administrator Real-Time Oversight)     -->
+        <!-- ============================================================ -->
+        <div id="view-worker-monitoring" class="space-y-6 hidden">
+          <!-- View Header -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+            <div>
+              <div class="flex items-center space-x-2 mb-1">
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-red-100 text-[#C8102E] tracking-wider border border-red-200">ADMIN CONTROL CENTER</span>
+                <span class="inline-flex items-center text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1.5"></span> Live Worker Telemetry
+                </span>
+              </div>
+              <h1 class="text-xl font-black text-slate-900 tracking-tight">Worker Monitoring & Shift Operations Oversight</h1>
+              <p class="text-xs text-slate-500">Real-time supervision of shift workers, task completion progression, and handover reports across JKIA terminals and ramps.</p>
+            </div>
+            <div class="flex items-center space-x-2.5">
+              <button onclick="loadWorkerMonitoring()" class="inline-flex items-center space-x-1.5 px-3 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <span>Refresh Live Data</span>
+              </button>
+              <button onclick="openModal('modal-admin-broadcast')" class="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-xs font-bold shadow-sm transition">
+                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+                <span>Broadcast Directive</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Monitoring KPI Stat Cards -->
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-3.5">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-1">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Shift Workers</span>
+              <div class="flex items-baseline space-x-2">
+                <span class="text-2xl font-black text-slate-900" id="mon-total-workers">...</span>
+                <span class="text-[10px] text-slate-500">enrolled</span>
+              </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-1">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">On Duty / Active</span>
+              <div class="flex items-baseline space-x-2">
+                <span class="text-2xl font-black text-emerald-600" id="mon-active-workers">...</span>
+                <span class="text-[10px] text-emerald-700 font-semibold">on shift</span>
+              </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-1">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Shift Tasks Progress</span>
+              <div class="flex items-baseline space-x-2">
+                <span class="text-2xl font-black text-slate-900" id="mon-total-tasks">...</span>
+              </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-1">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Completion Rate</span>
+              <div class="flex items-baseline space-x-2">
+                <span class="text-2xl font-black text-indigo-600" id="mon-completion-rate">...</span>
+                <span class="text-[10px] text-slate-500">pace</span>
+              </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-1">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Pending Handovers</span>
+              <div class="flex items-baseline space-x-2">
+                <span class="text-2xl font-black text-amber-600" id="mon-pending-handovers">...</span>
+                <span class="text-[10px] text-amber-700 font-semibold">needs review</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Monitoring Grid: Left Roster (70%), Right Live Audit (30%) -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left: Worker Roster Table -->
+            <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+              <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h3 class="font-bold text-sm text-slate-900">Shift Worker Telemetry & Task Progression</h3>
+                  <p class="text-[11px] text-slate-500">Real-time status of on-duty operators, task completion rates, and handover filings.</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-[11px] text-slate-400">Current Shift:</span>
+                  <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-900 text-white font-mono">Day Shift A</span>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase text-[10px] tracking-wider">
+                      <th class="p-3.5">Worker / Operator</th>
+                      <th class="p-3.5">Department / Role</th>
+                      <th class="p-3.5">Status & Shift</th>
+                      <th class="p-3.5">Task Progress</th>
+                      <th class="p-3.5">Latest Handover</th>
+                      <th class="p-3.5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="mon-workers-tbody" class="divide-y divide-slate-100">
+                    <tr>
+                      <td colspan="6" class="p-6 text-center text-slate-400">Loading worker telemetry...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Right: Real-time Operational Audit Trail -->
+            <div class="space-y-4">
+              <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-4 space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-sm font-bold text-slate-900">Live Worker Audit Trail</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  </div>
+                  <span class="text-[10px] text-slate-400 uppercase font-mono">Event Log</span>
+                </div>
+                <div id="mon-audit-feed" class="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
+                  <div class="text-center py-6 text-slate-400 text-xs">Loading audit stream...</div>
+                </div>
+              </div>
+
+              <!-- Quick Directive Dispatcher Box -->
+              <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-4 text-white shadow-xs space-y-2.5 border-t-2 border-[#C8102E]">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-white flex items-center space-x-1.5">
+                    <span>⚡</span> <span>Quick Team Directive</span>
+                  </span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded bg-red-600 font-extrabold uppercase tracking-wide">BROADCAST</span>
+                </div>
+                <p class="text-[11px] text-slate-300">Push an operational priority alert immediately to all active shift workers.</p>
+                <div class="space-y-2">
+                  <input type="text" id="quick-broadcast-text" placeholder="e.g. Ramp 2 maintenance cleared. Resume pushback." class="w-full text-xs px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-red-500">
+                  <button type="button" onclick="quickBroadcastFromPanel()" class="w-full py-1.5 bg-[#C8102E] hover:bg-[#A60C25] rounded-lg text-xs font-bold transition">
+                    Dispatch Alert to Workers
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -1126,6 +1374,41 @@
   <!-- ============================================================ -->
   <!-- MODALS (Fig 3.11 Add User, Fig 3.7 Add Shift, Fig 3.9 Add Task)-->
   <!-- ============================================================ -->
+
+  <!-- Modal: Broadcast Directive to Workers (Admin) -->
+  <div id="modal-admin-broadcast" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4">
+      <div>
+        <div class="flex items-center space-x-2 mb-1">
+          <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-red-100 text-[#C8102E]">ADMIN DIRECTIVE</span>
+          <span class="text-xs font-semibold text-slate-500">All Shift Workers</span>
+        </div>
+        <h3 class="text-base font-bold text-slate-900">Broadcast Operational Directive</h3>
+        <p class="text-xs text-slate-500">Send an urgent alert or operational instruction directly to all active crew operators.</p>
+      </div>
+
+      <form onsubmit="handleSendBroadcast(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Directive Message</label>
+          <textarea id="broadcast-message" required rows="3" placeholder="e.g. High wind advisory in Ramp Sector 3. Fasten all container dollies and ground equipment immediately." class="w-full rounded-lg border border-slate-300 p-2.5 text-slate-900 focus:ring-2 focus:ring-[#C8102E]"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Priority Classification</label>
+          <select id="broadcast-priority" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
+            <option value="Critical">🔴 Critical Safety / Operational Alert</option>
+            <option value="High">🟠 High Priority Shift Instruction</option>
+            <option value="Medium">🟡 Routine Advisory</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-200">
+          <button type="button" onclick="closeModal('modal-admin-broadcast')" class="px-4 py-2 border border-slate-300 rounded-lg font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-[#C8102E] text-white font-bold hover:bg-[#A60C25] shadow">Dispatch Directive</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Modal: Add New User (Proposal Figure 3.11) -->
   <div id="modal-add-user" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1265,7 +1548,7 @@
       email: 'operator@industry.com'
     };
 
-    const views = ['dashboard', 'shift-log', 'shifts', 'create-handover', 'handover-reports', 'tasks', 'notifications', 'users'];
+    const views = ['dashboard', 'shift-log', 'shifts', 'create-handover', 'handover-reports', 'tasks', 'notifications', 'users', 'worker-monitoring'];
 
     let currentDetectedTasks = [];
 
@@ -1479,33 +1762,143 @@
       alert('Shift log notes and detected tasks transferred to Create Handover Report form.');
     }
 
-    function handleLogin(e) {
-      if (e) e.preventDefault();
-      document.getElementById('screen-login').classList.add('hidden');
-      document.getElementById('screen-app').classList.remove('hidden');
-      navigateTo('dashboard');
+    function switchAuthTab(tab) {
+      const tabLogin = document.getElementById('tab-btn-login');
+      const tabSignup = document.getElementById('tab-btn-signup');
+      const contentLogin = document.getElementById('auth-content-login');
+      const contentSignup = document.getElementById('auth-content-signup');
+
+      if (tab === 'login') {
+        if (tabLogin) tabLogin.className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-[#C8102E] text-white shadow transition';
+        if (tabSignup) tabSignup.className = 'flex-1 py-2 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition';
+        if (contentLogin) contentLogin.classList.remove('hidden');
+        if (contentSignup) contentSignup.classList.add('hidden');
+      } else {
+        if (tabSignup) tabSignup.className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-[#C8102E] text-white shadow transition';
+        if (tabLogin) tabLogin.className = 'flex-1 py-2 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition';
+        if (contentSignup) contentSignup.classList.remove('hidden');
+        if (contentLogin) contentLogin.classList.add('hidden');
+      }
     }
 
-    function quickLogin(name, role, email) {
-      currentUser = { name, role, email };
-      document.getElementById('header-user-name').innerText = name;
-      document.getElementById('header-user-role').innerText = role;
-      document.getElementById('user-avatar-initials').innerText = name.split(' ').map(n=>n[0]).join('');
-      
+    async function loginAsRole(roleType) {
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role_type: roleType })
+        });
+        const data = await res.json();
+        if (res.ok && data.user) {
+          applyUserSession(data.user);
+        } else {
+          if (roleType === 'administrator') {
+            quickLogin('Emily Watson', 'Administrator', 'admin@shiftsync.local');
+          } else {
+            quickLogin('John Doe', 'Worker', 'john@shiftsync.local');
+          }
+        }
+      } catch (err) {
+        if (roleType === 'administrator') {
+          quickLogin('Emily Watson', 'Administrator', 'admin@shiftsync.local');
+        } else {
+          quickLogin('John Doe', 'Worker', 'john@shiftsync.local');
+        }
+      }
+    }
+
+    async function handleSignup(e) {
+      if (e) e.preventDefault();
+      const name = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value.trim();
+      const role = document.getElementById('signup-role').value;
+      const dept = document.getElementById('signup-dept').value.trim();
+
+      if (!name || !email) {
+        alert('Please enter your full name and work email.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, role, department: dept })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || 'Account registration failed.');
+          return;
+        }
+
+        alert(`Account created successfully! Welcome to ShiftSync, ${name} (${role}).`);
+        applyUserSession(data.user);
+      } catch (err) {
+        alert('Could not connect to ShiftSync server: ' + err.message);
+      }
+    }
+
+    async function handleCustomLogin(e) {
+      if (e) e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value.trim();
+      const rolePref = document.getElementById('login-role-select').value;
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || 'Authentication error. Please check your credentials or register a new account.');
+          return;
+        }
+
+        applyUserSession(data.user);
+      } catch (err) {
+        applyUserSession({
+          name: email.split('@')[0],
+          role: rolePref,
+          email: email
+        });
+      }
+    }
+
+    function applyUserSession(user) {
+      currentUser = user;
+      document.getElementById('header-user-name').innerText = user.name;
+      document.getElementById('header-user-role').innerText = user.role;
+      document.getElementById('user-avatar-initials').innerText = (user.name || 'User').split(' ').map(n=>n[0]).join('');
+
+      const roleBadge = document.getElementById('header-role-badge');
+      const isAdmin = (user.role || '').toLowerCase().includes('admin');
+      if (roleBadge) {
+        roleBadge.innerText = isAdmin ? '🛡️ ADMINISTRATOR' : '👷 WORKER';
+        roleBadge.className = isAdmin 
+          ? 'px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-red-100 text-[#C8102E] border border-red-300'
+          : 'px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-slate-100 text-slate-700 border border-slate-300';
+      }
+
       const outgoingInput = document.getElementById('handover-outgoing-operator');
-      if (outgoingInput) outgoingInput.value = name + ' (Current Session)';
-      
+      if (outgoingInput) outgoingInput.value = user.name + ' (Current Session)';
+
       document.getElementById('screen-login').classList.add('hidden');
       document.getElementById('screen-app').classList.remove('hidden');
 
-      if (role.includes('Incoming')) {
-        navigateTo('handover-reports');
-        viewHandoverDetails('HO-2026-088');
-      } else if (role.includes('Admin')) {
-        navigateTo('users');
+      if (isAdmin) {
+        navigateTo('worker-monitoring');
       } else {
         navigateTo('dashboard');
       }
+    }
+
+    function quickLogin(name, role, email) {
+      applyUserSession({ name, role, email });
     }
 
     function handleLogout() {
@@ -1526,14 +1919,219 @@
       if (target) target.classList.remove('hidden');
       if (targetNav) targetNav.classList.add('sidebar-active');
       window.scrollTo(0, 0);
+
+      if (viewId === 'worker-monitoring') {
+        loadWorkerMonitoring();
+      }
     }
 
     // Modal controls
     function openModal(id) {
-      document.getElementById(id).classList.remove('hidden');
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('hidden');
     }
     function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
+      const el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
+    }
+
+    // Worker Monitoring Controller (Administrator View)
+    async function loadWorkerMonitoring() {
+      const data = await fetchAPI('/api/worker-monitoring');
+      if (!data) return;
+
+      // 1. Update Metrics
+      if (data.metrics) {
+        const m = data.metrics;
+        const elTotal = document.getElementById('mon-total-workers');
+        const elActive = document.getElementById('mon-active-workers');
+        const elTasks = document.getElementById('mon-total-tasks');
+        const elRate = document.getElementById('mon-completion-rate');
+        const elHandovers = document.getElementById('mon-pending-handovers');
+
+        if (elTotal) elTotal.innerText = m.total_workers;
+        if (elActive) elActive.innerText = m.active_workers;
+        if (elTasks) elTasks.innerText = `${m.completed_tasks} / ${m.total_tasks} Done`;
+        if (elRate) elRate.innerText = `${m.completion_rate}%`;
+        if (elHandovers) elHandovers.innerText = m.pending_handovers;
+      }
+
+      // 2. Render Workers Table
+      const tbody = document.getElementById('mon-workers-tbody');
+      if (tbody && data.workers) {
+        tbody.innerHTML = '';
+        data.workers.forEach(w => {
+          const isAdm = (w.role || '').toLowerCase().includes('admin');
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+
+          const taskStats = w.task_stats || { total: 0, completed: 0, completion_rate: 100 };
+          const ho = w.latest_handover;
+          const initials = (w.name || 'W').split(' ').map(n=>n[0]).join('');
+
+          let hoBadge = '<span class="text-slate-400 text-xs italic">No reports filed</span>';
+          if (ho) {
+            const hoClass = ho.status === 'Acknowledged' ? 'badge-completed' : (ho.status === 'Pending Review' ? 'badge-pending' : 'badge-inprogress');
+            hoBadge = `
+              <div class="space-y-0.5">
+                <span class="font-mono font-semibold text-slate-900 block text-xs">${ho.report_code}</span>
+                <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold ${hoClass}">${ho.status}</span>
+              </div>
+            `;
+          }
+
+          const statusBadge = w.status === 'Active' 
+            ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">● ON DUTY</span>'
+            : '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-300">○ OFF DUTY</span>';
+
+          tr.innerHTML = `
+            <td class="p-3.5">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full ${isAdm ? 'bg-red-100 text-[#C8102E] border border-red-300' : 'bg-slate-200 text-slate-700'} flex items-center justify-center text-xs font-bold">
+                  ${initials}
+                </div>
+                <div>
+                  <span class="font-bold text-slate-900 block text-xs">${w.name}</span>
+                  <span class="text-[10px] text-slate-500 font-mono">${w.email}</span>
+                </div>
+              </div>
+            </td>
+            <td class="p-3.5 text-xs text-slate-700 font-medium">
+              <div>${w.department}</div>
+              <span class="text-[10px] text-slate-400">${w.role}</span>
+            </td>
+            <td class="p-3.5 text-xs">
+              <div class="space-y-1">
+                <div class="font-mono text-[11px] text-slate-600">${w.current_shift || 'Day Shift A'}</div>
+                <button type="button" onclick="toggleWorkerStatus(${w.id})" title="Click to toggle worker status">
+                  ${statusBadge}
+                </button>
+              </div>
+            </td>
+            <td class="p-3.5">
+              <div class="w-36 space-y-1">
+                <div class="flex items-center justify-between text-[11px]">
+                  <span class="font-semibold text-slate-800">${taskStats.completed}/${taskStats.total} Done</span>
+                  <span class="font-bold text-slate-600">${taskStats.completion_rate}%</span>
+                </div>
+                <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                  <div class="h-full bg-emerald-500 rounded-full" style="width: ${taskStats.completion_rate}%"></div>
+                </div>
+              </div>
+            </td>
+            <td class="p-3.5">
+              ${hoBadge}
+            </td>
+            <td class="p-3.5 text-right space-x-1.5 whitespace-nowrap">
+              <button type="button" onclick="openAssignTaskModal('${w.name}')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[11px] transition">
+                + Task
+              </button>
+              <button type="button" onclick="toggleWorkerStatus(${w.id})" class="px-2 py-1 rounded border border-slate-300 hover:bg-slate-50 text-slate-600 text-[11px] transition">
+                ${w.status === 'Active' ? 'Set Offline' : 'Set Active'}
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // 3. Render Audit Trail Feed
+      const feed = document.getElementById('mon-audit-feed');
+      if (feed && data.audit_trail) {
+        feed.innerHTML = '';
+        data.audit_trail.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'p-3 rounded-lg border border-slate-100 bg-slate-50 text-xs space-y-1';
+          
+          let badgeColor = 'bg-blue-100 text-blue-800';
+          if (item.action.includes('Handover')) badgeColor = 'bg-amber-100 text-amber-800';
+          else if (item.action.includes('Task')) badgeColor = 'bg-emerald-100 text-emerald-800';
+          else if (item.action.includes('NLP')) badgeColor = 'bg-indigo-100 text-indigo-800';
+          else if (item.action.includes('Account')) badgeColor = 'bg-purple-100 text-purple-800';
+          else if (item.action.includes('Broadcast')) badgeColor = 'bg-red-100 text-[#C8102E]';
+
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-1.5">
+                <span class="font-bold text-slate-900">${item.user_name}</span>
+                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold ${badgeColor}">${item.action}</span>
+              </div>
+              <span class="text-[10px] text-slate-400 font-mono">${(item.created_at || '').split(' ')[1] || item.created_at}</span>
+            </div>
+            <p class="text-[11px] text-slate-600 leading-snug">${item.details || ''}</p>
+          `;
+          feed.appendChild(card);
+        });
+      }
+    }
+
+    async function toggleWorkerStatus(userId) {
+      try {
+        const res = await fetch('/api/admin/toggle-worker-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: userId })
+        });
+        if (res.ok) {
+          await loadWorkerMonitoring();
+          await loadUsers();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function openAssignTaskModal(workerName) {
+      const assigneeInput = document.getElementById('new-task-assignee');
+      if (assigneeInput) assigneeInput.value = workerName;
+      openModal('modal-add-task');
+    }
+
+    async function handleSendBroadcast(e) {
+      if (e) e.preventDefault();
+      const msg = document.getElementById('broadcast-message').value.trim();
+      const priority = document.getElementById('broadcast-priority').value;
+      if (!msg) return;
+
+      const res = await fetch('/api/admin/broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: msg,
+          priority: priority,
+          author: currentUser.name
+        })
+      });
+
+      closeModal('modal-admin-broadcast');
+      document.getElementById('broadcast-message').value = '';
+      alert('Operational directive broadcast dispatched to all shift workers!');
+      await loadNotifications();
+      await loadWorkerMonitoring();
+    }
+
+    async function quickBroadcastFromPanel() {
+      const input = document.getElementById('quick-broadcast-text');
+      const msg = input ? input.value.trim() : '';
+      if (!msg) {
+        alert('Please enter a directive message to broadcast.');
+        return;
+      }
+
+      await fetch('/api/admin/broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: msg,
+          priority: 'Critical',
+          author: currentUser.name
+        })
+      });
+
+      if (input) input.value = '';
+      alert('Directive broadcast dispatched to all shift workers!');
+      await loadNotifications();
+      await loadWorkerMonitoring();
     }
 
 
@@ -1867,6 +2465,7 @@
       loadHandovers();
       loadTasks();
       loadUsers();
+      loadWorkerMonitoring();
     });
 
   </script>
