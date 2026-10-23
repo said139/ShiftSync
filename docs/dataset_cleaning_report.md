@@ -1,5 +1,5 @@
 # ShiftSync NLP Dataset Cleaning & Preprocessing Report
-**Execution Date**: 2026-09-29 17:15:35  
+**Execution Date**: 2026-10-13 11:51:20  
 **Source File**: `data/shiftsync_handover_nlp_dataset.csv`  
 **Clean Benchmark File**: `data/shiftsync_handover_nlp_dataset_deduplicated.csv`  
 
@@ -8,8 +8,8 @@
 
 To ensure that the machine learning models generalize to unseen clinical and industrial handover logs without data leakage or overfitting, a rigorous audit and deduplication pipeline was executed.
 * **Total Synthetic Handover Records**: `1200`
-* **Unique Handover Descriptions**: `513`
-* **Exact Duplicate Descriptions**: `687` (repeated across shift schedules and operational domains)
+* **Unique Handover Descriptions**: `506`
+* **Exact Duplicate Descriptions**: `694` (repeated across shift schedules and operational domains)
 * **Label Conflict Rate**: `0` conflicts (100% label concordance)
 * **Missing / Null Values**: `0` across all fields
 
@@ -18,36 +18,36 @@ To ensure that the machine learning models generalize to unseen clinical and ind
 ### 2.1 Operational Category Distribution
 | Category | Count | Percentage |
 | :--- | :---: | :---: |
-| **Operations** | 158 | 30.8% |
-| **Maintenance** | 131 | 25.5% |
-| **Safety & Compliance** | 106 | 20.7% |
-| **Equipment Check** | 87 | 17.0% |
-| **Administration** | 31 | 6.0% |
+| **Maintenance** | 126 | 24.9% |
+| **Equipment Check** | 120 | 23.7% |
+| **Safety & Compliance** | 106 | 20.9% |
+| **Operations** | 90 | 17.8% |
+| **Administration** | 64 | 12.6% |
 
 ### 2.2 Task Priority Distribution
 | Priority | Count | Percentage |
 | :--- | :---: | :---: |
-| **Medium** | 188 | 36.6% |
-| **Critical** | 157 | 30.6% |
-| **High** | 128 | 25.0% |
-| **Low** | 40 | 7.8% |
+| **High** | 180 | 35.6% |
+| **Medium** | 178 | 35.2% |
+| **Critical** | 82 | 16.2% |
+| **Low** | 66 | 13.0% |
 
 ### 2.3 Industry Distribution
 | Industry Domain | Count | Percentage |
 | :--- | :---: | :---: |
-| Healthcare | 110 | 21.4% |
-| Energy & Utilities | 108 | 21.1% |
-| Security & Facilities | 105 | 20.5% |
-| Manufacturing | 101 | 19.7% |
-| Logistics & Warehousing | 89 | 17.3% |
+| Fleet Airworthiness & CAMO Compliance | 130 | 25.7% |
+| Flight Operations (Cockpit & Pilots) | 124 | 24.5% |
+| Airframe & Powerplant Engineering | 101 | 20.0% |
+| Aeronautical Line Maintenance | 97 | 19.2% |
+| Avionics & Flight Control Systems | 54 | 10.7% |
 
 ## 3. Text Length & Corpus Statistics
 
-* **Mean Word Count**: `16.7` words per handover description
-* **Median Word Count**: `16` words
+* **Mean Word Count**: `17.9` words per handover description
+* **Median Word Count**: `18` words
 * **Min Word Count**: `10` words
-* **Max Word Count**: `25` words
-* **Standard Deviation**: `3.0` words
+* **Max Word Count**: `23` words
+* **Standard Deviation**: `2.5` words
 
 ## 4. Pipeline Implications for Machine Learning
 

@@ -1,39 +1,46 @@
-# ShiftSync 🔄
-> **Intelligent Shift Handover & Operational Task Management System**  
+# ShiftSync ✈️🔄
+> **Intelligent Shift Handover & Operational Task Management System for Pilots & Aeronautical Engineers**  
 > *Developed for Strathmore University — School of Computing and Engineering Sciences (SCES)*
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Scikit-Learn](https://img.shields.io/badge/ML-Scikit--Learn-orange.svg)](https://scikit-learn.org/)
 [![Database-SQLite3](https://img.shields.io/badge/Database-SQLite3-lightgrey.svg)](https://www.sqlite.org/)
-[![Tests-13%20Passed-brightgreen](https://img.shields.io/badge/Tests-13%2F13%20Passed%20(100%25)-brightgreen.svg)](docs/test_results.md)
+[![Tests-19%20Passed-brightgreen](https://img.shields.io/badge/Tests-19%2F19%20Passed%20(100%25)-brightgreen.svg)](docs/test_results.md)
+[![Aviation-SMS-Compliant](https://img.shields.io/badge/Aviation-ICAO%20Annex%206%20%2F%20KCAA%20SMS-emerald.svg)]()
 [![License-Academic](https://img.shields.io/badge/License-Academic%20Use-blue.svg)]()
 
 ---
 
-## 📌 Executive Summary
+## 📌 Executive Summary & Project Scope
 
-Shift handover communication failures are a leading cause of operational downtime, safety oversights, and uncoordinated task execution across critical 24/7 industries (aviation, manufacturing, logistics, healthcare). **ShiftSync** bridges this gap by providing an end-to-end, digital shift handover management system integrated with an **AI/NLP classification engine**. 
+In commercial aviation, miscommunication during shift turnover between **Flight Crew (Pilots)** and **Aircraft Maintenance Engineers (AMEs)** represents a critical safety risk that can lead to flight delays, Aircraft on Ground (AOG) situations, Minimum Equipment List (MEL) non-compliance, and airworthiness hazards.
 
-ShiftSync enables outgoing operators to record unstructured shift logs, automatically segments composite handover entries into discrete tasks, and classifies their **operational category** and **urgency/priority** in real time using machine learning.
+**ShiftSync** is an intelligent, specialized shift handover management system designed exclusively for:
+1. **Pilots (Captains & First Officers)**: Documenting flight deck observations, cockpit snags, turnaround fuel/oil uplifts, weather radar/avionics checks, and sector turnover.
+2. **Licensed Aeronautical Engineers (AMEs & Avionics Engineers)**: Logging transit and line maintenance rectifications, clearing snags in the Aircraft Technical Log (TechLog), tracking deferred defects against the Minimum Equipment List (MEL), and issuing Certificates of Release to Service (CRS).
+3. **CAMO & Flight Operations Supervisors**: Overseeing airworthiness status, pending aircraft sign-offs, and critical AOG alerts.
+
+ShiftSync integrates a calibrated **Natural Language Processing (NLP)** engine that parses unstructured free-text handover narratives into discrete actionable tasks, classifying their **operational category** and **urgency/priority** in real time (<3ms latency) under ICAO Annex 6 and Kenya Civil Aviation Authority (KCAA) Safety Management System (SMS) guidelines.
 
 ---
 
 ## 🌟 Key Features
 
-1. **Intelligent Shift Handover Documentation**
-   * Standardized structured forms for equipment status, safety observations, and additional remarks.
-   * Free-text shift log analyzer powered by Natural Language Processing.
-2. **Real-Time NLP Task Segmentation & Classification**
-   * TF-IDF vectorization paired with calibrated machine learning classifiers.
-   * Automated categorization: *Equipment Check*, *Safety & Compliance*, *Maintenance*, *Administration*.
-   * Dynamic priority assignment: *Low*, *Medium*, *High*, *Critical*.
-3. **Formal Digital Handover & Acknowledgment Workflow**
-   * Multi-role accountability: Outgoing Operator submits -> Incoming Operator reviews and digitally signs/acknowledges with cryptographic-style timestamps and audit logs.
-4. **Interactive Operational Dashboard**
-   * Real-time metrics: pending handovers, incomplete operational tasks, active shifts, and safety alerts.
-   * Interactive task checklist with instant state synchronization to SQLite backend.
-5. **Robust System Verification**
-   * 100% test coverage across NLP accuracy, REST API endpoints, and relational database integrity constraints.
+1. **Aviation-Specific Handover Workflows**
+   * Pre-structured fields for **Aircraft Tail Number** (e.g., `5Y-KZE`, `5Y-KZG`), **Flight Sector** (e.g., `KQ 102 NBO → LHR`), **Technical Log Page Reference** (e.g., `TL-2026-088`), **Handover Mode** (*Engineer-to-Engineer*, *Pilot-to-Engineer*, *Pilot-to-Pilot*), and **MEL Dispatch Status** (*Nil Active MEL*, *MEL Cat C 21-31-01*).
+2. **Aviation NLP Engine (Task Segmentation & Multi-Model Inference)**
+   * TF-IDF vectorization paired with calibrated machine learning classifiers retrained on 506 clean, deduplicated aviation operational logs.
+   * **Task Categorisation Model**: **95.10%** test accuracy (5-fold CV: **96.64% ± 1.33%**) across *Pre-Flight Inspection / Equipment Check*, *Maintenance*, *Operations*, *Safety & Compliance*, and *Administration*.
+   * **Priority Detection Model**: **97.06%** test accuracy (5-fold CV: **96.64% ± 1.61%**) detecting *Critical* (AOG, uncontained leaks, flight control defects), *High* (techlog snags, MEL deferrals), *Medium*, and *Low* tasks.
+   * Average inference execution speed: **2.68 ms per task**.
+3. **Formal Digital Handover & Legal Custody Transfer**
+   * Multi-role accountability: Outgoing Pilot/AME submits -> Incoming Pilot/AME reviews aircraft technical status and digitally confirms sign-off.
+   * Generates an immutable audit trail with millisecond timestamps and authorized personnel signatures.
+4. **Real-Time Operational Cockpit Dashboard**
+   * Real-time metrics: pending handovers, outstanding airworthiness tasks, active sector rotations, and critical AOG notifications.
+   * Dual-panel task and report sync between browser UI and SQLite database.
+5. **Role-Based Access Control (RBAC)**
+   * Built-in persona profiles: Capt. John Doe (Pilot), Eng. Michael Chang (AME), Sarah Jenkins (CAMO Supervisor), Emily Watson (Administrator).
 
 ---
 
@@ -42,27 +49,29 @@ ShiftSync enables outgoing operators to record unstructured shift logs, automati
 ```
 ┌────────────────────────────────────────────────────────┐
 │                   ShiftSync UI (SPA)                   │
-│   HTML5 / Modern Responsive CSS / Vanilla JavaScript   │
+│   HTML5 / Tailwind CSS (Kenya Airways Theme) / JS      │
+│   Flight Deck & Line Maintenance Workflows             │
 └───────────────────────────▲────────────────────────────┘
                             │ HTTP / JSON REST
 ┌───────────────────────────▼────────────────────────────┐
 │                 Python REST Server                     │
 │         (http.server + socketserver, Port 8000)        │
+│   Aviation Handover Endpoints & RBAC Validation        │
 └─────────────┬────────────────────────────┬─────────────┘
               │                            │
               ▼                            ▼
 ┌──────────────────────────┐  ┌──────────────────────────┐
-│     SQLite Database      │  │    ShiftSync NLP Core    │
+│     SQLite Database      │  │   Aviation NLP Core      │
 │  (Foreign Keys, Checks)  │  │ (TF-IDF + Scikit-Learn)  │
-│    shiftsync.db          │  │ models/*.joblib          │
+│  Aviation Schema         │  │ models/*.joblib          │
 └──────────────────────────┘  └──────────────────────────┘
 ```
 
 * **Backend:** Python 3.10+ (Standard Library `http.server` & `socketserver`)
 * **Machine Learning / NLP:** `scikit-learn`, `numpy`, `pandas`, `joblib`
-* **Database:** SQLite3 with strict relational constraints and auto-seeding
-* **Frontend:** Modern Single Page Application (vanilla JS, CSS Grid/Flexbox)
-* **Automated Testing:** Python `unittest` framework with automated Chapter 4 Markdown reporting
+* **Database:** SQLite3 with strict relational constraints, aviation role checks, and auto-seeding
+* **Frontend:** Responsive Single Page Application (vanilla JS, Tailwind CSS, Kenya Airways palette)
+* **Automated Testing:** Python `unittest` suite (19 technical & ML verification tests)
 
 ---
 
@@ -71,35 +80,33 @@ ShiftSync enables outgoing operators to record unstructured shift logs, automati
 ```
 SHIFTSYNC/
 ├── data/
-│   ├── shiftsync.db                       # Relational SQLite database
-│   └── shiftsync_handover_nlp_dataset.csv # Training corpus for NLP models
+│   ├── shiftsync.db                                 # Relational SQLite database with aviation schema
+│   ├── shiftsync_handover_nlp_dataset.csv           # 1,200 synthetic aviation logs
+│   └── shiftsync_handover_nlp_dataset_deduplicated.csv # 506 clean, deduplicated aviation samples
 ├── docs/
-│   ├── Chapter_4_Implementation_and_Testing.md # Implementation & Verification Report
-│   ├── test_results.md                    # Automated test execution output
-│   └── screenshots/                       # System interface wireframes & captures
-│       ├── 01_shiftsync_dashboard_overview.jpg
-│       ├── 02_shiftsync_nlp_shift_log.jpg
-│       ├── 03_shiftsync_formal_acknowledgment.jpg
-│       ├── 04_shiftsync_create_handover_standard.jpg
-│       └── 05_shiftsync_user_management_admin.jpg
+│   ├── Chapter_4_Implementation_and_Testing.md      # Academic Report: Implementation & Testing
+│   ├── dataset_cleaning_report.md                   # Dataset preparation & deduplication audit
+│   ├── nlp_model_evaluation.md                      # Cross-validation & confusion matrix report
+│   ├── test_results.md                              # Automated test execution report (19 tests)
+│   └── screenshots/                                 # UI wireframes & interface captures
 ├── models/
-│   ├── category_model.joblib              # Serialized category classifier
-│   ├── priority_model.joblib              # Serialized priority classifier
-│   └── vectorizer.joblib                  # Serialized TF-IDF vectorizer
+│   ├── category_model.joblib                        # Retrained aviation category classifier
+│   ├── priority_model.joblib                        # Retrained aviation priority classifier
+│   └── vectorizer.joblib                            # Retrained TF-IDF vectorizer (max_features=2500)
 ├── scripts/
-│   ├── append_chapter_4_to_word.py        # Chapter 4 report compilation utility
-│   ├── apply_theme.py                     # Visual theme generator
-│   └── integrate_db_api.py                # Database API synchronization script
-├── .gitignore                             # Git ignore rules
-├── database.py                            # SQLite database schema, seeds & helpers
-├── predict.py                             # ShiftSync NLP inference engine
-├── requirements.txt                       # Project dependencies
-├── server.py                              # Full-stack HTTP REST API server
-├── shiftsync_core_system.html             # Core application frontend interface
-├── shiftsync_mockup.html                  # Initial UI prototype
-├── test_suite.py                          # Automated system verification suite
-├── train_model.py                         # NLP model training pipeline
-└── README.md                              # Repository documentation
+│   ├── append_chapter_4_to_word.py                  # Chapter 4 report compilation utility
+│   ├── apply_theme.py                               # Visual theme generator
+│   ├── build_aviation_nlp_dataset.py                # Aviation dataset synthesis & cleaning pipeline
+│   └── integrate_db_api.py                          # Database API synchronization script
+├── .gitignore                                       # Git ignore rules
+├── database.py                                      # SQLite schema, aviation roles, seeds & helpers
+├── predict.py                                       # Aviation NLP inference & keyword engine
+├── requirements.txt                                 # Project dependencies
+├── server.py                                        # Full-stack HTTP REST API server
+├── shiftsync_core_system.html                       # Flight Deck & AME frontend interface
+├── test_suite.py                                    # Automated 19-test verification suite
+├── train_model.py                                   # NLP model training pipeline with 5-fold CV
+└── README.md                                        # Repository documentation
 ```
 
 ---
@@ -132,8 +139,8 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 5. (Optional) Retrain NLP Models
-The pre-trained models are already included in `models/`. To retrain them on the dataset:
+### 5. Retrain Aviation NLP Models (Optional)
+The pre-trained aviation models are included in `models/`. To retrain them:
 ```bash
 python train_model.py
 ```
@@ -149,33 +156,25 @@ Open your browser and navigate to:
 
 ## 🧪 Automated Testing & Verification
 
-ShiftSync includes an automated test harness covering:
-* **NLP Model Accuracy & Task Segmentation** (TC-NLP-01 to TC-NLP-05)
-* **REST API Endpoints & CRUD Operations** (TC-API-01 to TC-API-06)
-* **Relational Database Integrity & Constraints** (TC-DB-01 to TC-DB-02)
+ShiftSync includes an automated 19-test verification harness:
+* **NLP Model Accuracy & Aviation Domain Tests** (`TC-NLP-01` to `TC-NLP-10`):
+  * Pre-flight walkaround, APU checks, critical AOG grounding, TechLog snag rectification, MEL deferrals, and multi-clause sentence segmentation.
+* **REST API Endpoints & CRUD Operations** (`TC-API-00` to `TC-API-06`):
+  * Health check, telemetry KPI calculation, shift list, task persistence, lifecycle status toggle, aviation handover creation, and custody sign-off.
+* **Relational Database Integrity & Constraints** (`TC-DB-01` to `TC-DB-02`):
+  * Foreign key referential joins and role `CHECK` constraints rejecting invalid permissions.
 
-To run the verification suite:
+To execute the verification suite:
 ```bash
 python test_suite.py
 ```
 
-**Verification Results:**
+**Verification Output:**
 ```
-Ran 13 tests in ~18s
-Status: OK (13/13 Passed - 100% Pass Rate)
+Ran 19 tests in ~20s
+Status: OK (19/19 Passed - 100% Pass Rate)
 Exported to: docs/test_results.md
 ```
-
----
-
-## 🌿 Git & GitHub Development Workflow
-
-This repository adheres to the university version control guidelines:
-* **`main`**: Production-ready, stable releases.
-* **`develop`**: Integration branch for ongoing sprint deliverables.
-* **`feature/*`**: Feature-specific branches (e.g. `feature/nlp-enhancements`, `feature/rest-api`).
-* **Pull Requests & Code Reviews**: All feature branches are merged via reviewed Pull Requests.
-* **Issues & Milestones**: Structured across project sprints to track development deliverables.
 
 ---
 
@@ -184,5 +183,6 @@ This repository adheres to the university version control guidelines:
 * **Author:** Bakari Said Marika
 * **Student ID:** 166229
 * **Institution:** Strathmore University
-* **Course:** Bachelor of Science in Informatics and Computer Science (BICS) / Information Systems
+* **Faculty:** School of Computing and Engineering Sciences (SCES)
+* **Degree:** Bachelor of Science in Informatics and Computer Science (BICS) / Information Systems
 * **Academic Year:** 2026

@@ -76,6 +76,52 @@ class TestShiftSyncNLP(unittest.TestCase):
         record_test("TC-NLP-05", "NLP Segmentation", "Split compound multi-task notes", text, "3 discrete tasks", f"{count} discrete tasks", passed, elapsed)
         self.assertEqual(count, 3)
 
+    def test_nlp_06_aviation_engine_check(self):
+        t0 = time.perf_counter()
+        text = "Checked Boeing 787 left engine oil and pressure sensor readings; parameter stable within flight envelope."
+        res = self.nlp.analyze_task(text)
+        elapsed = (time.perf_counter() - t0) * 1000
+        passed = (res["category"] == "Equipment Check" and res["priority"] in ["High", "Critical"])
+        record_test("TC-NLP-06", "Aviation NLP", "Flight deck & AME engine sensor check", text, "Equipment Check / High", f"{res['category']} / {res['priority']}", passed, elapsed)
+        self.assertTrue(passed)
+
+    def test_nlp_07_aviation_aog_grounding(self):
+        t0 = time.perf_counter()
+        text = "Major safety alert: jet fuel seepage detected at engine pylon fuel disconnect coupling; aircraft grounded pending seal swap."
+        res = self.nlp.analyze_task(text)
+        elapsed = (time.perf_counter() - t0) * 1000
+        passed = (res["category"] == "Safety & Compliance" and res["priority"] == "Critical")
+        record_test("TC-NLP-07", "Aviation NLP", "Critical AOG airworthiness grounding alert", text, "Safety & Compliance / Critical", f"{res['category']} / {res['priority']}", passed, elapsed)
+        self.assertTrue(passed)
+
+    def test_nlp_08_aviation_techlog_rectification(self):
+        t0 = time.perf_counter()
+        text = "Rectified TechLog snag #4412: replaced faulty line replaceable unit LRU for VHF Comm transceiver #1."
+        res = self.nlp.analyze_task(text)
+        elapsed = (time.perf_counter() - t0) * 1000
+        passed = (res["category"] in ["Maintenance", "Equipment Check"] and res["priority"] in ["High", "Critical"])
+        record_test("TC-NLP-08", "Aviation NLP", "TechLog snag LRU replacement rectification", text, "Maintenance / High", f"{res['category']} / {res['priority']}", passed, elapsed)
+        self.assertTrue(passed)
+
+    def test_nlp_09_aviation_mel_admin(self):
+        t0 = time.perf_counter()
+        text = "Closed and archived Aircraft Technical Logbook TechLog page #4412 in airline MRO enterprise system."
+        res = self.nlp.analyze_task(text)
+        elapsed = (time.perf_counter() - t0) * 1000
+        passed = (res["category"] == "Administration" and res["priority"] == "Low")
+        record_test("TC-NLP-09", "Aviation NLP", "TechLog page archiving & admin sign-off", text, "Administration / Low", f"{res['category']} / {res['priority']}", passed, elapsed)
+        self.assertTrue(passed)
+
+    def test_nlp_10_aviation_multi_segmentation(self):
+        t0 = time.perf_counter()
+        text = "Scanned EFIS cockpit displays on 5Y-KZE, rectified TechLog snag #4412 on VHF Comm #1, and signed off KCAA Certificate of Release to Service CRS."
+        res = self.nlp.analyze_shift_log(text)
+        elapsed = (time.perf_counter() - t0) * 1000
+        count = res["tasks_detected_count"]
+        passed = (count == 3)
+        record_test("TC-NLP-10", "Aviation NLP", "Multi-clause pilot & AME composite debrief", text, "3 discrete aviation tasks", f"{count} discrete tasks", passed, elapsed)
+        self.assertEqual(count, 3)
+
 class TestShiftSyncAPI(unittest.TestCase):
     _server_thread = None
     _httpd = None

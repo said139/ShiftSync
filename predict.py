@@ -93,9 +93,9 @@ class ShiftSyncNLP:
 
         # Operational status heuristic based on tense and keywords
         text_lower = text.lower()
-        if any(w in text_lower for w in ["completed", "done", "finished", "cleared", "reconciled", "signed off", "evacuated"]):
+        if any(w in text_lower for w in ["completed", "done", "finished", "cleared", "reconciled", "signed off", "evacuated", "rectified", "passed"]):
             status = "Completed"
-        elif any(w in text_lower for w in ["in progress", "underway", "rebuilding", "working on", "mixing", "sorting", "calibrating"]):
+        elif any(w in text_lower for w in ["in progress", "underway", "rebuilding", "working on", "calibrating", "troubleshooting", "overhauling", "hunting", "rigging"]):
             status = "In Progress"
         else:
             status = "Pending"
@@ -131,6 +131,6 @@ class ShiftSyncNLP:
 
 if __name__ == "__main__":
     nlp = ShiftSyncNLP()
-    sample = "Checked boiler pressure on Line 2, replaced faulty sensor on conveyor B, and initiated safety drill log for night crew."
+    sample = "Scanned EFIS cockpit displays on 5Y-KZE, rectified TechLog snag #4412 on VHF Comm #1, and signed off KCAA Certificate of Release to Service CRS."
     output = nlp.analyze_shift_log(sample)
     print(json.dumps(output, indent=2))

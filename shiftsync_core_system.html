@@ -90,25 +90,43 @@
 
       <!-- TAB 1: LOGIN -->
       <div id="auth-content-login" class="space-y-4">
-        <!-- Prominent Role Quick-Access Buttons -->
+        <!-- Prominent Role Quick-Access Buttons (Pilots & Aeronautical Engineers) -->
         <div>
-          <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 text-center">Select Role to Sign In</label>
+          <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 text-center">Select Aviation Credential to Sign In</label>
           <div class="grid grid-cols-2 gap-2.5">
-            <button type="button" onclick="loginAsRole('administrator')" class="p-3 rounded-xl border-2 border-red-200 bg-red-50/50 hover:bg-red-50 hover:border-[#C8102E] text-left transition group shadow-xs">
+            <button type="button" onclick="loginAsRole('pilot')" class="p-3 rounded-xl border-2 border-blue-200 bg-blue-50/50 hover:bg-blue-100 hover:border-blue-600 text-left transition group shadow-xs">
               <div class="flex items-center justify-between mb-1">
-                <span class="text-lg">🛡️</span>
-                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-[#C8102E] text-white">ADMIN</span>
+                <span class="text-lg">✈️</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-blue-700 text-white">PILOT</span>
               </div>
-              <span class="font-bold text-xs block text-slate-900 group-hover:text-[#C8102E] transition">Administrator</span>
-              <span class="text-[10px] text-slate-500">Monitor workers & ops</span>
+              <span class="font-bold text-xs block text-slate-900 group-hover:text-blue-700 transition">Flight Crew (Captain)</span>
+              <span class="text-[10px] text-slate-500">Log debrief & TechLog snags</span>
             </button>
-            <button type="button" onclick="loginAsRole('worker')" class="p-3 rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-400 text-left transition group shadow-xs">
+            <button type="button" onclick="loginAsRole('engineer')" class="p-3 rounded-xl border-2 border-emerald-200 bg-emerald-50/50 hover:bg-emerald-100 hover:border-emerald-600 text-left transition group shadow-xs">
               <div class="flex items-center justify-between mb-1">
-                <span class="text-lg">👷</span>
-                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-slate-800 text-white">WORKER</span>
+                <span class="text-lg">🔧</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-[#007A3D] text-white">AME</span>
               </div>
-              <span class="font-bold text-xs block text-slate-900 group-hover:text-slate-800 transition">Shift Worker</span>
-              <span class="text-[10px] text-slate-500">Log activity & handovers</span>
+              <span class="font-bold text-xs block text-slate-900 group-hover:text-[#007A3D] transition">Aeronautical Engineer</span>
+              <span class="text-[10px] text-slate-500">Line maintenance & CRS sign-off</span>
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5 mt-2">
+            <button type="button" onclick="loginAsRole('supervisor')" class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-left transition group">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-base">📋</span>
+                <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-100 text-amber-800">CAMO</span>
+              </div>
+              <span class="font-bold text-xs block text-slate-800">Chief Maintenance Supv</span>
+              <span class="text-[9px] text-slate-500">Airworthiness oversight</span>
+            </button>
+            <button type="button" onclick="loginAsRole('administrator')" class="p-2.5 rounded-xl border border-red-200 bg-red-50/40 hover:bg-red-50 text-left transition group">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-base">🛡️</span>
+                <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-[#C8102E] text-white">ADMIN</span>
+              </div>
+              <span class="font-bold text-xs block text-slate-800">System Admin</span>
+              <span class="text-[9px] text-slate-500">Fleet rosters & audit logs</span>
             </button>
           </div>
         </div>
@@ -122,7 +140,7 @@
         <form onsubmit="handleCustomLogin(event)" class="space-y-3">
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
-            <input type="email" id="login-email" value="admin@shiftsync.local" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition" placeholder="you@shiftsync.local">
+            <input type="email" id="login-email" value="john@shiftsync.local" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition" placeholder="capt.john@shiftsync.local">
           </div>
 
           <div>
@@ -136,8 +154,12 @@
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Access Role Preference</label>
             <select id="login-role-select" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900">
-              <option value="Administrator">Administrator (Worker Monitoring & Oversight)</option>
-              <option value="Worker">Shift Worker / Operator (Handover Execution)</option>
+              <option value="Pilot (Captain)">Pilot (Captain) — Flight Deck Operations</option>
+              <option value="Licensed Aeronautical Engineer (AME)">Licensed Aeronautical Engineer (AME) — Line Maintenance</option>
+              <option value="First Officer (Pilot)">First Officer (Pilot) — Flight Operations</option>
+              <option value="Avionics Maintenance Engineer">Avionics Maintenance Engineer — Workshop</option>
+              <option value="Maintenance Supervisor">Maintenance Supervisor (CAMO Airworthiness)</option>
+              <option value="Administrator">Administrator (Flight Ops & Engineering IT)</option>
             </select>
           </div>
 
@@ -148,23 +170,23 @@
 
         <!-- Quick Role Login Helper (for testing prototype) -->
         <div class="pt-3 border-t border-slate-200">
-          <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2 text-center">Fast Demo Profiles</p>
+          <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2 text-center">Fast Aviation Demo Profiles</p>
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <button type="button" onclick="quickLogin('Emily Watson', 'Administrator', 'admin@shiftsync.local')" class="p-2 rounded-lg bg-red-50/50 hover:bg-red-50 border border-red-200 text-left transition">
-              <span class="font-bold block text-slate-900 text-xs">Emily Watson</span>
-              <span class="text-[10px] text-[#C8102E] font-bold">🛡️ Administrator</span>
+            <button type="button" onclick="quickLogin('Capt. John Doe', 'Pilot (Captain)', 'john@shiftsync.local')" class="p-2 rounded-lg bg-blue-50/60 hover:bg-blue-100 border border-blue-200 text-left transition">
+              <span class="font-bold block text-slate-900 text-xs">Capt. John Doe</span>
+              <span class="text-[10px] text-blue-700 font-bold">✈️ Pilot (Captain • B787)</span>
             </button>
-            <button type="button" onclick="quickLogin('John Doe', 'Worker', 'john@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
-              <span class="font-bold block text-slate-900 text-xs">John Doe</span>
-              <span class="text-[10px] text-slate-600 font-bold">👷 Worker (Ramp Lead)</span>
+            <button type="button" onclick="quickLogin('Eng. Michael Chang', 'Licensed Aeronautical Engineer (AME)', 'michael@shiftsync.local')" class="p-2 rounded-lg bg-emerald-50/60 hover:bg-emerald-100 border border-emerald-200 text-left transition">
+              <span class="font-bold block text-slate-900 text-xs">Eng. Michael Chang</span>
+              <span class="text-[10px] text-emerald-700 font-bold">🔧 AME (Line Maint)</span>
             </button>
-            <button type="button" onclick="quickLogin('Sarah Jenkins', 'Supervisor', 'sarah@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
+            <button type="button" onclick="quickLogin('First Officer Amina Noor', 'First Officer (Pilot)', 'amina@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
+              <span class="font-semibold block text-slate-800 text-xs">F/O Amina Noor</span>
+              <span class="text-[10px] text-slate-500">First Officer (E190)</span>
+            </button>
+            <button type="button" onclick="quickLogin('Chief Eng. Sarah Jenkins', 'Maintenance Supervisor', 'sarah@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
               <span class="font-semibold block text-slate-800 text-xs">Sarah Jenkins</span>
-              <span class="text-[10px] text-slate-500">Shift Supervisor</span>
-            </button>
-            <button type="button" onclick="quickLogin('Michael Chang', 'Worker', 'michael@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
-              <span class="font-semibold block text-slate-800 text-xs">Michael Chang</span>
-              <span class="text-[10px] text-slate-500">Incoming Maintenance</span>
+              <span class="text-[10px] text-slate-500">CAMO Maintenance Supv</span>
             </button>
           </div>
         </div>
@@ -173,13 +195,13 @@
       <!-- TAB 2: SIGN UP -->
       <div id="auth-content-signup" class="space-y-4 hidden">
         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600">
-          Register a new Worker or Administrator account. User profiles are instantly saved to the operational database.
+          Register a new Pilot, Aeronautical Engineer, or Operations Supervisor account. Profiles are instantly persisted to SQLite database.
         </div>
 
         <form onsubmit="handleSignup(event)" class="space-y-3">
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
-            <input type="text" id="signup-name" required placeholder="e.g. David Kiprono" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#C8102E]">
+            <input type="text" id="signup-name" required placeholder="e.g. Capt. David Kiprono" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#C8102E]">
           </div>
 
           <div>
@@ -193,17 +215,20 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Account Role</label>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Aviation Operational Role</label>
             <select id="signup-role" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900">
-              <option value="Worker">👷 Worker / Operator (Shift Worker, Ramp & Maintenance)</option>
-              <option value="Administrator">🛡️ Administrator (Monitor Workers, Manage Roster & Audits)</option>
-              <option value="Supervisor">Shift Supervisor</option>
+              <option value="Pilot (Captain)">✈️ Pilot (Captain) — Flight Operations</option>
+              <option value="First Officer (Pilot)">✈️ First Officer (Pilot) — Flight Operations</option>
+              <option value="Licensed Aeronautical Engineer (AME)">🔧 Licensed Aeronautical Engineer (AME) — Line Maintenance</option>
+              <option value="Avionics Maintenance Engineer">⚡ Avionics Maintenance Engineer — Instruments & Navigation</option>
+              <option value="Maintenance Supervisor">📋 Maintenance Supervisor — CAMO Airworthiness</option>
+              <option value="Administrator">🛡️ Administrator — IT & Operations Oversight</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Department / Station</label>
-            <input type="text" id="signup-dept" required placeholder="e.g. JKIA Ramp Crew B, Line Maintenance" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#C8102E]">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Department / Engineering Fleet Base</label>
+            <input type="text" id="signup-dept" required placeholder="e.g. Flight Ops - B787 Fleet, Line Maintenance Hangar 1" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#C8102E]">
           </div>
 
           <button type="submit" class="w-full py-2.5 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-xs font-bold shadow-md hover:shadow-lg transition">
@@ -459,22 +484,22 @@
                   </thead>
                   <tbody class="divide-y divide-slate-100" id="dash-pending-tasks">
                     <tr>
-                      <td class="py-3 px-2 font-medium text-slate-900">Inspect Boiler Pressure Valve</td>
+                      <td class="py-3 px-2 font-medium text-slate-900">Rectify VHF Comm #1 Snag on 5Y-KZE</td>
                       <td class="py-3 px-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-high">High</span></td>
                       <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-full text-[10px] badge-pending">Open</span></td>
-                      <td class="py-3 px-2 text-right"><button onclick="toggleTaskStatus(this)" class="text-xs text-slate-600 hover:text-slate-900 font-medium">Mark Done</button></td>
+                      <td class="py-3 px-2 text-right"><button onclick="toggleTaskStatus(1, this)" class="text-xs text-slate-600 hover:text-slate-900 font-medium">Mark Done</button></td>
                     </tr>
                     <tr>
-                      <td class="py-3 px-2 font-medium text-slate-900">Safety Drill Log Upload</td>
+                      <td class="py-3 px-2 font-medium text-slate-900">Engine #1 Oil Uplift 1.5qt on 5Y-KZE</td>
                       <td class="py-3 px-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-medium">Medium</span></td>
                       <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-full text-[10px] badge-inprogress">In Progress</span></td>
-                      <td class="py-3 px-2 text-right"><button onclick="toggleTaskStatus(this)" class="text-xs text-slate-600 hover:text-slate-900 font-medium">Mark Done</button></td>
+                      <td class="py-3 px-2 text-right"><button onclick="toggleTaskStatus(2, this)" class="text-xs text-slate-600 hover:text-slate-900 font-medium">Mark Done</button></td>
                     </tr>
                     <tr>
-                      <td class="py-3 px-2 font-medium text-slate-900">Update Logbook Section 4</td>
-                      <td class="py-3 px-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-low">Low</span></td>
+                      <td class="py-3 px-2 font-medium text-slate-900">Sign off TechLog Page #4412 for KQ 102</td>
+                      <td class="py-3 px-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-high">High</span></td>
                       <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-full text-[10px] badge-pending">Open</span></td>
-                      <td class="py-3 px-2 text-right"><button onclick="toggleTaskStatus(this)" class="text-xs text-slate-600 hover:text-slate-900 font-medium">Mark Done</button></td>
+                      <td class="py-3 px-2 text-right"><button onclick="toggleTaskStatus(3, this)" class="text-xs text-slate-600 hover:text-slate-900 font-medium">Mark Done</button></td>
                     </tr>
                   </tbody>
                 </table>
@@ -503,16 +528,16 @@
             <!-- Free-text input card (Figure 02_shiftsync_nlp_shift_log.jpg) -->
             <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
               <label class="block text-xs font-semibold text-slate-800">
-                What did you work on this shift? Describe in your own words — ShiftSync NLP will automatically extract tasks, detect priorities, and categorize items.
+                What did you work on this shift? Describe in your own words — ShiftSync NLP will automatically extract aviation tasks, detect priorities, and categorize airworthiness items.
               </label>
-              <textarea id="nlp-shift-input" rows="3" class="w-full rounded-lg border border-slate-300 p-3 text-xs text-slate-900 focus:ring-2 focus:ring-slate-900 focus:outline-none bg-white shadow-sm font-sans" placeholder="Describe tasks completed or in progress during your shift...">Checked boiler pressure on Line 2, replaced faulty sensor on conveyor B, and initiated safety drill log for night crew.</textarea>
+              <textarea id="nlp-shift-input" rows="3" class="w-full rounded-lg border border-slate-300 p-3 text-xs text-slate-900 focus:ring-2 focus:ring-slate-900 focus:outline-none bg-white shadow-sm font-sans" placeholder="Describe flight defects, cockpit instrument checks, transit maintenance, or airworthiness tasks (e.g., 'Checked APU generator frequency, replaced faulty VHF Comm LRU, signed off TechLog page #4412')...">Checked Boeing 787 left engine oil and pressure sensor readings, rectified TechLog snag #4412 on VHF Comm #1, and signed off KCAA Certificate of Release to Service CRS.</textarea>
               
               <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
                 <div class="flex items-center space-x-2">
-                  <span class="text-[11px] text-slate-500 font-medium">Try Preset Examples:</span>
-                  <button type="button" onclick="loadSampleText(1)" class="px-2 py-1 rounded bg-white border border-slate-200 text-[11px] font-medium text-slate-700 hover:bg-slate-100">Standard Shift Log</button>
-                  <button type="button" onclick="loadSampleText(2)" class="px-2 py-1 rounded bg-white border border-slate-200 text-[11px] font-medium text-slate-700 hover:bg-slate-100">Critical Spill Incident</button>
-                  <button type="button" onclick="loadSampleText(3)" class="px-2 py-1 rounded bg-white border border-slate-200 text-[11px] font-medium text-slate-700 hover:bg-slate-100">Routine Warehouse Admin</button>
+                  <span class="text-[11px] text-slate-500 font-medium">Try Aviation Scenarios:</span>
+                  <button type="button" onclick="loadSampleText(1)" class="px-2 py-1 rounded bg-white border border-slate-200 text-[11px] font-medium text-slate-700 hover:bg-slate-100">✈️ Flight Deck & AME Handover</button>
+                  <button type="button" onclick="loadSampleText(2)" class="px-2 py-1 rounded bg-white border border-slate-200 text-[11px] font-medium text-slate-700 hover:bg-slate-100">⚠️ Critical AOG Grounding</button>
+                  <button type="button" onclick="loadSampleText(3)" class="px-2 py-1 rounded bg-white border border-slate-200 text-[11px] font-medium text-slate-700 hover:bg-slate-100">📋 Flight Dispatch & Fuel</button>
                 </div>
                 <button type="button" id="btn-run-nlp" onclick="runShiftSyncNLP()" class="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-xs font-bold shadow-md transition">
                   <span id="nlp-spinner" class="hidden animate-spin">⟳</span>
@@ -525,7 +550,7 @@
             <div id="nlp-results-wrapper" class="space-y-4">
               <div id="nlp-summary-banner" class="p-3 rounded-lg bg-sky-50 border border-sky-200 text-xs text-sky-900 font-medium flex flex-wrap items-center justify-between gap-2">
                 <span id="nlp-banner-text">✨ <strong>NLP Engine:</strong> 3 Tasks Detected • Categories: Maintenance, Equipment Check, Safety & Compliance</span>
-                <span id="nlp-latency-tag" class="text-[11px] text-sky-700 font-mono">Inference: ~12ms (Local Trained Model)</span>
+                <span id="nlp-latency-tag" class="text-[11px] text-sky-700 font-mono">Inference: ~3ms (Aviation Model)</span>
               </div>
 
               <!-- Dynamic Task Cards Container -->
@@ -537,13 +562,13 @@
             <!-- Operational Sections from Wireframe -->
             <div class="space-y-3 pt-3 border-t border-slate-200 text-xs">
               <div>
-                <label class="block font-semibold text-slate-700 mb-1">Equipment Status</label>
-                <textarea id="nlp-equip-status" rows="2" class="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-800" placeholder="Detailed equipment notes...">Boiler Valve #3 tested normal at 78 PSI. Conveyor B sensor inspected; requires zero-point calibration before next production run.</textarea>
+                <label class="block font-semibold text-slate-700 mb-1">Aircraft & Equipment Status</label>
+                <textarea id="nlp-equip-status" rows="2" class="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-800" placeholder="Detailed aircraft machinery and avionics telemetry...">Left Engine (Rolls-Royce Trent 1000) vibration parameter verified at 0.8 IPS. APU generator sync tested nominal at 400Hz. Hydraulic System B pressure steady at 3,020 PSI.</textarea>
               </div>
 
               <div>
-                <label class="block font-semibold text-slate-700 mb-1">Safety Issues / Near Misses</label>
-                <textarea id="nlp-safety-status" rows="2" class="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-800" placeholder="Safety observations...">No critical safety breaches or injuries occurred. Area around Compressor C-101 kept clean and dry.</textarea>
+                <label class="block font-semibold text-slate-700 mb-1">Flight Safety & Ramp Airworthiness Observations</label>
+                <textarea id="nlp-safety-status" rows="2" class="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-800" placeholder="Safety observations and FOD inspections...">Flight deck pre-flight walkaround completed; wheel chocks and landing gear safety pins verified. Gate 4 ramp sector FOD sweep clear.</textarea>
               </div>
             </div>
 
@@ -677,77 +702,130 @@
           </div>
 
           <form onsubmit="handleSubmitHandover(event)" class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5">
-            <!-- Row 1: Select Shift -->
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Select Shift</label>
-              <select id="handover-shift-select" class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-xs text-slate-900 bg-slate-50">
-                <option selected>Day Shift A (06:00 - 18:00, Oct 25, 2026)</option>
-                <option>Night Shift B (18:00 - 06:00, Oct 24, 2026)</option>
-                <option>Day Shift C (06:00 - 18:00, Oct 26, 2026)</option>
-              </select>
-            </div>
-
-            <!-- Row 2: Operators and Timestamps (Auto-filled) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Row 1: Select Shift & Operational Handover Mode -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-semibold text-slate-700 mb-1">Outgoing Operator (Auto-filled)</label>
-                <input type="text" id="handover-outgoing-operator" value="John Doe (Current Session)" readonly class="w-full rounded-lg border border-slate-200 bg-slate-100 px-3.5 py-2 text-xs text-slate-600">
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold text-slate-700 mb-1">Incoming Operator</label>
-                <select id="handover-incoming-operator" class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-xs text-slate-900 bg-white">
-                  <option value="Michael Chang">Michael Chang (Night Shift Lead)</option>
-                  <option value="Sarah Jenkins">Sarah Jenkins (Shift Supervisor)</option>
-                  <option value="David Miller">David Miller (Logistics Lead)</option>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Select Active Shift</label>
+                <select id="handover-shift-select" class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-xs text-slate-900 bg-slate-50">
+                  <option selected value="1">Line Maint & Flight Ops Shift A (06:00 - 18:00) — B787 Fleet</option>
+                  <option value="2">Night Turnaround & Defect Rectification B (18:00 - 06:00)</option>
+                  <option value="3">Transit Ramp Check Shift C (06:00 - 18:00) — E190 Fleet</option>
+                  <option value="4">Emergency AOG Standby Shift A (18:00 - 06:00)</option>
                 </select>
               </div>
 
               <div>
-                <label class="block text-xs font-semibold text-slate-700 mb-1">Date / Time (Auto-filled)</label>
-                <input type="text" value="2026-10-25 17:45" readonly class="w-full rounded-lg border border-slate-200 bg-slate-100 px-3.5 py-2 text-xs text-slate-600 font-mono">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Handover Operational Mode</label>
+                <select id="handover-type-select" class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-xs text-slate-900 bg-white">
+                  <option value="Pilot-to-Engineer" selected>✈️ Pilot-to-Engineer (Defect Debrief & Turnaround)</option>
+                  <option value="Engineer-to-Engineer">🔧 Engineer-to-Engineer (Line Maintenance Shift)</option>
+                  <option value="Pilot-to-Pilot">👨‍✈️ Pilot-to-Pilot (Flight Crew Relief & Briefing)</option>
+                </select>
               </div>
             </div>
 
-            <!-- Equipment Status -->
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Equipment Status</label>
-              <textarea id="handover-equipment" rows="3" class="w-full rounded-lg border border-slate-300 p-3 text-xs text-slate-900 focus:ring-2 focus:ring-slate-900 focus:outline-none" placeholder="State details on machinery, boilers, valve thresholds, and instrumentation updates...">Boiler Valve #3 tested normal at 78 PSI. Conveyor B sensor inspected; requires zero-point calibration before next production run.</textarea>
+            <!-- Row 2: Aircraft Fleet Registration, Flight Sector & TechLog Reference -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Aircraft Registration / Tail No.</label>
+                <select id="handover-tail-number" class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-xs text-slate-900 bg-white font-bold">
+                  <option value="5Y-KZE" selected>5Y-KZE (Boeing 787-8 Dreamliner)</option>
+                  <option value="5Y-KZB">5Y-KZB (Boeing 787-8 Dreamliner)</option>
+                  <option value="5Y-FFF">5Y-FFF (Embraer E190)</option>
+                  <option value="5Y-KYR">5Y-KYR (Embraer E190)</option>
+                  <option value="5Y-CYA">5Y-CYA (Boeing 737-800)</option>
+                  <option value="5Y-BBA">5Y-BBA (Bombardier Dash 8-Q400)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Flight Sector Code</label>
+                <input type="text" id="handover-flight-sector" value="KQ 102 (NBO - LHR)" class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-xs text-slate-900 bg-white" placeholder="e.g. KQ 102 (NBO - LHR)">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">TechLog Page Ref & MEL Status</label>
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="text" id="handover-techlog-ref" value="TL-2026-088" class="w-full rounded-lg border border-slate-300 px-2.5 py-2 text-xs text-slate-900 bg-white font-mono" placeholder="TL-2026-088">
+                  <select id="handover-mel-status" class="w-full rounded-lg border border-slate-300 px-2 py-2 text-xs text-slate-900 bg-white">
+                    <option value="Nil Active MEL">Nil Active MEL</option>
+                    <option value="MEL Cat B (3-Day Limit)">MEL Cat B (3-Day)</option>
+                    <option value="MEL Cat C 21-31-01" selected>MEL Cat C 21-31-01</option>
+                    <option value="MEL Cat D (120-Day Limit)">MEL Cat D (120-Day)</option>
+                    <option value="AOG Grounded">⚠️ AOG Grounded</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
-            <!-- Pending Tasks Checklist (Fig 3.8) -->
+            <!-- Row 3: Flight Crew & Engineers Auto-filled -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Outgoing Sign-off (Current Session)</label>
+                <input type="text" id="handover-outgoing-operator" value="Capt. John Doe (Flight Operations)" readonly class="w-full rounded-lg border border-slate-200 bg-slate-100 px-3.5 py-2 text-xs text-slate-700 font-semibold">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Incoming Lead / Receiving Authority</label>
+                <select id="handover-incoming-operator" class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-xs text-slate-900 bg-white font-medium">
+                  <option value="Michael Chang" selected>Eng. Michael Chang (Licensed Aeronautical Engineer)</option>
+                  <option value="John Doe">Capt. John Doe (Flight Operations B787)</option>
+                  <option value="Sarah Jenkins">Chief Eng. Sarah Jenkins (CAMO Supervisor)</option>
+                  <option value="Amina Noor">First Officer Amina Noor (E190 Flight Crew)</option>
+                  <option value="David Miller">Eng. David Miller (Avionics Specialist)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Handover Submission Timestamp</label>
+                <input type="text" value="2026-10-25 17:45 EAT" readonly class="w-full rounded-lg border border-slate-200 bg-slate-100 px-3.5 py-2 text-xs text-slate-600 font-mono">
+              </div>
+            </div>
+
+            <!-- Aircraft & Equipment Status -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Aircraft Systems & Powerplant Status</label>
+              <textarea id="handover-equipment" rows="3" class="w-full rounded-lg border border-slate-300 p-3 text-xs text-slate-900 focus:ring-2 focus:ring-slate-900 focus:outline-none" placeholder="State engine parameters, APU status, hydraulic pressure, avionics flags...">Left Engine (Rolls-Royce Trent 1000) vibration parameter verified at 0.8 IPS. APU generator sync tested nominal at 400Hz. Hydraulic System B pressure steady at 3,020 PSI.</textarea>
+            </div>
+
+            <!-- Pending Aviation Tasks Checklist -->
             <div>
               <div class="flex items-center justify-between mb-2">
-                <label class="block text-xs font-semibold text-slate-700">Pending Tasks Checklist</label>
-                <button type="button" onclick="addChecklistItemPrompt()" class="text-[11px] font-semibold text-slate-700 hover:text-slate-900">+ Add Task to Checklist</button>
+                <label class="block text-xs font-semibold text-slate-700">Transferred Operational Checklist</label>
+                <button type="button" onclick="addChecklistItemPrompt()" class="text-[11px] font-semibold text-[#C8102E] hover:underline">+ Add Task to Checklist</button>
               </div>
-              <div class="space-y-2 bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs" id="checklist-container">
+              <div class="space-y-2 bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-xs" id="checklist-container">
                 <label class="flex items-center space-x-2.5 text-slate-800">
-                  <input type="checkbox" checked class="w-4 h-4 rounded text-slate-900 border-slate-300">
-                  <span>Hourly safety round verification completed</span>
+                  <input type="checkbox" checked class="w-4 h-4 rounded text-[#007A3D] border-slate-300">
+                  <span>Pre-flight cockpit instrument scan & EFIS test verified nominal</span>
                 </label>
                 <label class="flex items-center space-x-2.5 text-slate-800">
-                  <input type="checkbox" class="w-4 h-4 rounded text-slate-900 border-slate-300">
-                  <span>Verify generator fuel reserve level above 40%</span>
+                  <input type="checkbox" checked class="w-4 h-4 rounded text-[#007A3D] border-slate-300">
+                  <span>Gate 4 ramp Foreign Object Debris (FOD) inspection sweep completed</span>
                 </label>
                 <label class="flex items-center space-x-2.5 text-slate-800">
-                  <input type="checkbox" class="w-4 h-4 rounded text-slate-900 border-slate-300">
-                  <span>Log maintenance task progress in Section B</span>
+                  <input type="checkbox" class="w-4 h-4 rounded text-[#007A3D] border-slate-300">
+                  <span>Verify APU fuel feed and hydraulic accumulator above 2,900 PSI</span>
+                </label>
+                <label class="flex items-center space-x-2.5 text-slate-800">
+                  <input type="checkbox" class="w-4 h-4 rounded text-[#007A3D] border-slate-300">
+                  <span>Review Minimum Equipment List (MEL) cockpit deferral placard #21-31-01</span>
                 </label>
               </div>
             </div>
 
-            <!-- Safety Issues / Near Misses -->
+            <!-- Airworthiness & Flight Safety Issues -->
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Safety Issues / Near Misses</label>
-              <textarea id="handover-safety" rows="2" class="w-full rounded-lg border border-slate-300 p-3 text-xs text-slate-900 focus:ring-2 focus:ring-slate-900 focus:outline-none" placeholder="Describe any safety hazards, incidents, near misses, or active alarm zones resolved...">No safety breaches or injuries occurred. Area around Compressor C-101 kept clean and dry.</textarea>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Flight Safety & Ramp Airworthiness Observations</label>
+              <textarea id="handover-safety" rows="2" class="w-full rounded-lg border border-slate-300 p-3 text-xs text-slate-900 focus:ring-2 focus:ring-slate-900 focus:outline-none" placeholder="Describe safety hazards, ramp FOD, or airworthiness alerts...">Flight deck pre-flight walkaround completed; wheel chocks and landing gear safety pins verified. Gate 4 ramp sector FOD sweep clear.</textarea>
             </div>
 
-            <!-- Additional Notes -->
+            <!-- Additional Notes / Remarks -->
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Additional Notes</label>
-              <textarea id="handover-notes" rows="2" class="w-full rounded-lg border border-slate-300 p-3 text-xs text-slate-900 focus:ring-2 focus:ring-slate-900 focus:outline-none" placeholder="Any other observations, general handoff comments, or tools to locate...">Keys for tool cabinet B placed in the shift locker. Incoming crew advised to review calibration log.</textarea>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">TechLog Rectification Remarks & Handover Notes</label>
+              <textarea id="handover-notes" rows="2" class="w-full rounded-lg border border-slate-300 p-3 text-xs text-slate-900 focus:ring-2 focus:ring-slate-900 focus:outline-none" placeholder="TechLog defect references, tool locker sign-offs, or dispatch instructions...">TechLog page #4412 signed off. MEL Cat C 21-31-01 cabin recirculation fan inspection deferred with KCAA flight ops authorization.</textarea>
             </div>
+
 
             <!-- Buttons -->
             <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-200">
@@ -781,9 +859,11 @@
               <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-medium">
                 <tr>
                   <th class="p-3.5">Report ID</th>
-                  <th class="p-3.5">Shift</th>
-                  <th class="p-3.5">Outgoing Operator</th>
-                  <th class="p-3.5">Incoming Operator</th>
+                  <th class="p-3.5">Aircraft / Sector</th>
+                  <th class="p-3.5">Shift & Mode</th>
+                  <th class="p-3.5">TechLog & MEL</th>
+                  <th class="p-3.5">Outgoing</th>
+                  <th class="p-3.5">Incoming</th>
                   <th class="p-3.5">Date Submitted</th>
                   <th class="p-3.5">Status</th>
                   <th class="p-3.5 text-right">Actions</th>
@@ -792,9 +872,20 @@
               <tbody class="divide-y divide-slate-100" id="all-handovers-tbody">
                 <tr class="hover:bg-slate-50 bg-amber-50/40">
                   <td class="p-3.5 font-mono font-bold text-slate-900">#HO-2026-088</td>
-                  <td class="p-3.5 font-medium text-slate-900">Day Shift A → Night B</td>
-                  <td class="p-3.5 text-slate-700">John Doe</td>
-                  <td class="p-3.5 text-slate-700">Michael Chang</td>
+                  <td class="p-3.5">
+                    <span class="font-bold text-slate-900 block">5Y-KZE</span>
+                    <span class="text-[10px] text-slate-500 font-mono">KQ 102 (NBO → LHR)</span>
+                  </td>
+                  <td class="p-3.5">
+                    <span class="font-medium text-slate-900 block">Day Shift A → Night B</span>
+                    <span class="text-[10px] text-blue-700 font-semibold">Engineer-to-Engineer</span>
+                  </td>
+                  <td class="p-3.5">
+                    <span class="font-mono text-slate-800 block">TL-2026-088</span>
+                    <span class="text-[10px] text-amber-700 font-medium">MEL Cat C 21-31-01</span>
+                  </td>
+                  <td class="p-3.5 text-slate-700 font-medium">Capt. John Doe</td>
+                  <td class="p-3.5 text-slate-700 font-medium">Eng. Michael Chang</td>
                   <td class="p-3.5 font-mono text-slate-600">Today, 17:45</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-inprogress" id="badge-ho-88">Pending Review</span></td>
                   <td class="p-3.5 text-right">
@@ -803,9 +894,20 @@
                 </tr>
                 <tr class="hover:bg-slate-50">
                   <td class="p-3.5 font-mono text-slate-600">#HO-2026-087</td>
-                  <td class="p-3.5 font-medium text-slate-900">Night Shift B → Day A</td>
-                  <td class="p-3.5 text-slate-700">Sarah Jenkins</td>
-                  <td class="p-3.5 text-slate-700">John Doe</td>
+                  <td class="p-3.5">
+                    <span class="font-bold text-slate-900 block">5Y-KZG</span>
+                    <span class="text-[10px] text-slate-500 font-mono">KQ 310 (NBO → DXB)</span>
+                  </td>
+                  <td class="p-3.5">
+                    <span class="font-medium text-slate-900 block">Night Shift B → Day A</span>
+                    <span class="text-[10px] text-sky-700 font-semibold">Pilot-to-Pilot</span>
+                  </td>
+                  <td class="p-3.5">
+                    <span class="font-mono text-slate-800 block">TL-2026-087</span>
+                    <span class="text-[10px] text-emerald-700 font-medium">Nil Active MEL</span>
+                  </td>
+                  <td class="p-3.5 text-slate-700">Capt. Sarah Jenkins</td>
+                  <td class="p-3.5 text-slate-700">FO. David Miller</td>
                   <td class="p-3.5 font-mono text-slate-600">Oct 24, 2026 05:55</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed">Acknowledged</span></td>
                   <td class="p-3.5 text-right">
@@ -814,9 +916,20 @@
                 </tr>
                 <tr class="hover:bg-slate-50">
                   <td class="p-3.5 font-mono text-slate-600">#HO-2026-086</td>
-                  <td class="p-3.5 font-medium text-slate-900">Day Shift A → Night B</td>
-                  <td class="p-3.5 text-slate-700">Michael Chang</td>
-                  <td class="p-3.5 text-slate-700">Sarah Jenkins</td>
+                  <td class="p-3.5">
+                    <span class="font-bold text-slate-900 block">5Y-KZB</span>
+                    <span class="text-[10px] text-slate-500 font-mono">KQ 404 (NBO → JNB)</span>
+                  </td>
+                  <td class="p-3.5">
+                    <span class="font-medium text-slate-900 block">Day Shift A → Night B</span>
+                    <span class="text-[10px] text-purple-700 font-semibold">Pilot-to-Engineer</span>
+                  </td>
+                  <td class="p-3.5">
+                    <span class="font-mono text-slate-800 block">TL-2026-086</span>
+                    <span class="text-[10px] text-emerald-700 font-medium">TechLog Rectified</span>
+                  </td>
+                  <td class="p-3.5 text-slate-700">Eng. Michael Chang</td>
+                  <td class="p-3.5 text-slate-700">Capt. John Doe</td>
                   <td class="p-3.5 font-mono text-slate-600">Oct 23, 2026 17:50</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed">Acknowledged</span></td>
                   <td class="p-3.5 text-right">
@@ -841,47 +954,75 @@
                 <button onclick="closeModal('handover-review-modal')" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
               </div>
 
+              <!-- Aircraft Technical Dispatch Context -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs">
+                <div>
+                  <span class="text-[10px] text-slate-500 font-medium block">Aircraft Tail</span>
+                  <span class="font-mono font-bold text-slate-900" id="modal-ho-tail">5Y-KZE (B787-8)</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-500 font-medium block">Flight Sector</span>
+                  <span class="font-semibold text-slate-800" id="modal-ho-flight">KQ 102 (NBO → LHR)</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-500 font-medium block">TechLog Ref</span>
+                  <span class="font-mono font-semibold text-slate-800" id="modal-ho-techlog">TL-2026-088</span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-500 font-medium block">MEL Dispatch Status</span>
+                  <span class="font-semibold text-amber-700" id="modal-ho-mel">MEL Cat C 21-31-01</span>
+                </div>
+              </div>
+
               <!-- Content Breakdown -->
               <div class="space-y-3 text-xs">
                 <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                  <h4 class="font-bold text-slate-800 mb-1">Equipment Status Log</h4>
-                  <p class="text-slate-600">Boiler Valve #3 tested normal at 78 PSI. Conveyor B sensor inspected; requires zero-point calibration before next production run.</p>
+                  <div class="flex items-center justify-between mb-1">
+                    <h4 class="font-bold text-slate-800">Aircraft Systems & Technical Log</h4>
+                    <span class="text-[10px] font-medium text-slate-500" id="modal-ho-type">Engineer-to-Engineer</span>
+                  </div>
+                  <p class="text-slate-600" id="modal-ho-equip">Rolls-Royce Trent 1000 oil level verified at 19.5qt (1.5qt uplift). VHF Comm transceiver #1 swapped and pass-tested. Pitot-static probe covers removed for pre-flight.</p>
                 </div>
 
                 <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                  <h4 class="font-bold text-slate-800 mb-1">Safety Issues & Hazards</h4>
-                  <p class="text-slate-600">No safety breaches or injuries occurred. Area around Compressor C-101 kept clean and dry.</p>
+                  <h4 class="font-bold text-slate-800 mb-1">Flight Safety & Ramp Airworthiness Observations</h4>
+                  <p class="text-slate-600" id="modal-ho-safety">Flight deck pre-flight walkaround completed; wheel chocks and landing gear safety pins verified. Gate 4 ramp sector FOD sweep clear.</p>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <h4 class="font-bold text-slate-800 mb-1">TechLog Rectification Remarks & Handover Notes</h4>
+                  <p class="text-slate-600" id="modal-ho-notes">TechLog page #4412 signed off. MEL Cat C 21-31-01 cabin recirculation fan inspection deferred with KCAA flight ops authorization.</p>
                 </div>
 
                 <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
                   <h4 class="font-bold text-slate-800 mb-2">Transferred Pending Tasks Checklist</h4>
-                  <div class="space-y-1.5 text-slate-700">
+                  <div class="space-y-1.5 text-slate-700" id="modal-ho-checklist">
                     <label class="flex items-center space-x-2">
                       <input type="checkbox" checked disabled class="rounded text-slate-900">
-                      <span>Hourly safety round verification completed (Verified by John Doe)</span>
+                      <span>Pre-flight exterior walkaround and gear pin removal (Verified by Capt. John Doe)</span>
                     </label>
                     <label class="flex items-center space-x-2 font-medium text-slate-900">
                       <input type="checkbox" id="ack-chk-1" class="rounded text-slate-900">
-                      <span>Verify generator fuel reserve level above 40% (Pending Night Shift)</span>
+                      <span>Verify Engine #1 oil uplift 1.5qt recorded in aircraft techlog (Pending AME Michael Chang)</span>
                     </label>
                     <label class="flex items-center space-x-2 font-medium text-slate-900">
                       <input type="checkbox" id="ack-chk-2" class="rounded text-slate-900">
-                      <span>Log maintenance task progress in Section B (Pending Night Shift)</span>
+                      <span>Sign off Certificate of Release to Service (CRS) before passenger boarding (Pending Night Shift)</span>
                     </label>
                   </div>
                 </div>
 
                 <!-- Accountability Box -->
                 <div class="p-3.5 rounded-lg bg-blue-50 border border-blue-200 text-slate-800 space-y-1">
-                  <p class="font-bold text-blue-900">Formal Acknowledgment Agreement (Proposal Section 2.4)</p>
-                  <p class="text-slate-600">By acknowledging this report, you confirm receipt of all equipment notes and accept operational custody of outstanding tasks.</p>
-                  <p class="font-mono text-[11px] text-slate-500">Sign-off Authority: <strong class="text-slate-800" id="modal-ho-ack-user">Michael Chang</strong></p>
+                  <p class="font-bold text-blue-900">ICAO Annex 6 / KCAA SMS Shift Handover Compliance Agreement</p>
+                  <p class="text-slate-600">By acknowledging this report, you confirm receipt of aircraft technical status, accept custody of outstanding maintenance items, and certify airworthiness alignment.</p>
+                  <p class="font-mono text-[11px] text-slate-500">Sign-off Authority: <strong class="text-slate-800" id="modal-ho-ack-user">Eng. Michael Chang (Licensed Aeronautical Engineer - AME)</strong></p>
                 </div>
               </div>
 
               <!-- Modal Actions -->
               <div class="flex items-center justify-between pt-2 border-t border-slate-200">
-                <button onclick="alert('Discrepancy flagged to Supervisor Sarah Jenkins.'); closeModal('handover-review-modal');" class="text-xs font-semibold text-rose-600 hover:text-rose-800">
+                <button onclick="alert('Airworthiness discrepancy flagged to Supervisor Sarah Jenkins.'); closeModal('handover-review-modal');" class="text-xs font-semibold text-rose-600 hover:text-rose-800">
                   Flag Discrepancy
                 </button>
                 <div class="space-x-2">
@@ -943,69 +1084,69 @@
               </thead>
               <tbody class="divide-y divide-slate-100" id="tasks-table-body">
                 <tr class="hover:bg-slate-50" data-status="In Progress" data-priority="High">
-                  <td class="p-3.5 font-bold text-slate-900">Inspect Boiler Pressure Valve</td>
-                  <td class="p-3.5 text-slate-700">John Doe</td>
+                  <td class="p-3.5 font-bold text-slate-900">Rectify VHF Comm #1 Snag on 5Y-KZE</td>
+                  <td class="p-3.5 text-slate-700">Capt. John Doe</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-high">HIGH</span></td>
                   <td class="p-3.5 font-mono text-slate-600">Today, 18:00</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-inprogress">IN PROGRESS</span></td>
                   <td class="p-3.5 text-right space-x-2">
-                    <button onclick="alert('Viewing task: Inspect Boiler Pressure Valve')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
-                    <button onclick="alert('Editing task: Inspect Boiler Pressure Valve')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                    <button onclick="alert('Viewing task: Rectify VHF Comm #1 Snag on 5Y-KZE')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing task: Rectify VHF Comm #1 Snag on 5Y-KZE')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
                   </td>
                 </tr>
                 <tr class="hover:bg-slate-50" data-status="Open" data-priority="Medium">
-                  <td class="p-3.5 font-bold text-slate-900">Safety Drill Log Upload</td>
-                  <td class="p-3.5 text-slate-700">Sarah Jenkins</td>
+                  <td class="p-3.5 font-bold text-slate-900">Engine #1 Oil Uplift 1.5qt on 5Y-KZE</td>
+                  <td class="p-3.5 text-slate-700">Eng. Michael Chang</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-medium">MEDIUM</span></td>
                   <td class="p-3.5 font-mono text-slate-600">Oct 27, 2026</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-pending">PENDING</span></td>
                   <td class="p-3.5 text-right space-x-2">
-                    <button onclick="alert('Viewing task: Safety Drill Log Upload')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
-                    <button onclick="alert('Editing task: Safety Drill Log Upload')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                    <button onclick="alert('Viewing task: Engine #1 Oil Uplift 1.5qt on 5Y-KZE')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing task: Engine #1 Oil Uplift 1.5qt on 5Y-KZE')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
                   </td>
                 </tr>
                 <tr class="hover:bg-slate-50" data-status="Completed" data-priority="High">
-                  <td class="p-3.5 font-bold text-slate-900">Generator Fuel Level Verification</td>
-                  <td class="p-3.5 text-slate-700">Michael Chang</td>
+                  <td class="p-3.5 font-bold text-slate-900">Pre-flight Exterior Walkaround on 5Y-KZG</td>
+                  <td class="p-3.5 text-slate-700">Capt. Sarah Jenkins</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-high">HIGH</span></td>
                   <td class="p-3.5 font-mono text-slate-600">Oct 26, 2026</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed">COMPLETED</span></td>
                   <td class="p-3.5 text-right space-x-2">
-                    <button onclick="alert('Viewing task: Generator Fuel Level Verification')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
-                    <button onclick="alert('Editing task: Generator Fuel Level Verification')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                    <button onclick="alert('Viewing task: Pre-flight Exterior Walkaround on 5Y-KZG')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing task: Pre-flight Exterior Walkaround on 5Y-KZG')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
                   </td>
                 </tr>
                 <tr class="hover:bg-slate-50" data-status="Open" data-priority="Low">
-                  <td class="p-3.5 font-bold text-slate-900">Update Shift Logbook Section 4</td>
-                  <td class="p-3.5 text-slate-700">Sarah Jenkins</td>
+                  <td class="p-3.5 font-bold text-slate-900">Update KCAA TechLog CRS Defect Log</td>
+                  <td class="p-3.5 text-slate-700">Eng. Amina Noor</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-low">LOW</span></td>
                   <td class="p-3.5 font-mono text-slate-600">Oct 28, 2026</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-pending">PENDING</span></td>
                   <td class="p-3.5 text-right space-x-2">
-                    <button onclick="alert('Viewing task: Update Shift Logbook Section 4')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
-                    <button onclick="alert('Editing task: Update Shift Logbook Section 4')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                    <button onclick="alert('Viewing task: Update KCAA TechLog CRS Defect Log')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing task: Update KCAA TechLog CRS Defect Log')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
                   </td>
                 </tr>
                 <tr class="hover:bg-slate-50" data-status="Open" data-priority="Medium">
-                  <td class="p-3.5 font-bold text-slate-900">Calibrate Water Flow Sensor #2</td>
-                  <td class="p-3.5 text-slate-700">John Doe</td>
+                  <td class="p-3.5 font-bold text-slate-900">Calibrate Pitot-Static Probe Heating</td>
+                  <td class="p-3.5 text-slate-700">Eng. Michael Chang</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-medium">MEDIUM</span></td>
                   <td class="p-3.5 font-mono text-slate-600">Oct 29, 2026</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-pending">PENDING</span></td>
                   <td class="p-3.5 text-right space-x-2">
-                    <button onclick="alert('Viewing task: Calibrate Water Flow Sensor #2')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
-                    <button onclick="alert('Editing task: Calibrate Water Flow Sensor #2')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                    <button onclick="alert('Viewing task: Calibrate Pitot-Static Probe Heating')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing task: Calibrate Pitot-Static Probe Heating')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
                   </td>
                 </tr>
                 <tr class="hover:bg-slate-50" data-status="Completed" data-priority="Low">
-                  <td class="p-3.5 font-bold text-slate-900">Daily Backup of SCADA Telemetry</td>
-                  <td class="p-3.5 text-slate-700">System Auto</td>
+                  <td class="p-3.5 font-bold text-slate-900">FOD Ramp Clearance Verification Gate 4</td>
+                  <td class="p-3.5 text-slate-700">FO. David Miller</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-low">LOW</span></td>
                   <td class="p-3.5 font-mono text-slate-600">Everyday, 23:59</td>
                   <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold badge-completed">COMPLETED</span></td>
                   <td class="p-3.5 text-right space-x-2">
-                    <button onclick="alert('Viewing task: Daily Backup of SCADA Telemetry')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
-                    <button onclick="alert('Editing task: Daily Backup of SCADA Telemetry')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
+                    <button onclick="alert('Viewing task: FOD Ramp Clearance Verification Gate 4')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">View</button>
+                    <button onclick="alert('Editing task: FOD Ramp Clearance Verification Gate 4')" class="px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50">Edit</button>
                   </td>
                 </tr>
               </tbody>
@@ -1075,7 +1216,7 @@
               <div class="flex items-center space-x-3">
                 <div class="w-2.5 h-2.5 rounded-full bg-blue-600 flex-shrink-0 notif-dot"></div>
                 <div>
-                  <p class="font-semibold text-slate-900">Critical Alert: Boiler pressure threshold warning resolved on Valve #3</p>
+                  <p class="font-semibold text-slate-900">Critical Alert: Aircraft 5Y-KZE hydraulic pressure threshold resolved by AME Michael Chang</p>
                   <p class="text-[11px] text-slate-500 font-mono mt-0.5">2 hours ago</p>
                 </div>
               </div>
@@ -1543,19 +1684,20 @@
   <!-- JavaScript Prototype Controller -->
   <script>
     let currentUser = {
-      name: 'John Doe',
-      role: 'Outgoing Operator',
-      email: 'operator@industry.com'
+      name: 'Capt. John Doe',
+      role: 'Pilot (Captain)',
+      email: 'john@shiftsync.local'
     };
 
     const views = ['dashboard', 'shift-log', 'shifts', 'create-handover', 'handover-reports', 'tasks', 'notifications', 'users', 'worker-monitoring'];
 
     let currentDetectedTasks = [];
+    let loadedHandovers = [];
 
     const samplePresets = {
-      1: "Checked boiler pressure on Line 2, replaced faulty sensor on conveyor B, and initiated safety drill log for night crew.",
-      2: "Major chemical spill reported in Warehouse Sector B, evacuated personnel and awaiting hazardous materials response team.",
-      3: "Updated shift logbook Section 4, completed routine inventory reconciliation in bin rack R-44, and handed over locker keys to incoming lead."
+      1: "Completed pre-flight walkaround on 5Y-KZE. Engine #1 oil replenished by 1.5qt, TechLog defect #4412 regarding bleed air valve closed, and signed off maintenance release for flight KQ 102.",
+      2: "CRITICAL AOG on 5Y-KZG at Gate 4. Hydraulic System B reservoir leak detected during turn-around check. Grounded aircraft, notified CAMO control, and initiated seal replacement.",
+      3: "Flight KQ 310 sector complete on 5Y-KZB. Weather radar test OK, fuel remaining 14,200 kg verified against flight dispatch plan, handed over TechLog to incoming First Officer."
     };
 
     function loadSampleText(id) {
@@ -1659,23 +1801,26 @@
         let prio = "Medium";
         let stat = "Pending";
 
-        if (lower.includes("boiler") || lower.includes("valve") || lower.includes("gauge") || lower.includes("sensor")) {
+        if (lower.includes("oil") || lower.includes("engine") || lower.includes("hydraulic") || lower.includes("bleed") || lower.includes("valve") || lower.includes("avionics") || lower.includes("sensor")) {
+          cat = "Maintenance";
+          prio = lower.includes("leak") || lower.includes("fail") || lower.includes("aog") ? "Critical" : "High";
+        } else if (lower.includes("aog") || lower.includes("grounded") || lower.includes("abort") || lower.includes("fire") || lower.includes("spill")) {
+          cat = "Safety & Compliance";
+          prio = "Critical";
+        } else if (lower.includes("walkaround") || lower.includes("pre-flight") || lower.includes("gear") || lower.includes("chock") || lower.includes("pin") || lower.includes("tire") || lower.includes("brake") || lower.includes("pitot")) {
           cat = "Equipment Check";
           prio = "High";
-        } else if (lower.includes("repair") || lower.includes("replace") || lower.includes("leak") || lower.includes("pump")) {
-          cat = "Maintenance";
-          prio = lower.includes("leak") || lower.includes("fail") ? "Critical" : "High";
-        } else if (lower.includes("safety") || lower.includes("spill") || lower.includes("drill") || lower.includes("alarm")) {
-          cat = "Safety & Compliance";
-          prio = lower.includes("spill") ? "Critical" : "High";
-        } else if (lower.includes("logbook") || lower.includes("key") || lower.includes("sop") || lower.includes("report")) {
-          cat = "Administration";
+        } else if (lower.includes("techlog") || lower.includes("logbook") || lower.includes("dispatch") || lower.includes("fuel") || lower.includes("mel") || lower.includes("release") || lower.includes("sign")) {
+          cat = "Operations";
+          prio = "Medium";
+        } else {
+          cat = "Operations";
           prio = "Low";
         }
 
-        if (lower.includes("checked") || lower.includes("completed") || lower.includes("done") || lower.includes("swept")) {
+        if (lower.includes("checked") || lower.includes("completed") || lower.includes("done") || lower.includes("signed") || lower.includes("closed") || lower.includes("replenished") || lower.includes("rectified")) {
           stat = "Completed";
-        } else if (lower.includes("replacing") || lower.includes("repairing") || lower.includes("progress")) {
+        } else if (lower.includes("replacing") || lower.includes("repairing") || lower.includes("progress") || lower.includes("calibrating") || lower.includes("grounded")) {
           stat = "In Progress";
         }
 
@@ -1792,18 +1937,24 @@
         if (res.ok && data.user) {
           applyUserSession(data.user);
         } else {
-          if (roleType === 'administrator') {
-            quickLogin('Emily Watson', 'Administrator', 'admin@shiftsync.local');
-          } else {
-            quickLogin('John Doe', 'Worker', 'john@shiftsync.local');
-          }
+          fallbackQuickLogin(roleType);
         }
       } catch (err) {
-        if (roleType === 'administrator') {
-          quickLogin('Emily Watson', 'Administrator', 'admin@shiftsync.local');
-        } else {
-          quickLogin('John Doe', 'Worker', 'john@shiftsync.local');
-        }
+        fallbackQuickLogin(roleType);
+      }
+    }
+
+    function fallbackQuickLogin(roleType) {
+      if (roleType === 'administrator') {
+        quickLogin('Emily Watson', 'Administrator', 'admin@shiftsync.local');
+      } else if (roleType === 'pilot') {
+        quickLogin('Capt. John Doe', 'Pilot (Captain)', 'john@shiftsync.local');
+      } else if (roleType === 'engineer') {
+        quickLogin('Eng. Michael Chang', 'Licensed Aeronautical Engineer (AME)', 'michael@shiftsync.local');
+      } else if (roleType === 'supervisor') {
+        quickLogin('Sarah Jenkins', 'Maintenance Supervisor', 'sarah@shiftsync.local');
+      } else {
+        quickLogin('Capt. John Doe', 'Pilot (Captain)', 'john@shiftsync.local');
       }
     }
 
@@ -1876,12 +2027,29 @@
       document.getElementById('user-avatar-initials').innerText = (user.name || 'User').split(' ').map(n=>n[0]).join('');
 
       const roleBadge = document.getElementById('header-role-badge');
-      const isAdmin = (user.role || '').toLowerCase().includes('admin');
+      const rLower = (user.role || '').toLowerCase();
+      const isAdmin = rLower.includes('admin');
+      const isPilot = rLower.includes('pilot') || rLower.includes('captain') || rLower.includes('first officer');
+      const isAME = rLower.includes('engineer') || rLower.includes('ame') || rLower.includes('avionics');
+      const isSupv = rLower.includes('supervisor') || rLower.includes('camo');
+
       if (roleBadge) {
-        roleBadge.innerText = isAdmin ? '🛡️ ADMINISTRATOR' : '👷 WORKER';
-        roleBadge.className = isAdmin 
-          ? 'px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-red-100 text-[#C8102E] border border-red-300'
-          : 'px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-slate-100 text-slate-700 border border-slate-300';
+        if (isAdmin) {
+          roleBadge.innerText = '🛡️ ADMINISTRATOR';
+          roleBadge.className = 'px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-red-100 text-[#C8102E] border border-red-300';
+        } else if (isPilot) {
+          roleBadge.innerText = '✈️ PILOT';
+          roleBadge.className = 'px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-sky-100 text-sky-800 border border-sky-300';
+        } else if (isAME) {
+          roleBadge.innerText = '🔧 AME';
+          roleBadge.className = 'px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300';
+        } else if (isSupv) {
+          roleBadge.innerText = '📋 CAMO SUPV';
+          roleBadge.className = 'px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-purple-100 text-purple-800 border border-purple-300';
+        } else {
+          roleBadge.innerText = '✈️ FLIGHT CREW';
+          roleBadge.className = 'px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-slate-100 text-slate-700 border border-slate-300';
+        }
       }
 
       const outgoingInput = document.getElementById('handover-outgoing-operator');
@@ -2214,8 +2382,9 @@
       const data = await fetchAPI('/api/handovers');
       if (!data || !data.handovers) return;
 
+      loadedHandovers = data.handovers;
       const tbody = document.getElementById('all-handovers-tbody');
-      const dashTbody = document.getElementById('dash-handovers-tbody');
+      const dashTbody = document.getElementById('dash-recent-handovers') || document.getElementById('dash-handovers-tbody');
       if (!tbody) return;
 
       tbody.innerHTML = '';
@@ -2228,13 +2397,24 @@
         
         tr.innerHTML = `
           <td class="p-3.5 font-mono font-bold text-slate-900">#${h.report_code}</td>
-          <td class="p-3.5 font-medium text-slate-900">${h.shift_name || 'Shift'} (${h.team || 'Crew'})</td>
-          <td class="p-3.5 text-slate-700">${h.outgoing_operator}</td>
-          <td class="p-3.5 text-slate-700">${h.incoming_operator}</td>
+          <td class="p-3.5">
+            <span class="font-bold text-slate-900 block">${h.aircraft_tail_number || '5Y-KZE'}</span>
+            <span class="text-[10px] text-slate-500 font-mono">${h.flight_number || 'KQ Sector'}</span>
+          </td>
+          <td class="p-3.5">
+            <span class="font-medium text-slate-900 block">${h.shift_name || 'Shift'}</span>
+            <span class="text-[10px] text-blue-700 font-semibold">${h.handover_type || 'Transfer'}</span>
+          </td>
+          <td class="p-3.5">
+            <span class="font-mono text-slate-800 block">${h.techlog_reference || 'TL-2026-088'}</span>
+            <span class="text-[10px] ${h.mel_status && h.mel_status.includes('Active') ? 'text-amber-700 font-bold' : 'text-slate-500 font-medium'}">${h.mel_status || 'Nil MEL'}</span>
+          </td>
+          <td class="p-3.5 text-slate-700 font-medium">${h.outgoing_operator}</td>
+          <td class="p-3.5 text-slate-700 font-medium">${h.incoming_operator}</td>
           <td class="p-3.5 font-mono text-slate-600">${h.submitted_at}</td>
           <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeClass}" id="badge-${h.report_code}">${h.status}</span></td>
           <td class="p-3.5 text-right">
-            <button onclick="viewHandoverDetails('${h.report_code}', '${h.outgoing_operator}', '${h.incoming_operator}', '${h.equipment_status || ''}', '${h.safety_notes || ''}')" class="px-2.5 py-1 rounded ${h.status === 'Pending Review' ? 'bg-[#C8102E] text-white hover:bg-[#A60C25]' : 'border border-slate-300 text-slate-700 hover:bg-slate-50'} font-semibold text-xs transition">
+            <button onclick="viewHandoverDetails('${h.report_code}')" class="px-2.5 py-1 rounded ${h.status === 'Pending Review' ? 'bg-[#C8102E] text-white hover:bg-[#A60C25]' : 'border border-slate-300 text-slate-700 hover:bg-slate-50'} font-semibold text-xs transition">
               ${h.status === 'Pending Review' ? 'Review & Acknowledge' : 'View Details'}
             </button>
           </td>
@@ -2242,7 +2422,17 @@
         tbody.appendChild(tr);
 
         if (dashTbody) {
-          const dTr = tr.cloneNode(true);
+          const dTr = document.createElement('tr');
+          dTr.className = h.status === 'Pending Review' ? 'bg-amber-50/50' : '';
+          dTr.innerHTML = `
+            <td class="py-3 px-2 font-mono text-slate-700">${(h.submitted_at || '').split(' ')[0] || h.submitted_at}</td>
+            <td class="py-3 px-2">
+              <span class="font-bold text-slate-900 block text-xs">${h.aircraft_tail_number || '5Y-KZE'} • ${h.flight_number || 'KQ Sector'}</span>
+              <span class="text-[10px] text-slate-500">${h.shift_name || 'Shift'}</span>
+            </td>
+            <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${badgeClass}">${h.status}</span></td>
+            <td class="py-3 px-2 text-right"><button onclick="viewHandoverDetails('${h.report_code}')" class="text-xs font-bold ${h.status === 'Pending Review' ? 'text-[#C8102E]' : 'text-slate-700'} hover:underline">${h.status === 'Pending Review' ? 'Review' : 'View'}</button></td>
+          `;
           dashTbody.appendChild(dTr);
         }
       });
@@ -2329,6 +2519,11 @@
       e.preventDefault();
       const shiftId = document.getElementById('handover-shift-select').value;
       const incoming = document.getElementById('handover-incoming-operator').value;
+      const tailNo = (document.getElementById('handover-tail-number')?.value || '5Y-KZE').trim();
+      const flightSector = (document.getElementById('handover-flight-sector')?.value || 'KQ 102 (NBO → LHR)').trim();
+      const hoType = document.getElementById('handover-type-select')?.value || 'Engineer-to-Engineer';
+      const techlogRef = (document.getElementById('handover-techlog-ref')?.value || 'TL-2026-088').trim();
+      const melStatus = document.getElementById('handover-mel-status')?.value || 'Nil Active MEL';
       const equip = document.getElementById('handover-equipment').value;
       const safety = document.getElementById('handover-safety').value;
       const notes = document.getElementById('handover-notes').value;
@@ -2344,6 +2539,11 @@
         shift_id: parseInt(shiftId) || 1,
         outgoing_operator: currentUser.name,
         incoming_operator: incoming,
+        aircraft_tail_number: tailNo,
+        flight_number: flightSector,
+        handover_type: hoType,
+        techlog_reference: techlogRef,
+        mel_status: melStatus,
         equipment_status: equip,
         safety_notes: safety,
         additional_notes: notes,
@@ -2352,7 +2552,7 @@
 
       const res = await fetchAPI('/api/handovers', 'POST', payload);
       const code = res ? res.report_code : 'HO-2026-NEW';
-      alert(`Handover report #${code} formally submitted to database!\nStatus: PENDING ACKNOWLEDGMENT\nAssigned Incoming Lead: ${incoming}`);
+      alert(`Handover report #${code} formally submitted to database!\nAircraft: ${tailNo} (${flightSector})\nStatus: PENDING ACKNOWLEDGMENT\nAssigned Incoming Lead: ${incoming}`);
       
       await loadHandovers();
       await loadTasks();
@@ -2361,11 +2561,59 @@
     }
 
     // Connect Acknowledgment to DB
-    function viewHandoverDetails(id, outOp = 'John Doe', inOp = 'Michael Chang', equip = '', safety = '') {
+    function viewHandoverDetails(id) {
       activeHandoverId = id;
-      document.getElementById('handover-review-modal').classList.remove('hidden');
-      document.getElementById('modal-ho-id').innerText = 'Handover Report #' + id;
-      document.getElementById('modal-ho-ack-user').innerText = currentUser.name + ' (' + currentUser.role + ')';
+      const modal = document.getElementById('handover-review-modal');
+      if (modal) modal.classList.remove('hidden');
+
+      const h = (loadedHandovers || []).find(x => x.report_code === id);
+      if (h) {
+        const elId = document.getElementById('modal-ho-id');
+        const elStatus = document.getElementById('modal-ho-status');
+        const elShift = document.getElementById('modal-ho-shift');
+        const elTail = document.getElementById('modal-ho-tail');
+        const elFlight = document.getElementById('modal-ho-flight');
+        const elType = document.getElementById('modal-ho-type');
+        const elTechlog = document.getElementById('modal-ho-techlog');
+        const elMel = document.getElementById('modal-ho-mel');
+        const elEquip = document.getElementById('modal-ho-equip');
+        const elSafety = document.getElementById('modal-ho-safety');
+        const elNotes = document.getElementById('modal-ho-notes');
+        const elAckUser = document.getElementById('modal-ho-ack-user');
+        const btnAck = document.getElementById('btn-ack-confirm');
+
+        if (elId) elId.innerText = 'Handover Report #' + h.report_code;
+        if (elStatus) {
+          elStatus.innerText = h.status;
+          elStatus.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold ' + (h.status === 'Acknowledged' ? 'badge-completed' : 'badge-inprogress');
+        }
+        if (elShift) elShift.innerText = `${h.shift_name || 'Shift'} (${h.submitted_at || 'Today'}) • ${h.outgoing_operator} → ${h.incoming_operator}`;
+        if (elTail) elTail.innerText = h.aircraft_tail_number || '5Y-KZE (B787-8)';
+        if (elFlight) elFlight.innerText = h.flight_number || 'KQ 102 (NBO → LHR)';
+        if (elType) elType.innerText = h.handover_type || 'Engineer-to-Engineer';
+        if (elTechlog) elTechlog.innerText = h.techlog_reference || 'TL-2026-088';
+        if (elMel) elMel.innerText = h.mel_status || 'Nil Active MEL';
+        if (elEquip) elEquip.innerText = h.equipment_status || 'All aircraft systems nominal.';
+        if (elSafety) elSafety.innerText = h.safety_notes || 'No ramp safety incidents reported.';
+        if (elNotes) elNotes.innerText = h.additional_notes || 'No additional TechLog notes.';
+        if (elAckUser) elAckUser.innerText = currentUser.name + ' (' + currentUser.role + ')';
+        if (btnAck) {
+          if (h.status === 'Acknowledged') {
+            btnAck.innerText = '✔ Already Acknowledged';
+            btnAck.disabled = true;
+            btnAck.className = 'px-4 py-1.5 rounded-lg bg-slate-300 text-slate-600 text-xs font-semibold cursor-not-allowed';
+          } else {
+            btnAck.innerText = '✔ Acknowledge Handover';
+            btnAck.disabled = false;
+            btnAck.className = 'px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow';
+          }
+        }
+      } else {
+        const elId = document.getElementById('modal-ho-id');
+        const elAckUser = document.getElementById('modal-ho-ack-user');
+        if (elId) elId.innerText = 'Handover Report #' + id;
+        if (elAckUser) elAckUser.innerText = currentUser.name + ' (' + currentUser.role + ')';
+      }
     }
 
     async function confirmAcknowledgment() {

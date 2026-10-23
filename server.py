@@ -234,10 +234,16 @@ class ShiftSyncRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_json_response({"error": "Full name and email are required."}, 400)
                 return
 
-            # Validate role
-            valid_roles = ["Worker", "Operator", "Outgoing Operator", "Incoming Operator", "Supervisor", "Administrator"]
+            # Validate role (Pilots & Aeronautical Engineers)
+            valid_roles = [
+                "Pilot", "Captain", "First Officer", "Pilot (Captain)", "First Officer (Pilot)",
+                "Aeronautical Engineer", "Licensed Aeronautical Engineer (AME)",
+                "Avionics Maintenance Engineer", "Maintenance Supervisor",
+                "Flight Operations Supervisor", "Administrator",
+                "Worker", "Operator", "Outgoing Operator", "Incoming Operator", "Supervisor"
+            ]
             if role not in valid_roles:
-                role = "Worker"
+                role = "Licensed Aeronautical Engineer (AME)"
 
             conn = database.get_connection()
             cursor = conn.cursor()
@@ -295,7 +301,15 @@ class ShiftSyncRequestHandler(http.server.SimpleHTTPRequestHandler):
                 if role_type == "administrator" and not email:
                     cursor.execute("SELECT * FROM users WHERE role = 'Administrator' ORDER BY id ASC LIMIT 1")
                 elif role_type == "worker" and not email:
-                    cursor.execute("SELECT * FROM users WHERE role IN ('Worker', 'Operator', 'Outgoing Operator') ORDER BY id ASC LIMIT 1")
+                    cursor.execute("""
+                    SELECT * FROM users 
+                    WHERE role IN (
+                        'Pilot (Captain)', 'Pilot', 'Captain', 'First Officer', 'First Officer (Pilot)',
+                        'Licensed Aeronautical Engineer (AME)', 'Aeronautical Engineer', 
+                        'Avionics Maintenance Engineer', 'Worker', 'Operator', 'Outgoing Operator'
+                    ) 
+                    ORDER BY id ASC LIMIT 1
+                    """)
                 else:
                     cursor.execute("SELECT * FROM users WHERE LOWER(email) = ?", (email,))
 
@@ -371,6 +385,11 @@ class ShiftSyncRequestHandler(http.server.SimpleHTTPRequestHandler):
                 shift_id = data.get("shift_id", 1)
                 outgoing = data.get("outgoing_operator", "John Doe")
                 incoming = data.get("incoming_operator", "Michael Chang")
+                aircraft_tail = data.get("aircraft_tail_number", "5Y-KZE")
+                flight_no = data.get("flight_number", "KQ 102")
+                techlog_ref = data.get("techlog_reference", "TL-2026-088")
+                handover_type = data.get("handover_type", "Engineer-to-Engineer")
+                mel_status = data.get("mel_status", "Nil Active MEL")
                 equip = data.get("equipment_status", "")
                 safety = data.get("safety_notes", "")
                 notes = data.get("additional_notes", "")
@@ -382,21 +401,21 @@ class ShiftSyncRequestHandler(http.server.SimpleHTTPRequestHandler):
 
                 cursor.execute("""
                 INSERT INTO handover_reports 
-                (report_code, shift_id, outgoing_operator, incoming_operator, equipment_status, safety_notes, additional_notes, status, submitted_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending Review', ?)
-                """, (report_code, shift_id, outgoing, incoming, equip, safety, notes, datetime.now().strftime("%Y-%m-%d %H:%M")))
+                (report_code, shift_id, outgoing_operator, incoming_operator, aircraft_tail_number, flight_number, techlog_reference, handover_type, mel_status, equipment_status, safety_notes, additional_notes, status, submitted_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending Review', ?)
+                """, (report_code, shift_id, outgoing, incoming, aircraft_tail, flight_no, techlog_ref, handover_type, mel_status, equip, safety, notes, datetime.now().strftime("%Y-%m-%d %H:%M")))
                 report_id = cursor.lastrowid
 
                 # Save associated tasks
                 for t in tasks:
                     t_name = t.get("task") or t.get("name")
-                    t_cat = t.get("category", "General")
+                    t_cat = t.get("category", "Equipment Check")
                     t_prio = t.get("priority", "Medium")
                     t_stat = t.get("status", "Pending")
                     cursor.execute("""
-                    INSERT INTO tasks (report_id, task_name, assigned_to, category, priority, due_date, status)
-                    VALUES (?, ?, ?, ?, ?, 'Today, Shift End', ?)
-                    """, (report_id, t_name, incoming, t_cat, t_prio, t_stat))
+                    INSERT INTO tasks (report_id, task_name, assigned_to, category, priority, due_date, status, aircraft_tail_number)
+                    VALUES (?, ?, ?, ?, ?, 'Today, Shift End', ?, ?)
+                    """, (report_id, t_name, incoming, t_cat, t_prio, t_stat, aircraft_tail))
 
                 # Create Notification
                 cursor.execute("""
@@ -439,11 +458,12 @@ class ShiftSyncRequestHandler(http.server.SimpleHTTPRequestHandler):
                 prio = data.get("priority", "Medium")
                 due = data.get("due_date", "Today, 18:00")
                 stat = data.get("status", "Pending")
+                aircraft_tail = data.get("aircraft_tail_number", "5Y-KZE")
 
                 cursor.execute("""
-                INSERT INTO tasks (task_name, assigned_to, category, priority, due_date, status)
-                VALUES (?, ?, ?, ?, ?, ?)
-                """, (name, assignee, cat, prio, due, stat))
+                INSERT INTO tasks (task_name, assigned_to, category, priority, due_date, status, aircraft_tail_number)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (name, assignee, cat, prio, due, stat, aircraft_tail))
                 conn.commit()
                 task_id = cursor.lastrowid
                 database.log_audit(assignee, "Worker", "Task Created", f"Assigned task '{name}' (Priority: {prio})")

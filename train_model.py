@@ -152,11 +152,15 @@ def train_and_evaluate():
     print("=" * 80)
 
     test_samples = [
+        ("Checked Boeing 787 left engine oil and pressure sensor readings; parameter stable within flight envelope.", "Equipment Check", ["High", "Critical"]),
         ("Checked boiler pressure valve on Line 2, fluctuating readings observed.", "Equipment Check", ["High", "Critical"]),
+        ("Major safety alert: jet fuel seepage detected at engine pylon fuel disconnect coupling; aircraft grounded pending seal swap.", "Safety & Compliance", ["Critical"]),
         ("Major chemical spill reported in Warehouse Sector B, evacuated personnel.", "Safety & Compliance", ["Critical"]),
+        ("Rectified TechLog snag #4412: replaced faulty line replaceable unit LRU for VHF Comm transceiver #1.", "Maintenance", ["High", "Critical"]),
         ("Replaced faulty sensor and worn conveyor belt bearing in packaging area.", "Maintenance", ["High", "Critical"]),
+        ("Closed and archived Aircraft Technical Logbook TechLog page #4412 in airline MRO enterprise system.", "Administration", ["Low"]),
         ("Updated shift logbook Section 4 and filed maintenance work orders.", "Administration", ["Low"]),
-        ("Completed routine inventory reconciliation in bin rack R-44.", "Operations", ["Medium", "Low"])
+        ("Verified final flight plan fuel uplift of 42600 kg and cross-checked fuel density against fueler delivery docket.", "Operations", ["Medium", "Low"])
     ]
 
     verification_table = []
