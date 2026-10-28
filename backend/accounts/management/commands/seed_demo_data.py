@@ -75,6 +75,38 @@ class Command(BaseCommand):
         # 3. Create Role-Specific Users in Primary Organisation
         users_spec = [
             (
+                "said@kq.ac.ke",
+                "Eng. Said Marika",
+                "KQ-ENG-001",
+                UserRole.ADMIN,
+                "IT & Systems Governance",
+                True,
+            ),
+            (
+                "david@kq.ac.ke",
+                "Eng. David Ochieng",
+                "KQ-ENG-002",
+                UserRole.OUTGOING_WORKER,
+                "Line Maintenance",
+                False,
+            ),
+            (
+                "amina@kq.ac.ke",
+                "Eng. Amina Hassan",
+                "KQ-ENG-003",
+                UserRole.INCOMING_WORKER,
+                "Line Maintenance",
+                False,
+            ),
+            (
+                "grace@kq.ac.ke",
+                "Capt. Grace Wanjiku",
+                "KQ-OPS-001",
+                UserRole.SUPERVISOR,
+                "Safety & Quality Assurance",
+                False,
+            ),
+            (
                 "admin@shiftsync.ac.ke",
                 "Eng. Said Marika (SysAdmin)",
                 "EMP-ADM-001",
@@ -165,6 +197,11 @@ class Command(BaseCommand):
         out2_u = created_users["outgoing2@shiftsync.ac.ke"]
         inc2_u = created_users["incoming2@shiftsync.ac.ke"]
 
+        said_kq = created_users["said@kq.ac.ke"]
+        david_kq = created_users["david@kq.ac.ke"]
+        amina_kq = created_users["amina@kq.ac.ke"]
+        grace_kq = created_users["grace@kq.ac.ke"]
+
         today = date.today()
         yesterday = today - timedelta(days=1)
         two_days_ago = today - timedelta(days=2)
@@ -248,6 +285,39 @@ class Command(BaseCommand):
                 "supervisor": sup_u,
                 "status": ShiftStatus.SCHEDULED,
                 "notes": "[DEMO DATA] Upcoming scheduled shift.",
+            },
+        )
+
+        # Kenya Airways Personnel Shifts (said@kq.ac.ke, david@kq.ac.ke, amina@kq.ac.ke)
+        shift_kq_line_maint, _ = Shift.objects.update_or_create(
+            organisation=org_kq,
+            name="KQ 787 Line Maintenance & Flight Ops (Bay 4)",
+            shift_date=today,
+            defaults={
+                "department": "Line Maintenance",
+                "start_time": time(6, 0),
+                "end_time": time(14, 0),
+                "outgoing_worker": david_kq,
+                "incoming_worker": amina_kq,
+                "supervisor": grace_kq,
+                "status": ShiftStatus.ACTIVE,
+                "notes": "[KQ OPERATIONS] Active Line Maintenance Shift. David is Outgoing, Amina is Incoming.",
+            },
+        )
+
+        shift_kq_avionics, _ = Shift.objects.update_or_create(
+            organisation=org_kq,
+            name="KQ Fleet Avionics & Radar Calibration (Bay 2)",
+            shift_date=today,
+            defaults={
+                "department": "Avionics & Flight Control Systems",
+                "start_time": time(14, 0),
+                "end_time": time(22, 0),
+                "outgoing_worker": said_kq,
+                "incoming_worker": david_kq,
+                "supervisor": grace_kq,
+                "status": ShiftStatus.ACTIVE,
+                "notes": "[KQ OPERATIONS] Active Avionics Inspection. Said is Outgoing, David is Incoming.",
             },
         )
 

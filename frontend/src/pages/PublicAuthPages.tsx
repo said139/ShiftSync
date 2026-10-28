@@ -228,7 +228,7 @@ export const LoginPage: React.FC = () => {
           </Link>
         </div>
 
-        {/* Demo Fast-Fill Section */}
+        {/* Kenya Airways Crew Demonstration Accounts */}
         <div
           style={{
             marginTop: "1.25rem",
@@ -241,49 +241,102 @@ export const LoginPage: React.FC = () => {
               fontSize: "0.73rem",
               fontWeight: 700,
               textTransform: "uppercase",
-              color: "var(--kq-gold-700)",
+              color: "var(--kq-red-700)",
               marginBottom: "0.55rem",
               display: "flex",
               alignItems: "center",
-              gap: "0.35rem",
+              justifyContent: "space-between",
             }}
           >
-            <Sparkles size={13} />
-            <span>Quick-Fill Demonstration Accounts (Dev Environment)</span>
+            <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+              <Plane size={13} color="var(--kq-red-600)" />
+              <span>Kenya Airways Flight & Line Crew (Click to Sign In)</span>
+            </span>
+            <span style={{ fontSize: "0.68rem", color: "var(--slate-400)" }}>Dev / Demo</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.45rem" }}>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.45rem", marginBottom: "0.6rem" }}>
             <button
               type="button"
               className="btn btn-secondary btn-sm"
-              onClick={() => fillDemo("outgoing@shiftsync.ac.ke")}
-              data-testid="demo-outgoing-btn"
+              style={{ textAlign: "left", padding: "0.45rem 0.6rem", display: "flex", flexDirection: "column", gap: "0.15rem" }}
+              onClick={() => fillDemo("said@kq.ac.ke")}
+              data-testid="demo-kq-said-btn"
             >
-              Outgoing Worker
+              <strong style={{ fontSize: "0.78rem", color: "var(--navy-900)" }}>Eng. Said Marika</strong>
+              <span style={{ fontSize: "0.7rem", color: "var(--slate-500)" }}>said@kq.ac.ke • Admin</span>
             </button>
             <button
               type="button"
-              onClick={() => fillDemo("incoming@shiftsync.ac.ke")}
               className="btn btn-secondary btn-sm"
-              data-testid="demo-incoming-btn"
+              style={{ textAlign: "left", padding: "0.45rem 0.6rem", display: "flex", flexDirection: "column", gap: "0.15rem" }}
+              onClick={() => fillDemo("david@kq.ac.ke")}
+              data-testid="demo-kq-david-btn"
             >
-              Incoming Worker
+              <strong style={{ fontSize: "0.78rem", color: "var(--navy-900)" }}>Eng. David Ochieng</strong>
+              <span style={{ fontSize: "0.7rem", color: "var(--slate-500)" }}>david@kq.ac.ke • Line Maint</span>
             </button>
             <button
               type="button"
-              onClick={() => fillDemo("supervisor@shiftsync.ac.ke")}
               className="btn btn-secondary btn-sm"
-              data-testid="demo-supervisor-btn"
+              style={{ textAlign: "left", padding: "0.45rem 0.6rem", display: "flex", flexDirection: "column", gap: "0.15rem" }}
+              onClick={() => fillDemo("amina@kq.ac.ke")}
+              data-testid="demo-kq-amina-btn"
             >
-              Supervisor
+              <strong style={{ fontSize: "0.78rem", color: "var(--navy-900)" }}>Eng. Amina Hassan</strong>
+              <span style={{ fontSize: "0.7rem", color: "var(--slate-500)" }}>amina@kq.ac.ke • Line Maint</span>
             </button>
             <button
               type="button"
-              onClick={() => fillDemo("admin@shiftsync.ac.ke")}
               className="btn btn-secondary btn-sm"
-              data-testid="demo-admin-btn"
+              style={{ textAlign: "left", padding: "0.45rem 0.6rem", display: "flex", flexDirection: "column", gap: "0.15rem" }}
+              onClick={() => fillDemo("grace@kq.ac.ke")}
+              data-testid="demo-kq-grace-btn"
             >
-              System Admin
+              <strong style={{ fontSize: "0.78rem", color: "var(--navy-900)" }}>Capt. Grace Wanjiku</strong>
+              <span style={{ fontSize: "0.7rem", color: "var(--slate-500)" }}>grace@kq.ac.ke • QA Sup</span>
             </button>
+          </div>
+
+          {/* Quick-fill by Role (Legacy & Automated Test Compatibility) */}
+          <div style={{ marginTop: "0.75rem", paddingTop: "0.6rem", borderTop: "1px dashed var(--slate-200)" }}>
+            <div style={{ fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", color: "var(--slate-500)", marginBottom: "0.4rem" }}>
+              Quick-Fill By Operational Role
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.35rem" }}>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => fillDemo("outgoing@shiftsync.ac.ke")}
+                data-testid="demo-outgoing-btn"
+              >
+                Outgoing Worker
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemo("incoming@shiftsync.ac.ke")}
+                className="btn btn-secondary btn-sm"
+                data-testid="demo-incoming-btn"
+              >
+                Incoming Worker
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemo("supervisor@shiftsync.ac.ke")}
+                className="btn btn-secondary btn-sm"
+                data-testid="demo-supervisor-btn"
+              >
+                Supervisor
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemo("admin@shiftsync.ac.ke")}
+                className="btn btn-secondary btn-sm"
+                data-testid="demo-admin-btn"
+              >
+                System Admin
+              </button>
+            </div>
           </div>
         </div>
       </div>

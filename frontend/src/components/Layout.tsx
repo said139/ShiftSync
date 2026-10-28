@@ -78,8 +78,10 @@ export const AppLayout: React.FC = () => {
 
   if (!user) return null;
 
-  const isOutgoing = user.role === "OUTGOING_WORKER" || user.role === "ADMIN";
-  const isIncoming = user.role === "INCOMING_WORKER" || user.role === "ADMIN";
+  const isWorker =
+    user.role === "OUTGOING_WORKER" ||
+    user.role === "INCOMING_WORKER" ||
+    user.role === "ADMIN";
   const isSupervisor = user.role === "SUPERVISOR" || user.role === "ADMIN";
   const isAdmin = user.role === "ADMIN";
 
@@ -160,7 +162,7 @@ export const AppLayout: React.FC = () => {
               <CalendarClock size={17} />
               <span>Shift Management</span>
             </NavLink>
-            {isOutgoing && (
+            {isWorker && (
               <>
                 <NavLink to="/handovers/create" className="nav-link">
                   <FilePlus2 size={17} />
@@ -170,13 +172,11 @@ export const AppLayout: React.FC = () => {
                   <Activity size={17} />
                   <span>Log Shift Activity (NLP)</span>
                 </NavLink>
+                <NavLink to="/handovers/incoming" className="nav-link">
+                  <ClipboardCheck size={17} />
+                  <span>Incoming Review & Ack</span>
+                </NavLink>
               </>
-            )}
-            {isIncoming && (
-              <NavLink to="/handovers/incoming" className="nav-link">
-                <ClipboardCheck size={17} />
-                <span>Incoming Review & Ack</span>
-              </NavLink>
             )}
             <NavLink to="/tasks" className="nav-link">
               <CheckSquare size={17} />

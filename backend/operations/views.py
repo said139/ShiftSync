@@ -15,6 +15,7 @@ from .models import (
     HandoverReport,
     HandoverStatus,
     Shift,
+    ShiftStatus,
     Task,
     TaskPriority,
     TaskStatus,
@@ -99,7 +100,7 @@ class ShiftViewSet(viewsets.ModelViewSet):
         return qs
 
     def get_permissions(self):
-        if self.action in ("list", "retrieve", "my_active"):
+        if self.action in ("list", "retrieve", "my_active", "my_duty"):
             return [permissions.IsAuthenticated()]
         return [IsSystemAdmin()]
 
@@ -154,6 +155,174 @@ class ShiftViewSet(viewsets.ModelViewSet):
             models.Q(outgoing_worker=user) | models.Q(incoming_worker=user)
         )
         return Response(ShiftSerializer(qs, many=True).data)
+
+    @action(detail=False, methods=["get"], url_path="my-duty")
+    def my_duty(self, request):
+        """
+        Returns the authenticated worker's current operational shift assignment:
+        indicates whether the user is currently the OUTGOING worker (preparing handover)
+        or INCOMING worker (receiving & acknowledging handover) for their assigned shift(s).
+        """
+        user = request.user
+        today = timezone.localdate()
+
+        # 1. Look for currently ACTIVE shift where user is assigned
+        active_shifts = (
+            self.get_queryset()
+            .filter(
+                models.Q(outgoing_worker=user) | models.Q(incoming_worker=user),
+                status=ShiftStatus.ACTIVE,
+            )
+            .select_related("outgoing_worker", "incoming_worker", "supervisor")
+        )
+
+        # 2. Or scheduled shift for today/upcoming if no active shift
+        if not active_shifts.exists():
+            active_shifts = (
+                self.get_queryset()
+                .filter(
+                    models.Q(outgoing_worker=user) | models.Q(incoming_worker=user),
+                    status=ShiftStatus.SCHEDULED,
+                    shift_date__gte=today,
+                )
+                .order_by("shift_date", "start_time")
+                .select_related("outgoing_worker", "incoming_worker", "supervisor")
+            )
+
+        current_shift = active_shifts.first()
+        if not current_shift:
+            # Check if there is any past completed shift or general assignment
+            any_shift = (
+                self.get_queryset()
+                .filter(
+                    models.Q(outgoing_worker=user) | models.Q(incoming_worker=user)
+                )
+                .order_by("-shift_date", "-start_time")
+                .select_related("outgoing_worker", "incoming_worker", "supervisor")
+                .first()
+            )
+            if any_shift:
+                is_out = any_shift.outgoing_worker_id == user.id
+                partner = any_shift.incoming_worker if is_out else any_shift.outgoing_worker
+                return Response(
+                    {
+                        "has_assignment": True,
+                        "is_active_now": False,
+                        "role_type": "OUTGOING" if is_out else "INCOMING",
+                        "role_label": "Outgoing Worker (Recent Duty)" if is_out else "Incoming Worker (Recent Duty)",
+                        "is_outgoing": is_out,
+                        "is_incoming": not is_out,
+                        "shift": ShiftSerializer(any_shift).data,
+                        "partner_worker": {
+                            "id": str(partner.id),
+                            "full_name": partner.full_name,
+                            "email": partner.email,
+                            "employee_id": partner.employee_id,
+                            "department": partner.department,
+                        } if partner else None,
+                        "handover": None,
+                        "suggested_action": "VIEW_SCHEDULE",
+                        "suggested_action_label": "View Master Shift Schedule",
+                        "suggested_url": "/shifts",
+                    }
+                )
+
+            return Response(
+                {
+                    "has_assignment": False,
+                    "is_active_now": False,
+                    "role_type": "STANDBY",
+                    "role_label": "Operational Standby / Off Duty",
+                    "is_outgoing": False,
+                    "is_incoming": False,
+                    "shift": None,
+                    "handover": None,
+                    "partner_worker": None,
+                    "suggested_action": "VIEW_SCHEDULE",
+                    "suggested_action_label": "View Master Shift Schedule",
+                    "suggested_url": "/shifts",
+                }
+            )
+
+        is_outgoing = current_shift.outgoing_worker_id == user.id
+        is_incoming = current_shift.incoming_worker_id == user.id
+        partner = (
+            current_shift.incoming_worker if is_outgoing else current_shift.outgoing_worker
+        )
+
+        handover = current_shift.handover_reports.order_by("-created_at").first()
+        handover_data = None
+        if handover:
+            handover_data = {
+                "id": str(handover.id),
+                "report_code": handover.report_code,
+                "status": handover.status,
+                "status_display": handover.get_status_display(),
+                "task_count": handover.tasks.count(),
+                "unresolved_tasks": handover.tasks.exclude(
+                    status=TaskStatus.COMPLETED
+                ).count(),
+                "has_safety_incident": handover.has_safety_incident,
+            }
+
+        role_type = "OUTGOING" if is_outgoing else "INCOMING"
+        role_label = (
+            "Outgoing Worker (Handing Over Responsibility)"
+            if is_outgoing
+            else "Incoming Worker (Receiving Shift & Acknowledging)"
+        )
+
+        if is_outgoing:
+            if not handover:
+                act = "CREATE_HANDOVER"
+                act_label = "Record Tasks & Create Handover"
+                act_url = "/handovers/create"
+            elif handover.status == HandoverStatus.DRAFT:
+                act = "EDIT_DRAFT"
+                act_label = f"Continue Handover Draft ({handover.report_code})"
+                act_url = f"/handovers/{handover.id}/edit"
+            else:
+                act = "VIEW_SUBMITTED"
+                act_label = f"View Handover Report ({handover.report_code})"
+                act_url = f"/handovers/{handover.id}"
+        else:
+            if handover and handover.status == HandoverStatus.SUBMITTED:
+                act = "ACKNOWLEDGE"
+                act_label = f"Review & Acknowledge Handover ({handover.report_code})"
+                act_url = f"/handovers/{handover.id}/acknowledge"
+            elif handover and handover.status == HandoverStatus.ACKNOWLEDGED:
+                act = "VIEW_ACKNOWLEDGED"
+                act_label = f"View Acknowledged Handover ({handover.report_code})"
+                act_url = f"/handovers/{handover.id}"
+            else:
+                act = "AWAITING_SUBMISSION"
+                act_label = "Awaiting Handover from Outgoing Crew"
+                act_url = "/handovers/incoming"
+
+        return Response(
+            {
+                "has_assignment": True,
+                "is_active_now": current_shift.status == ShiftStatus.ACTIVE,
+                "role_type": role_type,
+                "role_label": role_label,
+                "is_outgoing": is_outgoing,
+                "is_incoming": is_incoming,
+                "shift": ShiftSerializer(current_shift).data,
+                "partner_worker": {
+                    "id": str(partner.id),
+                    "full_name": partner.full_name,
+                    "email": partner.email,
+                    "employee_id": partner.employee_id,
+                    "department": partner.department,
+                }
+                if partner
+                else None,
+                "handover": handover_data,
+                "suggested_action": act,
+                "suggested_action_label": act_label,
+                "suggested_url": act_url,
+            }
+        )
 
 
 class HandoverReportViewSet(viewsets.ModelViewSet):

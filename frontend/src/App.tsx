@@ -61,7 +61,7 @@ export const AppRoutes: React.FC = () => {
           <Route
             path="/handovers/create"
             element={
-              <ProtectedRoute allowedRoles={["OUTGOING_WORKER", "ADMIN"]}>
+              <ProtectedRoute allowedRoles={["OUTGOING_WORKER", "INCOMING_WORKER", "ADMIN"]}>
                 <CreateEditHandoverPage />
               </ProtectedRoute>
             }
@@ -69,7 +69,7 @@ export const AppRoutes: React.FC = () => {
           <Route
             path="/handovers/:id/edit"
             element={
-              <ProtectedRoute allowedRoles={["OUTGOING_WORKER", "ADMIN"]}>
+              <ProtectedRoute allowedRoles={["OUTGOING_WORKER", "INCOMING_WORKER", "ADMIN"]}>
                 <CreateEditHandoverPage />
               </ProtectedRoute>
             }
@@ -77,7 +77,7 @@ export const AppRoutes: React.FC = () => {
           <Route
             path="/activity/log"
             element={
-              <ProtectedRoute allowedRoles={["OUTGOING_WORKER", "ADMIN"]}>
+              <ProtectedRoute allowedRoles={["OUTGOING_WORKER", "INCOMING_WORKER", "ADMIN"]}>
                 <LogShiftActivityPage />
               </ProtectedRoute>
             }

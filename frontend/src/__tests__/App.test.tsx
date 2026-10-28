@@ -107,34 +107,63 @@ describe("ShiftSync Frontend Security, Components, Dashboard, Notifications & Ta
     expect(screen.getByText("404 — Page Not Found")).toBeInTheDocument();
   });
 
-  it("renders DashboardOverviewPage metric cards from backend API response", async () => {
-    vi.spyOn(apiClient, "get").mockResolvedValueOnce({
-      data: {
-        scope: "personal",
-        role: "OUTGOING_WORKER",
-        organisation_name: "Kenya Airways Line Maintenance",
-        metrics: {
-          active_shifts: 2,
-          scheduled_shifts: 1,
-          handovers_awaiting_acknowledgment: 1,
-          submitted_handovers: 3,
-          acknowledged_handovers: 2,
-          draft_handovers: 1,
-          unresolved_tasks: 2,
-          carried_forward_tasks: 1,
-          critical_priority_tasks: 1,
-          handover_completion_rate: 66.7,
-          completion_rate_numerator: 2,
-          completion_rate_denominator: 3,
+  it("renders DashboardOverviewPage metric cards and live duty assignment banner from backend API response", async () => {
+    vi.spyOn(apiClient, "get").mockImplementation((url: string) => {
+      if (url.includes("/shifts/my-duty/")) {
+        return Promise.resolve({
+          data: {
+            has_assignment: true,
+            is_active_now: true,
+            role_type: "OUTGOING",
+            role_label: "Outgoing Worker",
+            is_outgoing: true,
+            is_incoming: false,
+            shift: {
+              shift_name: "Morning Maintenance Ramp Shift",
+              shift_date: "2026-10-28",
+              start_time: "06:00:00",
+              end_time: "14:00:00",
+              department_display: "Line Maintenance",
+            },
+            partner_worker: {
+              full_name: "Eng. Amina Hassan",
+              email: "amina@kq.ac.ke",
+              employee_id: "KQ-ENG-003",
+            },
+            suggested_action: "CREATE_HANDOVER",
+            suggested_action_label: "Record Tasks & Create Handover",
+            suggested_url: "/handovers/create",
+          },
+        });
+      }
+      return Promise.resolve({
+        data: {
+          scope: "personal",
+          role: "OUTGOING_WORKER",
+          organisation_name: "Kenya Airways Line Maintenance",
+          metrics: {
+            active_shifts: 2,
+            scheduled_shifts: 1,
+            handovers_awaiting_acknowledgment: 1,
+            submitted_handovers: 3,
+            acknowledged_handovers: 2,
+            draft_handovers: 1,
+            unresolved_tasks: 2,
+            carried_forward_tasks: 1,
+            critical_priority_tasks: 1,
+            handover_completion_rate: 66.7,
+            completion_rate_numerator: 2,
+            completion_rate_denominator: 3,
+          },
+          recent_handovers: [],
+          outstanding_tasks: [],
+          critical_tasks: [],
+          safety_and_equipment_alerts: [],
+          upcoming_and_active_shifts: [],
+          recent_notifications: [],
+          completion_trend: [],
         },
-        recent_handovers: [],
-        outstanding_tasks: [],
-        critical_tasks: [],
-        safety_and_equipment_alerts: [],
-        upcoming_and_active_shifts: [],
-        recent_notifications: [],
-        completion_trend: [],
-      },
+      });
     });
 
     render(
@@ -146,6 +175,9 @@ describe("ShiftSync Frontend Security, Components, Dashboard, Notifications & Ta
     await waitFor(() => {
       expect(screen.getByTestId("metric-active-shifts")).toHaveTextContent("2");
       expect(screen.getByTestId("metric-completion-rate")).toHaveTextContent("66.7%");
+      expect(screen.getByTestId("shift-duty-banner")).toBeInTheDocument();
+      expect(screen.getByTestId("duty-role-badge")).toHaveTextContent("YOU ARE: OUTGOING WORKER");
+      expect(screen.getByTestId("duty-shift-name")).toHaveTextContent("Morning Maintenance Ramp Shift");
     });
   });
 
