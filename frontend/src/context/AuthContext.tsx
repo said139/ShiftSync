@@ -40,6 +40,7 @@ interface AuthContextValue {
   organisation: OrganisationConfig | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<UserProfile>;
+  register: (payload: Record<string, any>) => Promise<{ user: UserProfile; requires_approval: boolean; detail?: string }>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -87,6 +88,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return res.data.user;
   };
 
+  const register = async (
+    payload: Record<string, any>
+  ): Promise<{ user: UserProfile; requires_approval: boolean; detail?: string }> => {
+    const res = await apiClient.post("/auth/register/", payload);
+    if (res.data.access) {
+      setAccessToken(res.data.access);
+      setUser(res.data.user);
+      if (res.data.organisation) {
+        setOrganisation(res.data.organisation);
+      }
+    }
+    return {
+      user: res.data.user,
+      requires_approval: Boolean(res.data.requires_approval),
+      detail: res.data.detail,
+    };
+  };
+
   const logout = async () => {
     try {
       await apiClient.post("/auth/logout/", {});
@@ -107,7 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ user, organisation, loading, login, logout, refreshProfile }}
+      value={{ user, organisation, loading, login, register, logout, refreshProfile }}
     >
       {children}
     </AuthContext.Provider>

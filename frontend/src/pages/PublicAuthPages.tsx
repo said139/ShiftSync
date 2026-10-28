@@ -2,11 +2,20 @@ import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   AlertCircle,
+  ArrowRight,
+  Briefcase,
   CheckCircle2,
   KeyRound,
   Lock,
+  Mail,
+  Phone,
+  Plane,
+  Shield,
   ShieldAlert,
   Sparkles,
+  User,
+  UserCheck,
+  UserPlus,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { apiClient } from "../api/client";
@@ -14,14 +23,23 @@ import { apiClient } from "../api/client";
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [searchParams] = useSearchParams();
+
+  const initialEmail = searchParams.get("email") || "";
+  const justRegistered = searchParams.get("registered") === "true" || searchParams.get("registered") === "1";
+
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(
+    justRegistered ? "Account created successfully! Please sign in with your credentials." : null
+  );
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccessMsg(null);
     if (!email.trim() || !password) {
       setError("Please enter both your email address and password.");
       return;
@@ -35,10 +53,10 @@ export const LoginPage: React.FC = () => {
         navigate("/dashboard");
       }
     } catch (err: any) {
-      setError(
+      const detail =
         err.response?.data?.detail ||
-          "Authentication failed. Please check your credentials and try again."
-      );
+        "Authentication failed. Please check your credentials and try again.";
+      setError(detail);
     } finally {
       setSubmitting(false);
     }
@@ -48,33 +66,65 @@ export const LoginPage: React.FC = () => {
     setEmail(demoEmail);
     setPassword("ShiftSync@2026!");
     setError(null);
+    setSuccessMsg(null);
   };
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, var(--navy-950) 0%, var(--navy-900) 60%, var(--navy-800) 100%)",
+        background: "linear-gradient(135deg, #0a0d13 0%, #141820 50%, #202735 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: "1.5rem",
       }}
     >
-      <div className="card" style={{ maxWidth: "460px", width: "100%", padding: "2rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
-          <div className="brand-icon" style={{ width: 42, height: 42, fontSize: "1.1rem" }}>
-            SS
+      <div className="card" style={{ maxWidth: "480px", width: "100%", padding: "2.25rem", position: "relative", overflow: "hidden" }}>
+        {/* Kenya Airways Top Ribbon Accent */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", height: "4px" }}>
+          <div style={{ flex: 5, backgroundColor: "var(--kq-red-600)" }} />
+          <div style={{ flex: 2, backgroundColor: "var(--kq-gold-500)" }} />
+          <div style={{ flex: 2, backgroundColor: "var(--green-600)" }} />
+        </div>
+
+        {/* Brand Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.85rem", marginBottom: "1.5rem" }}>
+          <div
+            className="brand-icon"
+            style={{
+              width: 46,
+              height: 46,
+              fontSize: "1.15rem",
+              background: "linear-gradient(135deg, var(--kq-red-600) 0%, var(--kq-red-800) 100%)",
+              border: "1px solid var(--kq-gold-500)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Plane size={24} color="#fff" />
           </div>
           <div>
-            <h1 style={{ fontSize: "1.35rem", fontWeight: 700, color: "var(--navy-900)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+              <span className="kq-tag">KENYA AIRWAYS</span>
+              <span style={{ fontSize: "0.72rem", color: "var(--slate-500)", fontWeight: 600 }}>JKIA HUB</span>
+            </div>
+            <h1 style={{ fontSize: "1.35rem", fontWeight: 700, color: "var(--navy-900)", lineHeight: 1.25 }}>
               ShiftSync Portal
             </h1>
             <p style={{ fontSize: "0.8rem", color: "var(--slate-500)" }}>
-              Formal Shift Handover Management & NLP Task Classification
+              Flight Operations & Line Maintenance Shift Handover
             </p>
           </div>
         </div>
+
+        {successMsg && (
+          <div className="alert alert-success" role="status">
+            <CheckCircle2 size={18} style={{ flexShrink: 0, marginTop: 2 }} />
+            <span>{successMsg}</span>
+          </div>
+        )}
 
         {error && (
           <div className="alert alert-error" role="alert" data-testid="login-error">
@@ -86,19 +136,21 @@ export const LoginPage: React.FC = () => {
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
             <label htmlFor="login-email" className="form-label">
-              Work Email Address
+              Work Email Address or Staff ID
             </label>
-            <input
-              id="login-email"
-              type="email"
-              className="form-control"
-              placeholder="name@shiftsync.ac.ke"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              data-testid="login-email-input"
-            />
+            <div style={{ position: "relative" }}>
+              <input
+                id="login-email"
+                type="text"
+                className="form-control"
+                placeholder="name@shiftsync.ac.ke or KQ-XXXX"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="username"
+                data-testid="login-email-input"
+              />
+            </div>
           </div>
 
           <div className="form-group">
@@ -108,7 +160,7 @@ export const LoginPage: React.FC = () => {
               </label>
               <Link
                 to="/forgot-password"
-                style={{ fontSize: "0.78rem", color: "var(--teal-700)", fontWeight: 600 }}
+                style={{ fontSize: "0.78rem", color: "var(--kq-red-600)", fontWeight: 600 }}
               >
                 Forgot password?
               </Link>
@@ -129,18 +181,57 @@ export const LoginPage: React.FC = () => {
           <button
             type="submit"
             className="btn btn-primary"
-            style={{ width: "100%", marginTop: "0.5rem", padding: "0.65rem" }}
+            style={{ width: "100%", marginTop: "0.5rem", padding: "0.7rem", fontSize: "0.95rem" }}
             disabled={submitting}
             data-testid="login-submit-button"
           >
             <Lock size={16} />
-            <span>{submitting ? "Authenticating..." : "Sign In to ShiftSync"}</span>
+            <span>{submitting ? "Verifying Credentials..." : "Sign In to ShiftSync"}</span>
           </button>
         </form>
 
+        {/* Prominent Sign Up CTA Link */}
         <div
           style={{
-            marginTop: "1.5rem",
+            marginTop: "1.25rem",
+            padding: "0.9rem 1rem",
+            background: "var(--kq-red-50)",
+            border: "1px solid var(--kq-red-100)",
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--kq-red-900)" }}>
+              New crew member?
+            </div>
+            <div style={{ fontSize: "0.75rem", color: "var(--slate-600)" }}>
+              Create an operational pilot, engineer, or crew account.
+            </div>
+          </div>
+          <Link
+            to="/signup"
+            className="btn btn-sm"
+            style={{
+              backgroundColor: "var(--kq-red-600)",
+              color: "#fff",
+              fontWeight: 700,
+              fontSize: "0.8rem",
+              whiteSpace: "nowrap",
+            }}
+            data-testid="go-to-signup-btn"
+          >
+            <UserPlus size={14} />
+            <span>Sign Up</span>
+          </Link>
+        </div>
+
+        {/* Demo Fast-Fill Section */}
+        <div
+          style={{
+            marginTop: "1.25rem",
             paddingTop: "1.1rem",
             borderTop: "1px solid var(--slate-200)",
           }}
@@ -150,7 +241,7 @@ export const LoginPage: React.FC = () => {
               fontSize: "0.73rem",
               fontWeight: 700,
               textTransform: "uppercase",
-              color: "var(--slate-500)",
+              color: "var(--kq-gold-700)",
               marginBottom: "0.55rem",
               display: "flex",
               alignItems: "center",
@@ -158,7 +249,7 @@ export const LoginPage: React.FC = () => {
             }}
           >
             <Sparkles size={13} />
-            <span>Seeded Demonstration Accounts (Dev Environment)</span>
+            <span>Quick-Fill Demonstration Accounts (Dev Environment)</span>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.45rem" }}>
             <button
@@ -194,9 +285,338 @@ export const LoginPage: React.FC = () => {
               System Admin
             </button>
           </div>
-          <p style={{ fontSize: "0.73rem", color: "var(--slate-500)", marginTop: "0.6rem" }}>
-            Account creation follows administrative provisioning. Contact your System Administrator for new credentials.
-          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const SignUpPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    full_name: "",
+    email: "",
+    employee_id: "",
+    personnel_category: "ENGINEER",
+    department: "Line Maintenance & Hangar Engineering",
+    phone_number: "",
+    password: "",
+    confirm_password: "",
+    privacy_terms_accepted: true,
+  });
+
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const categoryDepartments: Record<string, string> = {
+    PILOT: "Flight Operations (B787 / B737 Fleet)",
+    ENGINEER: "Line Maintenance & Hangar Engineering",
+    CABIN_CREW: "Cabin Services & In-Flight Operations",
+  };
+
+  const handleCategoryChange = (cat: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      personnel_category: cat,
+      department: categoryDepartments[cat] || prev.department,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    // Client-side validation
+    if (!formData.full_name.trim()) {
+      setError("Please enter your full name.");
+      return;
+    }
+    if (!formData.email.trim() || !formData.email.includes("@")) {
+      setError("Please enter a valid work email address.");
+      return;
+    }
+    if (!formData.employee_id.trim() || formData.employee_id.trim().length < 3) {
+      setError("Staff ID must be at least 3 characters (e.g., KQ-8492).");
+      return;
+    }
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      return;
+    }
+    if (formData.password !== formData.confirm_password) {
+      setError("Password confirmation does not match.");
+      return;
+    }
+    if (!formData.privacy_terms_accepted) {
+      setError("You must accept the Kenya Airways ShiftSync operational safety protocols.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const payload = {
+        full_name: formData.full_name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        employee_id: formData.employee_id.trim().toUpperCase(),
+        personnel_category: formData.personnel_category,
+        department: formData.department.trim(),
+        phone_number: formData.phone_number.trim(),
+        password: formData.password,
+        confirm_password: formData.confirm_password,
+        privacy_terms_accepted: formData.privacy_terms_accepted,
+      };
+
+      await apiClient.post("/auth/register/", payload);
+
+      // Navigate to login with success flag and prefilled email
+      navigate(`/login?registered=1&email=${encodeURIComponent(payload.email)}`);
+    } catch (err: any) {
+      const data = err.response?.data;
+      if (typeof data === "string") {
+        setError(data);
+      } else if (data?.detail) {
+        setError(data.detail);
+      } else if (data && typeof data === "object") {
+        // Collect field validation errors
+        const messages = Object.entries(data)
+          .map(([field, errs]) => {
+            const msg = Array.isArray(errs) ? errs.join(" ") : String(errs);
+            const fieldName = field.replace(/_/g, " ");
+            return `${fieldName}: ${msg}`;
+          })
+          .join(" | ");
+        setError(messages || "Registration failed. Please verify your details.");
+      } else {
+        setError("Network or server error during registration. Please try again.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #0a0d13 0%, #141820 50%, #202735 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "1.5rem",
+      }}
+    >
+      <div className="card" style={{ maxWidth: "560px", width: "100%", padding: "2.25rem", position: "relative", overflow: "hidden" }}>
+        {/* Kenya Airways Top Ribbon Accent */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", height: "4px" }}>
+          <div style={{ flex: 5, backgroundColor: "var(--kq-red-600)" }} />
+          <div style={{ flex: 2, backgroundColor: "var(--kq-gold-500)" }} />
+          <div style={{ flex: 2, backgroundColor: "var(--green-600)" }} />
+        </div>
+
+        {/* Brand Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.85rem", marginBottom: "1.25rem" }}>
+          <div
+            className="brand-icon"
+            style={{
+              width: 44,
+              height: 44,
+              fontSize: "1.1rem",
+              background: "linear-gradient(135deg, var(--kq-red-600) 0%, var(--kq-red-800) 100%)",
+              border: "1px solid var(--kq-gold-500)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <UserPlus size={22} color="#fff" />
+          </div>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+              <span className="kq-tag">KENYA AIRWAYS</span>
+              <span style={{ fontSize: "0.72rem", color: "var(--slate-500)", fontWeight: 600 }}>CREW ENROLMENT</span>
+            </div>
+            <h1 style={{ fontSize: "1.35rem", fontWeight: 700, color: "var(--navy-900)", lineHeight: 1.25 }}>
+              Sign Up for ShiftSync
+            </h1>
+            <p style={{ fontSize: "0.8rem", color: "var(--slate-500)" }}>
+              Create an operational flight crew or maintenance account
+            </p>
+          </div>
+        </div>
+
+        {error && (
+          <div className="alert alert-error" role="alert" data-testid="signup-error">
+            <AlertCircle size={18} style={{ flexShrink: 0, marginTop: 2 }} />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} noValidate>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
+            <div className="form-group" style={{ gridColumn: "1 / -1" }}>
+              <label htmlFor="signup-fullname" className="form-label">
+                Full Name <span className="required">*</span>
+              </label>
+              <input
+                id="signup-fullname"
+                type="text"
+                className="form-control"
+                placeholder="Capt. / Eng. Jane Doe"
+                value={formData.full_name}
+                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                required
+                data-testid="signup-fullname-input"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="signup-email" className="form-label">
+                Work Email <span className="required">*</span>
+              </label>
+              <input
+                id="signup-email"
+                type="email"
+                className="form-control"
+                placeholder="name@shiftsync.ac.ke"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+                data-testid="signup-email-input"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="signup-employee-id" className="form-label">
+                Staff / Employee ID <span className="required">*</span>
+              </label>
+              <input
+                id="signup-employee-id"
+                type="text"
+                className="form-control"
+                placeholder="KQ-7842"
+                value={formData.employee_id}
+                onChange={(e) => setFormData({ ...formData, employee_id: e.target.value.toUpperCase() })}
+                required
+                data-testid="signup-employee-id-input"
+              />
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
+            <div className="form-group">
+              <label htmlFor="signup-category" className="form-label">
+                Personnel Category <span className="required">*</span>
+              </label>
+              <select
+                id="signup-category"
+                className="form-control"
+                value={formData.personnel_category}
+                onChange={(e) => handleCategoryChange(e.target.value)}
+                data-testid="signup-category-select"
+              >
+                <option value="ENGINEER">Aeronautical Engineer / Line Maintenance</option>
+                <option value="PILOT">Pilot / Flight Operations Crew</option>
+                <option value="CABIN_CREW">Cabin Crew / In-Flight Services</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="signup-phone" className="form-label">
+                Phone Number (Optional)
+              </label>
+              <input
+                id="signup-phone"
+                type="tel"
+                className="form-control"
+                placeholder="+254 7XX XXX XXX"
+                value={formData.phone_number}
+                onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                data-testid="signup-phone-input"
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="signup-department" className="form-label">
+              Operational Department
+            </label>
+            <input
+              id="signup-department"
+              type="text"
+              className="form-control"
+              value={formData.department}
+              onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+              data-testid="signup-department-input"
+            />
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
+            <div className="form-group">
+              <label htmlFor="signup-password" className="form-label">
+                Password <span className="required">*</span>
+              </label>
+              <input
+                id="signup-password"
+                type="password"
+                className="form-control"
+                placeholder="Min 8 characters"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                required
+                minLength={8}
+                data-testid="signup-password-input"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="signup-confirm-password" className="form-label">
+                Confirm Password <span className="required">*</span>
+              </label>
+              <input
+                id="signup-confirm-password"
+                type="password"
+                className="form-control"
+                placeholder="Repeat password"
+                value={formData.confirm_password}
+                onChange={(e) => setFormData({ ...formData, confirm_password: e.target.value })}
+                required
+                data-testid="signup-confirm-password-input"
+              />
+            </div>
+          </div>
+
+          <div className="form-group" style={{ marginTop: "0.25rem" }}>
+            <label style={{ display: "flex", alignItems: "flex-start", gap: "0.55rem", cursor: "pointer", fontSize: "0.82rem", color: "var(--navy-900)" }}>
+              <input
+                type="checkbox"
+                checked={formData.privacy_terms_accepted}
+                onChange={(e) => setFormData({ ...formData, privacy_terms_accepted: e.target.checked })}
+                style={{ marginTop: "0.2rem", accentColor: "var(--kq-red-600)" }}
+                data-testid="signup-terms-checkbox"
+              />
+              <span>
+                I agree to the Kenya Airways Shift Handover safety protocol, audit logging, and data privacy policies.
+              </span>
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: "100%", padding: "0.7rem", fontSize: "0.95rem", marginTop: "0.5rem" }}
+            disabled={submitting}
+            data-testid="signup-submit-button"
+          >
+            <UserCheck size={16} />
+            <span>{submitting ? "Registering Crew Account..." : "Create Account & Continue to Sign In"}</span>
+          </button>
+        </form>
+
+        <div style={{ marginTop: "1.25rem", textAlign: "center", fontSize: "0.85rem", color: "var(--slate-600)" }}>
+          Already have an operational account?{" "}
+          <Link to="/login" style={{ color: "var(--kq-red-600)", fontWeight: 700 }} data-testid="signup-login-link">
+            Sign In here
+          </Link>
         </div>
       </div>
     </div>
@@ -271,9 +691,15 @@ export const PasswordRecoveryPage: React.FC = () => {
         padding: "1.5rem",
       }}
     >
-      <div className="card" style={{ maxWidth: "460px", width: "100%", padding: "2rem" }}>
+      <div className="card" style={{ maxWidth: "460px", width: "100%", padding: "2rem", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, display: "flex", height: "4px" }}>
+          <div style={{ flex: 5, backgroundColor: "var(--kq-red-600)" }} />
+          <div style={{ flex: 2, backgroundColor: "var(--kq-gold-500)" }} />
+          <div style={{ flex: 2, backgroundColor: "var(--green-600)" }} />
+        </div>
+
         <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", marginBottom: "1rem" }}>
-          <KeyRound size={24} color="var(--teal-600)" />
+          <KeyRound size={24} color="var(--kq-red-600)" />
           <h1 style={{ fontSize: "1.25rem", fontWeight: 700 }}>
             Password Recovery & Reset
           </h1>
@@ -295,7 +721,7 @@ export const PasswordRecoveryPage: React.FC = () => {
         {step === "request" ? (
           <form onSubmit={handleRequestToken}>
             <p style={{ fontSize: "0.85rem", color: "var(--slate-600)", marginBottom: "1rem" }}>
-              Enter your registered work email to generate a time-limited password reset token.
+              Enter your registered Kenya Airways work email to generate a time-limited password reset token.
             </p>
             <div className="form-group">
               <label htmlFor="rec-email" className="form-label">
@@ -370,12 +796,12 @@ export const AccessDeniedPage: React.FC = () => {
   const { user } = useAuth();
   return (
     <div style={{ maxWidth: "560px", margin: "4rem auto" }} className="card">
-      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--red-700)", marginBottom: "1rem" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--red-600)", marginBottom: "1rem" }}>
         <ShieldAlert size={32} />
         <h1 style={{ fontSize: "1.4rem", fontWeight: 700 }}>403 — Access Denied</h1>
       </div>
       <p style={{ color: "var(--slate-600)", marginBottom: "1rem" }}>
-        Your current role (<strong>{user?.role_display || "Unauthenticated"}</strong>) is not authorised to access this operational resource. All role permissions are enforced by ShiftSync security policies.
+        Your current role (<strong>{user?.role_display || "Unauthenticated"}</strong>) is not authorised to access this operational resource. All role permissions are strictly enforced by Kenya Airways ShiftSync policies.
       </p>
       <Link to="/dashboard" className="btn btn-primary">
         Return to Authorised Dashboard

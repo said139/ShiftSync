@@ -7,6 +7,7 @@ import {
   LoginPage,
   NotFoundPage,
   PasswordRecoveryPage,
+  SignUpPage,
 } from "./pages/PublicAuthPages";
 import {
   DashboardOverviewPage,
@@ -38,6 +39,8 @@ export const AppRoutes: React.FC = () => {
     <Routes>
       {/* 1-4: Public & Authentication Pages */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/register" element={<SignUpPage />} />
       <Route path="/forgot-password" element={<PasswordRecoveryPage />} />
       <Route path="/reset-password" element={<PasswordRecoveryPage />} />
 

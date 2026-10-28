@@ -12,6 +12,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Plane,
   Settings,
   Shield,
   UserCheck,
@@ -97,13 +98,16 @@ export const AppLayout: React.FC = () => {
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`} aria-label="Main Navigation">
         <div className="sidebar-brand">
           <Link to="/dashboard" className="brand-logo">
-            <div className="brand-icon">SS</div>
+            <div className="brand-icon">
+              <Plane size={20} color="#fff" />
+            </div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.02em" }}>
-                ShiftSync
+              <div style={{ fontWeight: 800, fontSize: "1.05rem", letterSpacing: "-0.02em", display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                <span>ShiftSync</span>
+                <span style={{ fontSize: "0.62rem", padding: "0.1rem 0.35rem", backgroundColor: "var(--kq-red-600)", borderRadius: "3px", color: "#fff", fontWeight: 700 }}>KQ</span>
               </div>
-              <div style={{ fontSize: "0.7rem", color: "var(--slate-400)" }}>
-                {organisation?.code || "OPERATIONS"}
+              <div style={{ fontSize: "0.7rem", color: "var(--kq-gold-400)", fontWeight: 600 }}>
+                {organisation?.code || "KQ-MRO"} • JKIA
               </div>
             </div>
           </Link>

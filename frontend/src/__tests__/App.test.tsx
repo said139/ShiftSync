@@ -8,7 +8,7 @@ import {
   TaskStatusBadge,
   EquipmentStatusBadge,
 } from "../components/Badges";
-import { AccessDeniedPage, LoginPage, NotFoundPage } from "../pages/PublicAuthPages";
+import { AccessDeniedPage, LoginPage, NotFoundPage, SignUpPage } from "../pages/PublicAuthPages";
 import { DashboardOverviewPage, NotificationsCentrePage } from "../pages/SharedPages";
 import { TaskTrackingPage } from "../pages/OperationalPages";
 import { apiClient, getAccessToken, setAccessToken } from "../api/client";
@@ -218,6 +218,99 @@ describe("ShiftSync Frontend Security, Components, Dashboard, Notifications & Ta
         screen.getByText("Carried Forward Across Shifts")
       ).toBeInTheDocument();
       expect(screen.getByText("NLP Overridden")).toBeInTheDocument();
+    });
+  });
+
+  it("validates passwords matching and minimum length on SignUpPage", async () => {
+    render(
+      <MemoryRouter>
+        <SignUpPage />
+      </MemoryRouter>
+    );
+
+    // Click submit without entering data
+    fireEvent.click(screen.getByTestId("signup-submit-button"));
+    expect(screen.getByTestId("signup-error")).toHaveTextContent("Please enter your full name.");
+
+    // Fill valid name, email, employee ID, but mismatched password
+    fireEvent.change(screen.getByTestId("signup-fullname-input"), {
+      target: { value: "Capt. Alice Waweru" },
+    });
+    fireEvent.change(screen.getByTestId("signup-email-input"), {
+      target: { value: "awaweru@shiftsync.ac.ke" },
+    });
+    fireEvent.change(screen.getByTestId("signup-employee-id-input"), {
+      target: { value: "KQ-9941" },
+    });
+    fireEvent.change(screen.getByTestId("signup-password-input"), {
+      target: { value: "Short" },
+    });
+    fireEvent.change(screen.getByTestId("signup-confirm-password-input"), {
+      target: { value: "Short" },
+    });
+    fireEvent.click(screen.getByTestId("signup-submit-button"));
+    expect(screen.getByTestId("signup-error")).toHaveTextContent(
+      "Password must be at least 8 characters long."
+    );
+
+    // Mismatched passwords
+    fireEvent.change(screen.getByTestId("signup-password-input"), {
+      target: { value: "SecurePass@2026!" },
+    });
+    fireEvent.change(screen.getByTestId("signup-confirm-password-input"), {
+      target: { value: "DifferentPass@2026!" },
+    });
+    fireEvent.click(screen.getByTestId("signup-submit-button"));
+    expect(screen.getByTestId("signup-error")).toHaveTextContent(
+      "Password confirmation does not match."
+    );
+  });
+
+  it("submits valid SignUpPage registration and sends data to /auth/register/", async () => {
+    const postSpy = vi.spyOn(apiClient, "post").mockResolvedValueOnce({
+      data: {
+        detail: "Account created successfully.",
+        user: { id: "u-new", email: "pilot@shiftsync.ac.ke" },
+      },
+    });
+
+    render(
+      <MemoryRouter>
+        <SignUpPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByTestId("signup-fullname-input"), {
+      target: { value: "Capt. Alice Waweru" },
+    });
+    fireEvent.change(screen.getByTestId("signup-email-input"), {
+      target: { value: "awaweru@shiftsync.ac.ke" },
+    });
+    fireEvent.change(screen.getByTestId("signup-employee-id-input"), {
+      target: { value: "KQ-9941" },
+    });
+    fireEvent.change(screen.getByTestId("signup-password-input"), {
+      target: { value: "SecurePass@2026!" },
+    });
+    fireEvent.change(screen.getByTestId("signup-confirm-password-input"), {
+      target: { value: "SecurePass@2026!" },
+    });
+
+    fireEvent.click(screen.getByTestId("signup-submit-button"));
+
+    await waitFor(() => {
+      expect(postSpy).toHaveBeenCalledWith(
+        "/auth/register/",
+        expect.objectContaining({
+          full_name: "Capt. Alice Waweru",
+          email: "awaweru@shiftsync.ac.ke",
+          employee_id: "KQ-9941",
+          personnel_category: "ENGINEER",
+          password: "SecurePass@2026!",
+          confirm_password: "SecurePass@2026!",
+          privacy_terms_accepted: true,
+        })
+      );
     });
   });
 });

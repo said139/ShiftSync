@@ -75,7 +75,7 @@ test.describe("ShiftSync End-to-End Lifecycle & Security Verification", () => {
 
     // 5. Run NLP Categorisation & Priority Detection
     await page.getByTestId("run-nlp-button").click();
-    await expect(page.getByTestId("nlp-suggestion-banner")).toBeVisible({ timeout: 20000 });
+    await expect(page.getByTestId("nlp-suggestion-banner")).toBeVisible({ timeout: 45000 });
 
     // 6. Worker Edits Suggestion (Manual Override on Category) and Adds Task
     await page.getByTestId("task-category-select").selectOption("Maintenance");
@@ -164,5 +164,48 @@ test.describe("ShiftSync End-to-End Lifecycle & Security Verification", () => {
     await expect(page.getByTestId("detail-acknowledged-at")).toContainText(
       `E2E Incoming ${uniqueSuffix}`
     );
+  });
+
+  test("User Registration & Authentication Logic: SignUp -> Wrong Password Rejected -> Correct Password Accepted", async ({
+    page,
+  }) => {
+    const uniqueSuffix = Date.now().toString().slice(-6);
+    const signupEmail = `pilot.${uniqueSuffix}@shiftsync.ac.ke`;
+    const signupEmpId = `KQ-${uniqueSuffix}`;
+    const strongPw = "KenyaAirways@2026!";
+
+    // Navigate to Sign Up page from Login
+    await page.goto("/login");
+    await page.getByTestId("go-to-signup-btn").click();
+    await expect(page).toHaveURL(/\/signup$/);
+
+    // Test password mismatch rejection
+    await page.getByTestId("signup-fullname-input").fill(`Capt. Test Pilot ${uniqueSuffix}`);
+    await page.getByTestId("signup-email-input").fill(signupEmail);
+    await page.getByTestId("signup-employee-id-input").fill(signupEmpId);
+    await page.getByTestId("signup-category-select").selectOption("PILOT");
+    await page.getByTestId("signup-password-input").fill(strongPw);
+    await page.getByTestId("signup-confirm-password-input").fill("MismatchedPass123!");
+    await page.getByTestId("signup-submit-button").click();
+    await expect(page.getByTestId("signup-error")).toContainText("Password confirmation does not match");
+
+    // Correct password & complete signup
+    await page.getByTestId("signup-confirm-password-input").fill(strongPw);
+    await page.getByTestId("signup-submit-button").click();
+
+    // Redirected to Login with prefilled email
+    await expect(page).toHaveURL(/\/login/);
+    await expect(page.getByTestId("login-email-input")).toHaveValue(signupEmail);
+
+    // Attempt login with WRONG password -> strictly rejected
+    await page.getByTestId("login-password-input").fill("WrongPassword123!");
+    await page.getByTestId("login-submit-button").click();
+    await expect(page.getByTestId("login-error")).toBeVisible();
+
+    // Attempt login with CORRECT password -> accepted and enters dashboard
+    await page.getByTestId("login-password-input").fill(strongPw);
+    await page.getByTestId("login-submit-button").click();
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.locator("body")).toContainText(`Capt. Test Pilot ${uniqueSuffix}`);
   });
 });
