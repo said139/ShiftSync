@@ -90,43 +90,33 @@
 
       <!-- TAB 1: LOGIN -->
       <div id="auth-content-login" class="space-y-4">
-        <!-- Prominent Role Quick-Access Buttons (Pilots & Aeronautical Engineers) -->
+        <!-- Prominent Role Quick-Access Buttons (Pilot, Aeronautical Engineer & Administrator) -->
         <div>
           <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 text-center">Select Aviation Credential to Sign In</label>
-          <div class="grid grid-cols-2 gap-2.5">
-            <button type="button" onclick="loginAsRole('pilot')" class="p-3 rounded-xl border-2 border-blue-200 bg-blue-50/50 hover:bg-blue-100 hover:border-blue-600 text-left transition group shadow-xs">
+          <div class="grid grid-cols-3 gap-2">
+            <button type="button" onclick="loginAsRole('pilot')" class="p-2.5 rounded-xl border-2 border-blue-200 bg-blue-50/50 hover:bg-blue-100 hover:border-blue-600 text-left transition group shadow-xs">
               <div class="flex items-center justify-between mb-1">
-                <span class="text-lg">✈️</span>
-                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-blue-700 text-white">PILOT</span>
+                <span class="text-base">✈️</span>
+                <span class="px-1.5 py-0.5 rounded text-[8px] font-extrabold bg-blue-700 text-white">PILOT</span>
               </div>
-              <span class="font-bold text-xs block text-slate-900 group-hover:text-blue-700 transition">Flight Crew (Captain)</span>
-              <span class="text-[10px] text-slate-500">Log debrief & TechLog snags</span>
+              <span class="font-bold text-xs block text-slate-900 group-hover:text-blue-700 transition">Pilot</span>
+              <span class="text-[9px] text-slate-500">Flight deck & TechLog</span>
             </button>
-            <button type="button" onclick="loginAsRole('engineer')" class="p-3 rounded-xl border-2 border-emerald-200 bg-emerald-50/50 hover:bg-emerald-100 hover:border-emerald-600 text-left transition group shadow-xs">
+            <button type="button" onclick="loginAsRole('engineer')" class="p-2.5 rounded-xl border-2 border-emerald-200 bg-emerald-50/50 hover:bg-emerald-100 hover:border-emerald-600 text-left transition group shadow-xs">
               <div class="flex items-center justify-between mb-1">
-                <span class="text-lg">🔧</span>
-                <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-[#007A3D] text-white">AME</span>
+                <span class="text-base">🔧</span>
+                <span class="px-1.5 py-0.5 rounded text-[8px] font-extrabold bg-[#007A3D] text-white">ENGINEER</span>
               </div>
               <span class="font-bold text-xs block text-slate-900 group-hover:text-[#007A3D] transition">Aeronautical Engineer</span>
-              <span class="text-[10px] text-slate-500">Line maintenance & CRS sign-off</span>
+              <span class="text-[9px] text-slate-500">Line maint & CRS</span>
             </button>
-          </div>
-          <div class="grid grid-cols-2 gap-2.5 mt-2">
-            <button type="button" onclick="loginAsRole('supervisor')" class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-left transition group">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-base">📋</span>
-                <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-100 text-amber-800">CAMO</span>
-              </div>
-              <span class="font-bold text-xs block text-slate-800">Chief Maintenance Supv</span>
-              <span class="text-[9px] text-slate-500">Airworthiness oversight</span>
-            </button>
-            <button type="button" onclick="loginAsRole('administrator')" class="p-2.5 rounded-xl border border-red-200 bg-red-50/40 hover:bg-red-50 text-left transition group">
+            <button type="button" onclick="loginAsRole('administrator')" class="p-2.5 rounded-xl border-2 border-red-200 bg-red-50/40 hover:bg-red-100 hover:border-[#C8102E] text-left transition group shadow-xs">
               <div class="flex items-center justify-between mb-1">
                 <span class="text-base">🛡️</span>
-                <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-[#C8102E] text-white">ADMIN</span>
+                <span class="px-1.5 py-0.5 rounded text-[8px] font-extrabold bg-[#C8102E] text-white">ADMIN</span>
               </div>
-              <span class="font-bold text-xs block text-slate-800">System Admin</span>
-              <span class="text-[9px] text-slate-500">Fleet rosters & audit logs</span>
+              <span class="font-bold text-xs block text-slate-900 group-hover:text-[#C8102E] transition">Administrator</span>
+              <span class="text-[9px] text-slate-500">Rosters & audit logs</span>
             </button>
           </div>
         </div>
@@ -154,12 +144,9 @@
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Access Role Preference</label>
             <select id="login-role-select" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900">
-              <option value="Pilot (Captain)">Pilot (Captain) — Flight Deck Operations</option>
-              <option value="Licensed Aeronautical Engineer (AME)">Licensed Aeronautical Engineer (AME) — Line Maintenance</option>
-              <option value="First Officer (Pilot)">First Officer (Pilot) — Flight Operations</option>
-              <option value="Avionics Maintenance Engineer">Avionics Maintenance Engineer — Workshop</option>
-              <option value="Maintenance Supervisor">Maintenance Supervisor (CAMO Airworthiness)</option>
-              <option value="Administrator">Administrator (Flight Ops & Engineering IT)</option>
+              <option value="Pilot">Pilot</option>
+              <option value="Aeronautical Engineer">Aeronautical Engineer</option>
+              <option value="Administrator">Administrator</option>
             </select>
           </div>
 
@@ -171,22 +158,18 @@
         <!-- Quick Role Login Helper (for testing prototype) -->
         <div class="pt-3 border-t border-slate-200">
           <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2 text-center">Fast Aviation Demo Profiles</p>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <button type="button" onclick="quickLogin('Capt. John Doe', 'Pilot (Captain)', 'john@shiftsync.local')" class="p-2 rounded-lg bg-blue-50/60 hover:bg-blue-100 border border-blue-200 text-left transition">
+          <div class="grid grid-cols-3 gap-2 text-xs">
+            <button type="button" onclick="quickLogin('Capt. John Doe', 'Pilot', 'john@shiftsync.local')" class="p-2 rounded-lg bg-blue-50/60 hover:bg-blue-100 border border-blue-200 text-left transition">
               <span class="font-bold block text-slate-900 text-xs">Capt. John Doe</span>
-              <span class="text-[10px] text-blue-700 font-bold">✈️ Pilot (Captain • B787)</span>
+              <span class="text-[10px] text-blue-700 font-bold">✈️ Pilot</span>
             </button>
-            <button type="button" onclick="quickLogin('Eng. Michael Chang', 'Licensed Aeronautical Engineer (AME)', 'michael@shiftsync.local')" class="p-2 rounded-lg bg-emerald-50/60 hover:bg-emerald-100 border border-emerald-200 text-left transition">
+            <button type="button" onclick="quickLogin('Eng. Michael Chang', 'Aeronautical Engineer', 'michael@shiftsync.local')" class="p-2 rounded-lg bg-emerald-50/60 hover:bg-emerald-100 border border-emerald-200 text-left transition">
               <span class="font-bold block text-slate-900 text-xs">Eng. Michael Chang</span>
-              <span class="text-[10px] text-emerald-700 font-bold">🔧 AME (Line Maint)</span>
+              <span class="text-[10px] text-emerald-700 font-bold">🔧 Aeronautical Engineer</span>
             </button>
-            <button type="button" onclick="quickLogin('First Officer Amina Noor', 'First Officer (Pilot)', 'amina@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
-              <span class="font-semibold block text-slate-800 text-xs">F/O Amina Noor</span>
-              <span class="text-[10px] text-slate-500">First Officer (E190)</span>
-            </button>
-            <button type="button" onclick="quickLogin('Chief Eng. Sarah Jenkins', 'Maintenance Supervisor', 'sarah@shiftsync.local')" class="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left transition">
-              <span class="font-semibold block text-slate-800 text-xs">Sarah Jenkins</span>
-              <span class="text-[10px] text-slate-500">CAMO Maintenance Supv</span>
+            <button type="button" onclick="quickLogin('Emily Watson', 'Administrator', 'admin@shiftsync.local')" class="p-2 rounded-lg bg-red-50/60 hover:bg-red-100 border border-red-200 text-left transition">
+              <span class="font-bold block text-slate-900 text-xs">Emily Watson</span>
+              <span class="text-[10px] text-[#C8102E] font-bold">🛡️ Administrator</span>
             </button>
           </div>
         </div>
@@ -195,7 +178,7 @@
       <!-- TAB 2: SIGN UP -->
       <div id="auth-content-signup" class="space-y-4 hidden">
         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600">
-          Register a new Pilot, Aeronautical Engineer, or Operations Supervisor account. Profiles are instantly persisted to SQLite database.
+          Register a new Pilot, Aeronautical Engineer, or Administrator account. Profiles are instantly persisted to SQLite database.
         </div>
 
         <form onsubmit="handleSignup(event)" class="space-y-3">
@@ -217,12 +200,9 @@
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Aviation Operational Role</label>
             <select id="signup-role" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-900">
-              <option value="Pilot (Captain)">✈️ Pilot (Captain) — Flight Operations</option>
-              <option value="First Officer (Pilot)">✈️ First Officer (Pilot) — Flight Operations</option>
-              <option value="Licensed Aeronautical Engineer (AME)">🔧 Licensed Aeronautical Engineer (AME) — Line Maintenance</option>
-              <option value="Avionics Maintenance Engineer">⚡ Avionics Maintenance Engineer — Instruments & Navigation</option>
-              <option value="Maintenance Supervisor">📋 Maintenance Supervisor — CAMO Airworthiness</option>
-              <option value="Administrator">🛡️ Administrator — IT & Operations Oversight</option>
+              <option value="Pilot">Pilot</option>
+              <option value="Aeronautical Engineer">Aeronautical Engineer</option>
+              <option value="Administrator">Administrator</option>
             </select>
           </div>
 
@@ -378,26 +358,48 @@
         <!-- ============================================================ -->
         <div id="view-dashboard" class="space-y-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <h1 class="text-xl font-bold text-slate-900">Dashboard Overview</h1>
-            <div class="flex items-center space-x-2">
+            <div>
+              <div class="flex items-center space-x-2">
+                <h1 class="text-xl font-bold text-slate-900">Organisation-Wide Dashboard</h1>
+                <span id="dash-scope-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200">
+                  SCOPE: FLIGHT OPERATIONS
+                </span>
+              </div>
+              <p id="dash-scope-subtitle" class="text-xs text-slate-500 mt-0.5">
+                Showing real-time shift handovers, fleet status, and pending tasks for your authorised organisational scope.
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="flex items-center space-x-1.5 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 shadow-2xs">
+                <span class="text-[10px] font-bold uppercase text-slate-400">Authorised Scope:</span>
+                <select id="dashboard-scope-select" onchange="applyDashboardScopeFilter()" class="text-xs font-semibold text-slate-800 bg-transparent focus:outline-none">
+                  <option value="all">Organisation-Wide (All Authorised Units)</option>
+                  <option value="pilot">Flight Operations (Pilots • B787 / E190 Fleet)</option>
+                  <option value="engineer">Line Maintenance & Engineering (JKIA Hangar 1)</option>
+                </select>
+              </div>
               <button onclick="navigateTo('create-handover')" class="px-3.5 py-2 rounded-lg bg-[#C8102E] hover:bg-[#A60C25] text-white text-xs font-bold shadow-sm transition">
                 + Create Handover Report
               </button>
             </div>
           </div>
 
-          <!-- Active Shift Banner (Proposal Fig 3.6) -->
+          <!-- Active Shift & Organisational Scope Banner (Proposal Fig 3.6) -->
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div class="flex items-center space-x-2 mb-1">
                 <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">CURRENT ACTIVE SHIFT</span>
                 <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800">ACTIVE</span>
+                <span id="dash-shift-dept-tag" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">JKIA Terminal 1A & Hangar</span>
               </div>
-              <h2 class="text-lg font-bold text-slate-900">Day Shift (Crew A)</h2>
-              <p class="text-xs text-slate-600 font-mono mt-0.5">06:00 AM - 18:00 PM</p>
-              <p class="text-xs text-slate-500 mt-0.5">Supervisor: <strong class="text-slate-700">Sarah Jenkins</strong></p>
+              <h2 id="dash-active-shift-title" class="text-lg font-bold text-slate-900">Line Maint & Flight Ops Shift A (Crew A)</h2>
+              <p class="text-xs text-slate-600 font-mono mt-0.5">06:00 EAT - 18:00 EAT • Fleet: 5Y-KZE (B787-8), 5Y-FFF (E190), 5Y-KZB (B787-8)</p>
+              <p class="text-xs text-slate-500 mt-0.5">Authorised User: <strong id="dash-authorised-user" class="text-slate-800">Capt. John Doe (Pilot)</strong></p>
             </div>
             <div class="flex items-center space-x-2">
+              <button onclick="navigateTo('shift-log')" class="px-3.5 py-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs font-bold border border-indigo-200 transition">
+                ✨ NLP Shift Log
+              </button>
               <button onclick="navigateTo('create-handover')" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold border border-slate-300 transition">
                 Log Shift Handover
               </button>
@@ -1571,8 +1573,8 @@
         <div>
           <label class="block font-semibold text-slate-700 mb-1">Role</label>
           <select id="new-user-role" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900">
-            <option value="Operator">Operator (Shift Worker)</option>
-            <option value="Supervisor">Shift Supervisor</option>
+            <option value="Pilot">Pilot</option>
+            <option value="Aeronautical Engineer">Aeronautical Engineer</option>
             <option value="Administrator">Administrator</option>
           </select>
         </div>
@@ -1685,7 +1687,7 @@
   <script>
     let currentUser = {
       name: 'Capt. John Doe',
-      role: 'Pilot (Captain)',
+      role: 'Pilot',
       email: 'john@shiftsync.local'
     };
 
@@ -1693,6 +1695,121 @@
 
     let currentDetectedTasks = [];
     let loadedHandovers = [];
+    let loadedTasksList = [];
+
+    function applyDashboardScopeFilter() {
+      const scopeSelect = document.getElementById('dashboard-scope-select');
+      const scope = scopeSelect ? scopeSelect.value : 'all';
+      const scopeBadge = document.getElementById('dash-scope-badge');
+      const scopeSubtitle = document.getElementById('dash-scope-subtitle');
+      const shiftTitle = document.getElementById('dash-active-shift-title');
+      const shiftDept = document.getElementById('dash-shift-dept-tag');
+
+      if (scope === 'pilot') {
+        if (scopeBadge) {
+          scopeBadge.innerText = '✈️ SCOPE: FLIGHT OPERATIONS (PILOTS)';
+          scopeBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200';
+        }
+        if (scopeSubtitle) scopeSubtitle.innerText = 'Authorised Scope: Flight Deck Operations, Sector Debriefs (Pilot-to-Pilot / Pilot-to-Engineer) & Cockpit Checks.';
+        if (shiftTitle) shiftTitle.innerText = 'Flight Operations & Sector Dispatch Shift A (B787 / E190 Fleet)';
+        if (shiftDept) shiftDept.innerText = 'JKIA Flight Ops Dispatch';
+      } else if (scope === 'engineer') {
+        if (scopeBadge) {
+          scopeBadge.innerText = '🔧 SCOPE: LINE MAINTENANCE (AERONAUTICAL ENGINEERS)';
+          scopeBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200';
+        }
+        if (scopeSubtitle) scopeSubtitle.innerText = 'Authorised Scope: JKIA Hangar 1 & Ramp Line Maintenance, Defect Rectification & CRS Airworthiness Sign-offs.';
+        if (shiftTitle) shiftTitle.innerText = 'Line Maintenance & Defect Rectification Shift A (Hangar 1)';
+        if (shiftDept) shiftDept.innerText = 'JKIA Line Maintenance Hangar 1';
+      } else {
+        if (scopeBadge) {
+          scopeBadge.innerText = '🛡️ SCOPE: ORGANISATION-WIDE (ALL KQ UNITS)';
+          scopeBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-[#C8102E] border border-red-200';
+        }
+        if (scopeSubtitle) scopeSubtitle.innerText = 'Organisation-Wide View: Aggregated telemetry across Flight Operations, Line Maintenance, and Fleet Administration.';
+        if (shiftTitle) shiftTitle.innerText = 'Organisation-Wide Operations: Flight Ops & Line Maintenance Shift A';
+        if (shiftDept) shiftDept.innerText = 'All JKIA Terminals & Hangars';
+      }
+
+      // Filter Recent Handover Reports on Dashboard by Organisational Scope
+      const dashHoTbody = document.getElementById('dash-recent-handovers');
+      if (dashHoTbody && loadedHandovers.length) {
+        const filteredHo = loadedHandovers.filter(h => {
+          if (scope === 'all') return true;
+          const hType = (h.handover_type || '').toLowerCase();
+          if (scope === 'pilot') return hType.includes('pilot') || h.outgoing_operator.includes('John');
+          if (scope === 'engineer') return hType.includes('engineer') || h.outgoing_operator.includes('Michael') || h.incoming_operator.includes('Michael');
+          return true;
+        });
+
+        dashHoTbody.innerHTML = '';
+        filteredHo.forEach(h => {
+          const badgeClass = h.status === 'Acknowledged' ? 'badge-completed' : (h.status === 'Pending Review' ? 'badge-inprogress' : 'badge-pending');
+          const dTr = document.createElement('tr');
+          dTr.className = h.status === 'Pending Review' ? 'bg-amber-50/50' : '';
+          dTr.innerHTML = `
+            <td class="py-3 px-2 font-mono text-slate-700">${(h.submitted_at || '').split(' ')[0] || h.submitted_at}</td>
+            <td class="py-3 px-2">
+              <span class="font-bold text-slate-900 block text-xs">${h.aircraft_tail_number || '5Y-KZE'} • ${h.flight_number || 'KQ Sector'}</span>
+              <span class="text-[10px] text-slate-500">${h.handover_type || 'Shift Handover'} (${h.outgoing_operator} → ${h.incoming_operator})</span>
+            </td>
+            <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${badgeClass}">${h.status}</span></td>
+            <td class="py-3 px-2 text-right"><button onclick="viewHandoverDetails('${h.report_code}')" class="text-xs font-bold ${h.status === 'Pending Review' ? 'text-[#C8102E]' : 'text-slate-700'} hover:underline">${h.status === 'Pending Review' ? 'Review' : 'View'}</button></td>
+          `;
+          dashHoTbody.appendChild(dTr);
+        });
+
+        const statHandovers = document.getElementById('stat-pending-handovers');
+        if (statHandovers) {
+          statHandovers.innerText = filteredHo.filter(h => h.status === 'Pending Review').length;
+        }
+      }
+
+      // Filter Pending Tasks on Dashboard by Organisational Scope
+      const dashTasksTbody = document.getElementById('dash-pending-tasks');
+      if (dashTasksTbody && loadedTasksList.length) {
+        const filteredTasks = loadedTasksList.filter(t => {
+          if (t.status === 'Completed') return false;
+          if (scope === 'all') return true;
+          if (scope === 'pilot') {
+            return (t.assigned_to || '').includes('John') || (t.assigned_to || '').includes('Amina') || (t.category || '') === 'Operations' || (t.category || '') === 'Equipment Check';
+          }
+          if (scope === 'engineer') {
+            return (t.assigned_to || '').includes('Michael') || (t.assigned_to || '').includes('Sarah') || (t.category || '') === 'Maintenance' || (t.category || '') === 'Safety & Compliance';
+          }
+          return true;
+        });
+
+        dashTasksTbody.innerHTML = '';
+        filteredTasks.forEach(t => {
+          let prioClass = 'badge-medium';
+          if (t.priority === 'Critical') prioClass = 'badge-critical';
+          else if (t.priority === 'High') prioClass = 'badge-high';
+          else if (t.priority === 'Low') prioClass = 'badge-low';
+
+          let statusClass = 'badge-pending';
+          if (t.status === 'In Progress') statusClass = 'badge-inprogress';
+
+          const dTr = document.createElement('tr');
+          dTr.innerHTML = `
+            <td class="py-3 px-2">
+              <span class="font-medium text-slate-900 block">${t.task_name}</span>
+              <span class="text-[10px] text-slate-400">Assigned: ${t.assigned_to} • Aircraft: ${t.aircraft_tail_number || '5Y-KZE'}</span>
+            </td>
+            <td class="py-3 px-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${prioClass}">${t.priority}</span></td>
+            <td class="py-3 px-2"><span class="px-2 py-0.5 rounded-full text-[10px] ${statusClass}">${t.status}</span></td>
+            <td class="py-3 px-2 text-right"><button onclick="toggleTaskStatus(${t.id}, this)" class="text-xs text-slate-600 hover:text-slate-900 font-medium">Mark Done</button></td>
+          `;
+          dashTasksTbody.appendChild(dTr);
+        });
+
+        const statTasks = document.getElementById('stat-incomplete-tasks');
+        if (statTasks) {
+          statTasks.innerText = filteredTasks.length;
+        }
+      }
+    }
+
 
     const samplePresets = {
       1: "Completed pre-flight walkaround on 5Y-KZE. Engine #1 oil replenished by 1.5qt, TechLog defect #4412 regarding bleed air valve closed, and signed off maintenance release for flight KQ 102.",
@@ -1948,13 +2065,13 @@
       if (roleType === 'administrator') {
         quickLogin('Emily Watson', 'Administrator', 'admin@shiftsync.local');
       } else if (roleType === 'pilot') {
-        quickLogin('Capt. John Doe', 'Pilot (Captain)', 'john@shiftsync.local');
+        quickLogin('Capt. John Doe', 'Pilot', 'john@shiftsync.local');
       } else if (roleType === 'engineer') {
-        quickLogin('Eng. Michael Chang', 'Licensed Aeronautical Engineer (AME)', 'michael@shiftsync.local');
+        quickLogin('Eng. Michael Chang', 'Aeronautical Engineer', 'michael@shiftsync.local');
       } else if (roleType === 'supervisor') {
         quickLogin('Sarah Jenkins', 'Maintenance Supervisor', 'sarah@shiftsync.local');
       } else {
-        quickLogin('Capt. John Doe', 'Pilot (Captain)', 'john@shiftsync.local');
+        quickLogin('Capt. John Doe', 'Pilot', 'john@shiftsync.local');
       }
     }
 
@@ -2041,7 +2158,7 @@
           roleBadge.innerText = '✈️ PILOT';
           roleBadge.className = 'px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-sky-100 text-sky-800 border border-sky-300';
         } else if (isAME) {
-          roleBadge.innerText = '🔧 AME';
+          roleBadge.innerText = '🔧 ENGINEER';
           roleBadge.className = 'px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300';
         } else if (isSupv) {
           roleBadge.innerText = '📋 CAMO SUPV';
@@ -2054,6 +2171,44 @@
 
       const outgoingInput = document.getElementById('handover-outgoing-operator');
       if (outgoingInput) outgoingInput.value = user.name + ' (Current Session)';
+
+      // Restrict Admin-only sidebar navigation items based on authorised role scope
+      const navMonitoring = document.getElementById('nav-worker-monitoring');
+      const navUsers = document.getElementById('nav-users');
+      if (navMonitoring) navMonitoring.classList.toggle('hidden', !isAdmin);
+      if (navUsers) navUsers.classList.toggle('hidden', !isAdmin);
+
+      // Configure Authorised Organisational Scope on the Dashboard
+      const scopeSelect = document.getElementById('dashboard-scope-select');
+      const scopeBadge = document.getElementById('dash-scope-badge');
+      const scopeSubtitle = document.getElementById('dash-scope-subtitle');
+      const authUserLabel = document.getElementById('dash-authorised-user');
+      if (authUserLabel) authUserLabel.innerText = `${user.name} (${user.role} • ${user.department || 'KQ Operations'})`;
+
+      if (scopeSelect) {
+        if (isAdmin) {
+          scopeSelect.innerHTML = `
+            <option value="all">Organisation-Wide (All Flight Ops & Engineering Units)</option>
+            <option value="pilot">Flight Operations Scope (Pilots • B787 / E190 Fleet)</option>
+            <option value="engineer">Line Maintenance Scope (Aeronautical Engineers • Hangar 1)</option>
+          `;
+          scopeSelect.value = 'all';
+        } else if (isPilot) {
+          scopeSelect.innerHTML = `
+            <option value="pilot">Flight Operations Scope (Authorised: Pilots & Cockpit Crew)</option>
+            <option value="all">Organisation-Wide Read-Only Summary (Flight + Line Maint)</option>
+          `;
+          scopeSelect.value = 'pilot';
+        } else {
+          scopeSelect.innerHTML = `
+            <option value="engineer">Line Maintenance & Airworthiness Scope (Authorised: Aeronautical Engineers)</option>
+            <option value="all">Organisation-Wide Read-Only Summary (Line Maint + Flight Ops)</option>
+          `;
+          scopeSelect.value = 'engineer';
+        }
+      }
+
+      applyDashboardScopeFilter();
 
       document.getElementById('screen-login').classList.add('hidden');
       document.getElementById('screen-app').classList.remove('hidden');
@@ -2069,12 +2224,18 @@
       applyUserSession({ name, role, email });
     }
 
-    function handleLogout() {
+    function handleLogout(skipPush = false) {
       document.getElementById('screen-app').classList.add('hidden');
       document.getElementById('screen-login').classList.remove('hidden');
+      if (!skipPush && window.history && window.history.pushState) {
+        window.history.pushState({ screen: 'login' }, '', '#login');
+      }
     }
 
-    function navigateTo(viewId) {
+    function navigateTo(viewId, skipPush = false) {
+      document.getElementById('screen-login').classList.add('hidden');
+      document.getElementById('screen-app').classList.remove('hidden');
+
       views.forEach(v => {
         const el = document.getElementById('view-' + v);
         const nav = document.getElementById('nav-' + v);
@@ -2091,7 +2252,28 @@
       if (viewId === 'worker-monitoring') {
         loadWorkerMonitoring();
       }
+
+      if (!skipPush && window.history && window.history.pushState) {
+        window.history.pushState({ screen: 'app', viewId: viewId }, '', '#' + viewId);
+      }
     }
+
+    window.addEventListener('popstate', function(event) {
+      if (event.state) {
+        if (event.state.screen === 'login') {
+          handleLogout(true);
+        } else if (event.state.screen === 'app' && event.state.viewId) {
+          navigateTo(event.state.viewId, true);
+        }
+      } else {
+        const hash = window.location.hash.replace('#', '');
+        if (hash && views.includes(hash)) {
+          navigateTo(hash, true);
+        } else {
+          handleLogout(true);
+        }
+      }
+    });
 
     // Modal controls
     function openModal(id) {
@@ -2441,6 +2623,7 @@
     async function loadTasks() {
       const data = await fetchAPI('/api/tasks');
       if (!data || !data.tasks) return;
+      loadedTasksList = data.tasks;
 
       const tbody = document.getElementById('tasks-table-body');
       const dashTbody = document.getElementById('dash-pending-tasks');
@@ -2487,6 +2670,7 @@
           dashTbody.appendChild(dTr);
         }
       });
+      applyDashboardScopeFilter();
     }
 
     async function loadUsers() {

@@ -243,7 +243,7 @@ class ShiftSyncRequestHandler(http.server.SimpleHTTPRequestHandler):
                 "Worker", "Operator", "Outgoing Operator", "Incoming Operator", "Supervisor"
             ]
             if role not in valid_roles:
-                role = "Licensed Aeronautical Engineer (AME)"
+                role = "Aeronautical Engineer"
 
             conn = database.get_connection()
             cursor = conn.cursor()
@@ -300,16 +300,12 @@ class ShiftSyncRequestHandler(http.server.SimpleHTTPRequestHandler):
             try:
                 if role_type == "administrator" and not email:
                     cursor.execute("SELECT * FROM users WHERE role = 'Administrator' ORDER BY id ASC LIMIT 1")
+                elif role_type == "pilot" and not email:
+                    cursor.execute("SELECT * FROM users WHERE role LIKE 'Pilot%' ORDER BY id ASC LIMIT 1")
+                elif role_type in ("engineer", "aeronautical engineer") and not email:
+                    cursor.execute("SELECT * FROM users WHERE role LIKE '%Engineer%' ORDER BY id ASC LIMIT 1")
                 elif role_type == "worker" and not email:
-                    cursor.execute("""
-                    SELECT * FROM users 
-                    WHERE role IN (
-                        'Pilot (Captain)', 'Pilot', 'Captain', 'First Officer', 'First Officer (Pilot)',
-                        'Licensed Aeronautical Engineer (AME)', 'Aeronautical Engineer', 
-                        'Avionics Maintenance Engineer', 'Worker', 'Operator', 'Outgoing Operator'
-                    ) 
-                    ORDER BY id ASC LIMIT 1
-                    """)
+                    cursor.execute("SELECT * FROM users WHERE role != 'Administrator' ORDER BY id ASC LIMIT 1")
                 else:
                     cursor.execute("SELECT * FROM users WHERE LOWER(email) = ?", (email,))
 
@@ -319,6 +315,12 @@ class ShiftSyncRequestHandler(http.server.SimpleHTTPRequestHandler):
                     return
 
                 user = dict(row)
+                # Enforce strict password verification when logging in via email
+                if email and user.get("password") != password:
+                    database.log_audit(user["name"], user["role"], "Failed Login Attempt", f"Incorrect password entered for {email}")
+                    self.send_json_response({"error": "Invalid password. Please enter the correct password for this account."}, 401)
+                    return
+
                 # Update last active timestamp
                 cursor.execute("UPDATE users SET last_active = CURRENT_TIMESTAMP WHERE id = ?", (user["id"],))
                 conn.commit()

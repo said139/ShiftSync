@@ -35,11 +35,11 @@ def init_db():
         name TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
         password TEXT DEFAULT 'password123',
-        role TEXT NOT NULL CHECK(role IN (
-            'Pilot', 'Captain', 'First Officer', 'Pilot (Captain)', 'First Officer (Pilot)',
-            'Aeronautical Engineer', 'Licensed Aeronautical Engineer (AME)',
-            'Avionics Maintenance Engineer', 'Maintenance Supervisor',
-            'Flight Operations Supervisor', 'Administrator',
+                role TEXT NOT NULL CHECK(role IN (
+            'Pilot', 'Aeronautical Engineer', 'Administrator',
+            'Captain', 'First Officer', 'Pilot (Captain)', 'First Officer (Pilot)',
+            'Licensed Aeronautical Engineer (AME)', 'Avionics Maintenance Engineer',
+            'Maintenance Supervisor', 'Flight Operations Supervisor',
             'Outgoing Operator', 'Incoming Operator', 'Supervisor', 'Operator', 'Worker'
         )),
         department TEXT NOT NULL,
@@ -61,13 +61,13 @@ def init_db():
             name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
             password TEXT DEFAULT 'password123',
-            role TEXT NOT NULL CHECK(role IN (
-                'Pilot', 'Captain', 'First Officer', 'Pilot (Captain)', 'First Officer (Pilot)',
-                'Aeronautical Engineer', 'Licensed Aeronautical Engineer (AME)',
-                'Avionics Maintenance Engineer', 'Maintenance Supervisor',
-                'Flight Operations Supervisor', 'Administrator',
-                'Outgoing Operator', 'Incoming Operator', 'Supervisor', 'Operator', 'Worker'
-            )),
+                    role TEXT NOT NULL CHECK(role IN (
+            'Pilot', 'Aeronautical Engineer', 'Administrator',
+            'Captain', 'First Officer', 'Pilot (Captain)', 'First Officer (Pilot)',
+            'Licensed Aeronautical Engineer (AME)', 'Avionics Maintenance Engineer',
+            'Maintenance Supervisor', 'Flight Operations Supervisor',
+            'Outgoing Operator', 'Incoming Operator', 'Supervisor', 'Operator', 'Worker'
+        )),
             department TEXT NOT NULL,
             status TEXT DEFAULT 'Active' CHECK(status IN ('Active', 'Inactive')),
             current_shift TEXT DEFAULT 'Line Maint & Flight Ops Shift A',
@@ -194,12 +194,12 @@ def init_db():
         
         # Seed Aviation Users
         users_seed = [
-            ("John Doe", "john@shiftsync.local", "password123", "Pilot (Captain)", "Flight Operations - B787 Fleet"),
-            ("Michael Chang", "michael@shiftsync.local", "password123", "Licensed Aeronautical Engineer (AME)", "JKIA Line Maintenance (Hangar 1)"),
-            ("Amina Noor", "amina@shiftsync.local", "password123", "First Officer (Pilot)", "Flight Operations - E190 Fleet"),
-            ("Sarah Jenkins", "sarah@shiftsync.local", "password123", "Maintenance Supervisor", "Fleet Airworthiness & CAMO"),
+            ("John Doe", "john@shiftsync.local", "password123", "Pilot", "Flight Operations - B787 Fleet"),
+            ("Michael Chang", "michael@shiftsync.local", "password123", "Aeronautical Engineer", "JKIA Line Maintenance (Hangar 1)"),
+            ("Amina Noor", "amina@shiftsync.local", "password123", "Pilot", "Flight Operations - E190 Fleet"),
+            ("Sarah Jenkins", "sarah@shiftsync.local", "password123", "Aeronautical Engineer", "Fleet Airworthiness & CAMO"),
             ("Emily Watson", "admin@shiftsync.local", "password123", "Administrator", "Flight Operations & Engineering IT"),
-            ("David Miller", "david@shiftsync.local", "password123", "Avionics Maintenance Engineer", "Avionics Workshop JKIA")
+            ("David Miller", "david@shiftsync.local", "password123", "Aeronautical Engineer", "Avionics Workshop JKIA")
         ]
         cursor.executemany("INSERT INTO users (name, email, password, role, department) VALUES (?, ?, ?, ?, ?)", users_seed)
 
@@ -267,10 +267,10 @@ def init_db():
 
         # Seed Aviation Audit Trail
         initial_audit = [
-            ("John Doe", "Pilot (Captain)", "Pre-Flight Login", "Signed into Line Maint & Flight Ops Shift A (B787 Fleet 5Y-KZE)", "2026-10-01 06:05:00"),
-            ("John Doe", "Pilot (Captain)", "NLP TechLog Analysis", "Processed TechLog #4412 snag report - 3 maintenance tasks detected with 99% confidence", "2026-10-01 07:15:22"),
-            ("Michael Chang", "Licensed Aeronautical Engineer (AME)", "Task Completed", "Rectified snag: 'APU Starter Generator Voltage Verification' on 5Y-FFF", "2026-10-01 08:30:10"),
-            ("John Doe", "Pilot (Captain)", "Handover Submitted", "Filed Flight KQ 102 Handover Report HO-2026-088 to incoming AME Michael Chang", "2026-10-01 08:45:00"),
+            ("John Doe", "Pilot", "Pre-Flight Login", "Signed into Line Maint & Flight Ops Shift A (B787 Fleet 5Y-KZE)", "2026-10-01 06:05:00"),
+            ("John Doe", "Pilot", "NLP TechLog Analysis", "Processed TechLog #4412 snag report - 3 maintenance tasks detected with 99% confidence", "2026-10-01 07:15:22"),
+            ("Michael Chang", "Aeronautical Engineer", "Task Completed", "Rectified snag: 'APU Starter Generator Voltage Verification' on 5Y-FFF", "2026-10-01 08:30:10"),
+            ("John Doe", "Pilot", "Handover Submitted", "Filed Flight KQ 102 Handover Report HO-2026-088 to incoming AME Michael Chang", "2026-10-01 08:45:00"),
             ("Emily Watson", "Administrator", "Fleet Monitoring", "Inspected Line Maintenance Crew A & B task completion rate across JKIA gates", "2026-10-01 09:00:15")
         ]
         cursor.executemany("INSERT INTO audit_logs (user_name, user_role, action, details, created_at) VALUES (?, ?, ?, ?, ?)", initial_audit)
@@ -279,16 +279,16 @@ def init_db():
         print("Database seeded successfully with aviation records.")
     else:
         # If users exist, ensure aviation roles/departments and records are upgraded
-        cursor.execute("UPDATE users SET role = 'Pilot (Captain)', department = 'Flight Operations - B787 Fleet' WHERE email = 'john@shiftsync.local'")
-        cursor.execute("UPDATE users SET role = 'Licensed Aeronautical Engineer (AME)', department = 'JKIA Line Maintenance (Hangar 1)' WHERE email = 'michael@shiftsync.local'")
-        cursor.execute("UPDATE users SET role = 'Maintenance Supervisor', department = 'Fleet Airworthiness & CAMO' WHERE email = 'sarah@shiftsync.local'")
-        cursor.execute("UPDATE users SET role = 'Avionics Maintenance Engineer', department = 'Avionics Workshop JKIA' WHERE email = 'david@shiftsync.local'")
+        cursor.execute("UPDATE users SET role = 'Pilot', department = 'Flight Operations - B787 Fleet' WHERE email = 'john@shiftsync.local'")
+        cursor.execute("UPDATE users SET role = 'Aeronautical Engineer', department = 'JKIA Line Maintenance (Hangar 1)' WHERE email = 'michael@shiftsync.local'")
+        cursor.execute("UPDATE users SET role = 'Aeronautical Engineer', department = 'Fleet Airworthiness & CAMO' WHERE email = 'sarah@shiftsync.local'")
+        cursor.execute("UPDATE users SET role = 'Aeronautical Engineer', department = 'Avionics Workshop JKIA' WHERE email = 'david@shiftsync.local'")
         cursor.execute("UPDATE users SET role = 'Administrator', department = 'Flight Operations & Engineering IT' WHERE email = 'admin@shiftsync.local'")
         
         # Add Amina Noor if not present
         cursor.execute("SELECT id FROM users WHERE email = 'amina@shiftsync.local'")
         if not cursor.fetchone():
-            cursor.execute("INSERT INTO users (name, email, password, role, department) VALUES ('Amina Noor', 'amina@shiftsync.local', 'password123', 'First Officer (Pilot)', 'Flight Operations - E190 Fleet')")
+            cursor.execute("INSERT INTO users (name, email, password, role, department) VALUES ('Amina Noor', 'amina@shiftsync.local', 'password123', 'Pilot', 'Flight Operations - E190 Fleet')")
 
         # Update shifts with aviation titles if still on generic titles
         cursor.execute("UPDATE shifts SET shift_name = 'Line Maint & Flight Ops Shift A', team = 'Line Crew A (B787-8)' WHERE id = 1")
