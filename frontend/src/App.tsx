@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { WebSocketProvider } from "./context/WebSocketContext";
 import { AppLayout, ProtectedRoute } from "./components/Layout";
 import {
   AccessDeniedPage,
@@ -174,9 +175,11 @@ export const AppRoutes: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <WebSocketProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </WebSocketProvider>
     </AuthProvider>
   );
 };

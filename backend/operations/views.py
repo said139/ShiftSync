@@ -8,6 +8,11 @@ from rest_framework.response import Response
 from accounts.models import User, UserRole
 from accounts.permissions import IsOutgoingOrAdmin, IsSystemAdmin
 from accounts.views import get_client_ip, log_audit_event
+from accounts.email_service import (
+    send_handover_submitted_email,
+    send_handover_acknowledged_email,
+)
+from common.ws_broadcast import push_ws_event_to_org, push_ws_event_to_user
 from notifications.models import Notification, NotificationType
 from .models import (
     AcknowledgmentEvent,
@@ -51,6 +56,16 @@ def notify_supervisors(organisation, notification_type, title, message, handover
     ]
     if notifications:
         Notification.objects.bulk_create(notifications)
+        for sup in supervisors:
+            push_ws_event_to_user(
+                sup.id,
+                "NEW_NOTIFICATION",
+                {
+                    "title": title,
+                    "message": message,
+                    "type": notification_type,
+                },
+            )
 
 
 class ShiftViewSet(viewsets.ModelViewSet):
@@ -598,6 +613,32 @@ class HandoverReportViewSet(viewsets.ModelViewSet):
             )
 
         report.refresh_from_db()
+
+        # Broadcast real-time WS events
+        push_ws_event_to_user(
+            report.designated_incoming_worker_id,
+            "HANDOVER_SUBMITTED",
+            {
+                "report_id": str(report.id),
+                "report_code": report.report_code,
+                "shift_name": report.shift.name,
+                "submitting_worker": report.submitting_worker.full_name,
+                "task_count": task_count,
+                "has_safety_incident": report.has_safety_incident,
+            },
+        )
+        push_ws_event_to_org(
+            report.organisation_id,
+            "DASHBOARD_METRIC_UPDATE",
+            {
+                "event": "HANDOVER_SUBMITTED",
+                "report_code": report.report_code,
+            },
+        )
+
+        # Dispatch real SMTP notification email to incoming crew member
+        send_handover_submitted_email(report)
+
         return Response(
             HandoverReportSerializer(report, context={"request": request}).data,
             status=status.HTTP_200_OK,
@@ -749,6 +790,31 @@ class HandoverReportViewSet(viewsets.ModelViewSet):
             )
 
         report.refresh_from_db()
+
+        # Broadcast real-time WS events
+        push_ws_event_to_user(
+            report.submitting_worker_id,
+            "HANDOVER_ACKNOWLEDGED",
+            {
+                "report_id": str(report.id),
+                "report_code": report.report_code,
+                "shift_name": report.shift.name,
+                "acknowledged_by": user.full_name,
+                "acknowledged_at": report.acknowledged_at.isoformat() if report.acknowledged_at else None,
+            },
+        )
+        push_ws_event_to_org(
+            report.organisation_id,
+            "DASHBOARD_METRIC_UPDATE",
+            {
+                "event": "HANDOVER_ACKNOWLEDGED",
+                "report_code": report.report_code,
+            },
+        )
+
+        # Dispatch real SMTP notification email to outgoing crew member
+        send_handover_acknowledged_email(report)
+
         return Response(
             HandoverReportSerializer(report, context={"request": request}).data,
             status=status.HTTP_200_OK,

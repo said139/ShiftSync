@@ -21,6 +21,7 @@ import {
   X,
 } from "lucide-react";
 import { useAuth, UserRole } from "../context/AuthContext";
+import { useWebSocket } from "../context/WebSocketContext";
 import { apiClient } from "../api/client";
 
 export const ProtectedRoute: React.FC<{
@@ -51,6 +52,7 @@ export const ProtectedRoute: React.FC<{
 
 export const AppLayout: React.FC = () => {
   const { user, organisation, logout } = useAuth();
+  const { connected, lastEvent } = useWebSocket();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -71,6 +73,13 @@ export const AppLayout: React.FC = () => {
     const timer = setInterval(fetchUnreadCount, 15000);
     return () => clearInterval(timer);
   }, [user, location.pathname]);
+
+  // When live WebSocket pushes an event, refresh unread counter immediately
+  useEffect(() => {
+    if (lastEvent) {
+      fetchUnreadCount();
+    }
+  }, [lastEvent]);
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -273,6 +282,36 @@ export const AppLayout: React.FC = () => {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
+            {/* Live WebSocket Telemetry Indicator */}
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                fontSize: "0.72rem",
+                fontWeight: 700,
+                color: connected ? "var(--green-700)" : "var(--slate-500)",
+                background: connected ? "rgba(0, 122, 61, 0.08)" : "rgba(100, 116, 139, 0.08)",
+                padding: "0.3rem 0.65rem",
+                borderRadius: "5px",
+                border: connected ? "1px solid rgba(0, 122, 61, 0.25)" : "1px solid var(--slate-200)",
+              }}
+              title={connected ? "Connected to live WebSocket telemetry stream" : "Live WebSocket offline"}
+              data-testid="ws-connection-status"
+            >
+              <span
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: "50%",
+                  backgroundColor: connected ? "var(--green-600)" : "var(--slate-400)",
+                  display: "inline-block",
+                  boxShadow: connected ? "0 0 6px rgba(0, 122, 61, 0.6)" : "none",
+                }}
+              />
+              <span>{connected ? "LIVE WS" : "WS OFFLINE"}</span>
+            </div>
+
             <Link
               to="/notifications"
               className="btn btn-secondary btn-sm"

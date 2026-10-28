@@ -12,6 +12,8 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from notifications.models import Notification, NotificationType
+from common.ws_broadcast import push_ws_event_to_org, push_ws_event_to_user
+from .email_service import send_password_reset_email, send_smtp_diagnostic_test
 from .models import (
     AccountApprovalStatus,
     AuditEvent,
@@ -134,7 +136,7 @@ class RegisterAPIView(APIView):
             else f"New Crew Member Registered: {user.full_name} ({user.employee_id})"
         )
         for sup in approvers:
-            Notification.objects.create(
+            notif = Notification.objects.create(
                 organisation=user.organisation,
                 recipient=sup,
                 notification_type=notif_type,
@@ -143,6 +145,17 @@ class RegisterAPIView(APIView):
                     f"{user.full_name} ({user.get_personnel_category_display()}, Staff ID: {user.employee_id}) "
                     f"registered in department '{user.department}'."
                 ),
+            )
+            push_ws_event_to_user(
+                sup.id,
+                "NEW_NOTIFICATION",
+                {
+                    "id": str(notif.id),
+                    "title": notif.title,
+                    "message": notif.message,
+                    "type": notif.notification_type,
+                    "created_at": notif.created_at.isoformat(),
+                },
             )
 
         if user.approval_status == AccountApprovalStatus.PENDING:
@@ -484,9 +497,31 @@ class PasswordRecoveryRequestAPIView(APIView):
                 summary=f"Password recovery token generated for {user.email}.",
                 request=request,
             )
+            email_sent = send_password_reset_email(user, reset_obj.token)
             response_payload["reset_token"] = reset_obj.token
+            response_payload["email_dispatched"] = email_sent
 
         return Response(response_payload, status=status.HTTP_200_OK)
+
+
+class TestEmailAPIView(APIView):
+    """
+    Authenticated administrative endpoint to test real SMTP server delivery.
+    Sends a test email to the requested address and returns delivery telemetry.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        target_email = (request.data.get("recipient_email") or request.user.email).strip().lower()
+        result = send_smtp_diagnostic_test(
+            recipient_email=target_email,
+            actor_name=request.user.full_name,
+        )
+        return Response(
+            result,
+            status=status.HTTP_200_OK if result.get("success") else status.HTTP_502_BAD_GATEWAY,
+        )
 
 
 class PasswordResetConfirmAPIView(APIView):
