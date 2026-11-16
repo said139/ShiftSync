@@ -190,42 +190,41 @@ export const LoginPage: React.FC = () => {
           </button>
         </form>
 
-        {/* Prominent Sign Up CTA Link */}
+        {/* Enterprise Security Access Notice */}
         <div
           style={{
             marginTop: "1.25rem",
-            padding: "0.9rem 1rem",
-            background: "var(--kq-red-50)",
-            border: "1px solid var(--kq-red-100)",
+            padding: "0.85rem 1rem",
+            background: "var(--slate-50)",
+            border: "1px solid var(--slate-200)",
             borderRadius: "8px",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: "0.75rem",
           }}
+          data-testid="enterprise-access-notice"
         >
+          <div
+            style={{
+              padding: "0.35rem",
+              borderRadius: "6px",
+              background: "rgba(10, 25, 47, 0.08)",
+              color: "var(--navy-900)",
+              marginTop: "0.1rem",
+              flexShrink: 0,
+            }}
+          >
+            <Shield size={16} />
+          </div>
           <div>
-            <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--kq-red-900)" }}>
-              New crew member?
+            <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--navy-900)" }}>
+              Restricted Operational Access
             </div>
-            <div style={{ fontSize: "0.75rem", color: "var(--slate-600)" }}>
-              Create an operational pilot, engineer, or crew account.
+            <div style={{ fontSize: "0.75rem", color: "var(--slate-600)", lineHeight: 1.4, marginTop: "0.15rem" }}>
+              Public self-registration is disabled in accordance with ICAO Annex 6 / KCAA SMS compliance.
+              Flight deck and line maintenance accounts are strictly provisioned by the <strong>System Administrator</strong>.
             </div>
           </div>
-          <Link
-            to="/signup"
-            className="btn btn-sm"
-            style={{
-              backgroundColor: "var(--kq-red-600)",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: "0.8rem",
-              whiteSpace: "nowrap",
-            }}
-            data-testid="go-to-signup-btn"
-          >
-            <UserPlus size={14} />
-            <span>Sign Up</span>
-          </Link>
         </div>
 
         {/* Kenya Airways Crew Demonstration Accounts */}
