@@ -79,10 +79,13 @@ def send_password_reset_email(user, reset_token: str) -> bool:
 
 A password reset request was received for your ShiftSync account ({user.email}).
 
-Please open the following link in your browser to choose a new password:
+Your Password Reset Verification Token:
+{reset_token}
+
+You can copy and paste this token into the verification form, or open the following direct link in your browser:
 {reset_url}
 
-This link is valid for 1 hour. If you did not request this reset, you can safely ignore this email.
+This token is valid for 1 hour. If you did not request this reset, you can safely ignore this email.
 
 — Kenya Airways ShiftSync Operations Hub
 """
@@ -91,7 +94,11 @@ This link is valid for 1 hour. If you did not request this reset, you can safely
     <h2 style="font-size: 17px; font-weight: 700; color: #0f172a; margin-top: 0;">Password Recovery Request</h2>
     <p>Hello <strong>{user.full_name}</strong>,</p>
     <p>A password reset request was submitted for your ShiftSync account (<strong>{user.email}</strong>, Staff ID: <code>{user.employee_id or 'N/A'}</code>).</p>
-    <p>Click the button below to verify your identity and set a new secure password. This verification token is time-limited and expires in <strong>1 hour</strong>.</p>
+    <p style="margin-top: 16px; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #475569;">Your Password Reset Token:</p>
+    <div style="background: #f1f5f9; padding: 14px 18px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: 'JetBrains Mono', Consolas, monospace; font-size: 18px; font-weight: 700; color: #C8102E; text-align: center; letter-spacing: 2px; margin-bottom: 16px;">
+        {reset_token}
+    </div>
+    <p>Enter the token above on the recovery form, or click the button below to directly choose your new password. This verification token is time-limited and expires in <strong>1 hour</strong>.</p>
     """
 
     html_content = _build_html_wrapper(

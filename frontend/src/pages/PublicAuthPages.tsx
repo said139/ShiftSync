@@ -259,41 +259,41 @@ export const LoginPage: React.FC = () => {
               type="button"
               className="btn btn-secondary btn-sm"
               style={{ textAlign: "left", padding: "0.45rem 0.6rem", display: "flex", flexDirection: "column", gap: "0.15rem" }}
-              onClick={() => fillDemo("said@kq.ac.ke")}
+              onClick={() => fillDemo("said.kq.ac.ke@gmail.com")}
               data-testid="demo-kq-said-btn"
             >
               <strong style={{ fontSize: "0.78rem", color: "var(--navy-900)" }}>Eng. Said Marika</strong>
-              <span style={{ fontSize: "0.7rem", color: "var(--slate-500)" }}>said@kq.ac.ke • Admin</span>
+              <span style={{ fontSize: "0.7rem", color: "var(--slate-500)" }}>said.kq.ac.ke@gmail.com • Admin</span>
             </button>
             <button
               type="button"
               className="btn btn-secondary btn-sm"
               style={{ textAlign: "left", padding: "0.45rem 0.6rem", display: "flex", flexDirection: "column", gap: "0.15rem" }}
-              onClick={() => fillDemo("david@kq.ac.ke")}
+              onClick={() => fillDemo("david.kq.ac.ke@gmail.com")}
               data-testid="demo-kq-david-btn"
             >
               <strong style={{ fontSize: "0.78rem", color: "var(--navy-900)" }}>Eng. David Ochieng</strong>
-              <span style={{ fontSize: "0.7rem", color: "var(--slate-500)" }}>david@kq.ac.ke • Line Maint</span>
+              <span style={{ fontSize: "0.7rem", color: "var(--slate-500)" }}>david.kq.ac.ke@gmail.com • Line Maint</span>
             </button>
             <button
               type="button"
               className="btn btn-secondary btn-sm"
               style={{ textAlign: "left", padding: "0.45rem 0.6rem", display: "flex", flexDirection: "column", gap: "0.15rem" }}
-              onClick={() => fillDemo("amina@kq.ac.ke")}
+              onClick={() => fillDemo("amina.kq.ac.ke@gmail.com")}
               data-testid="demo-kq-amina-btn"
             >
               <strong style={{ fontSize: "0.78rem", color: "var(--navy-900)" }}>Eng. Amina Hassan</strong>
-              <span style={{ fontSize: "0.7rem", color: "var(--slate-500)" }}>amina@kq.ac.ke • Line Maint</span>
+              <span style={{ fontSize: "0.7rem", color: "var(--slate-500)" }}>amina.kq.ac.ke@gmail.com • Line Maint</span>
             </button>
             <button
               type="button"
               className="btn btn-secondary btn-sm"
               style={{ textAlign: "left", padding: "0.45rem 0.6rem", display: "flex", flexDirection: "column", gap: "0.15rem" }}
-              onClick={() => fillDemo("grace@kq.ac.ke")}
+              onClick={() => fillDemo("grace.kq.ac.ke@gmail.com")}
               data-testid="demo-kq-grace-btn"
             >
               <strong style={{ fontSize: "0.78rem", color: "var(--navy-900)" }}>Capt. Grace Wanjiku</strong>
-              <span style={{ fontSize: "0.7rem", color: "var(--slate-500)" }}>grace@kq.ac.ke • QA Sup</span>
+              <span style={{ fontSize: "0.7rem", color: "var(--slate-500)" }}>grace.kq.ac.ke@gmail.com • QA Sup</span>
             </button>
           </div>
 
@@ -696,8 +696,10 @@ export const PasswordRecoveryPage: React.FC = () => {
     try {
       const res = await apiClient.post("/auth/password-recovery/", { email });
       setMessage(res.data.detail);
-      if (res.data.reset_token) {
+      if (!res.data.email_dispatched && res.data.reset_token) {
         setResetToken(res.data.reset_token);
+      } else {
+        setResetToken("");
       }
       setStep("confirm");
     } catch (err: any) {

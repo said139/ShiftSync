@@ -500,6 +500,11 @@ class PasswordRecoveryRequestAPIView(APIView):
             email_sent = send_password_reset_email(user, reset_obj.token)
             response_payload["reset_token"] = reset_obj.token
             response_payload["email_dispatched"] = email_sent
+            if email_sent:
+                response_payload["detail"] = (
+                    f"A password reset token has been dispatched to {user.email}. "
+                    "Please check your Gmail inbox (and Spam folder) to retrieve your verification token."
+                )
 
         return Response(response_payload, status=status.HTTP_200_OK)
 
