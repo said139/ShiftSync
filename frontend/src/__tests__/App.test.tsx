@@ -345,4 +345,59 @@ describe("ShiftSync Frontend Security, Components, Dashboard, Notifications & Ta
       );
     });
   });
+
+  it("supports state-based Shift Stage switching between Incoming Worker and Outgoing Worker on DashboardOverviewPage", async () => {
+    vi.spyOn(apiClient, "get").mockImplementation((url: string) => {
+      if (url.includes("/shifts/my-duty/")) {
+        return Promise.resolve({
+          data: {
+            has_assignment: true,
+            is_active_now: true,
+            role_type: "OUTGOING",
+            role_label: "Outgoing Worker",
+            is_outgoing: true,
+            is_incoming: false,
+            shift: {
+              shift_name: "Line Maintenance Ramp Duty",
+              shift_date: "2026-10-28",
+              start_time: "07:00:00",
+              end_time: "15:00:00",
+              department_display: "Line Maintenance",
+            },
+            suggested_action: "CREATE_HANDOVER",
+            suggested_action_label: "Record Tasks & Create Handover",
+            suggested_url: "/handovers/create",
+          },
+        });
+      }
+      return Promise.resolve({
+        data: {
+          metrics: { active_shifts: 1 },
+          recent_handovers: [],
+        },
+      });
+    });
+
+    render(
+      <MemoryRouter>
+        <DashboardOverviewPage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("shift-mode-switcher-container")).toBeInTheDocument();
+      expect(screen.getByTestId("duty-role-badge")).toHaveTextContent("YOU ARE: OUTGOING WORKER");
+      expect(screen.getByTestId("duty-action-button")).toHaveTextContent("Record Tasks & Create Handover");
+    });
+
+    // Toggle to Incoming Worker mode
+    fireEvent.click(screen.getByTestId("toggle-incoming-stage-btn"));
+    expect(screen.getByTestId("duty-role-badge")).toHaveTextContent("YOU ARE: INCOMING WORKER");
+    expect(screen.getByTestId("duty-action-button")).toHaveTextContent("Review Incoming Handovers");
+
+    // Toggle back to Outgoing Worker mode
+    fireEvent.click(screen.getByTestId("toggle-outgoing-stage-btn"));
+    expect(screen.getByTestId("duty-role-badge")).toHaveTextContent("YOU ARE: OUTGOING WORKER");
+    expect(screen.getByTestId("duty-action-button")).toHaveTextContent("Record Tasks & Create Handover");
+  });
 });

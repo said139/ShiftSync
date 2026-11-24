@@ -33,10 +33,21 @@ export const DashboardOverviewPage: React.FC<{
   const { user } = useAuth();
   const [data, setData] = useState<any | null>(null);
   const [dutyStatus, setDutyStatus] = useState<any | null>(null);
+  const [workerActivePhase, setWorkerActivePhase] = useState<"INCOMING" | "OUTGOING" | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
+
+  useEffect(() => {
+    if (dutyStatus) {
+      if (dutyStatus.has_assignment) {
+        setWorkerActivePhase(dutyStatus.is_outgoing ? "OUTGOING" : "INCOMING");
+      } else {
+        setWorkerActivePhase("INCOMING");
+      }
+    }
+  }, [dutyStatus]);
 
   const fetchDutyStatus = async () => {
     try {
@@ -154,193 +165,428 @@ export const DashboardOverviewPage: React.FC<{
         </div>
       )}
 
-      {/* Dynamic Operational Duty Status Banner */}
-      {dutyStatus && dutyStatus.has_assignment && (
+      {/* State-Based Operational Shift Stage Selector (Approach 2) */}
+      {(user?.role === "OUTGOING_WORKER" || user?.role === "INCOMING_WORKER" || user?.role === "ADMIN") && (
         <div
-          className="duty-status-card"
-          data-testid="shift-duty-banner"
           style={{
-            marginBottom: "1.5rem",
-            background: dutyStatus.is_outgoing
-              ? "linear-gradient(135deg, rgba(200, 16, 46, 0.05) 0%, rgba(229, 168, 35, 0.06) 100%)"
-              : "linear-gradient(135deg, rgba(10, 25, 47, 0.04) 0%, rgba(0, 122, 61, 0.06) 100%)",
-            border: dutyStatus.is_outgoing
-              ? "1px solid rgba(200, 16, 46, 0.3)"
-              : "1px solid rgba(10, 25, 47, 0.25)",
-            borderLeft: dutyStatus.is_outgoing
-              ? "6px solid var(--kq-red-600)"
-              : "6px solid var(--navy-900)",
-            borderRadius: "10px",
-            padding: "1.25rem 1.5rem",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
+            marginBottom: "1rem",
+            padding: "0.75rem 1rem",
+            background: "var(--card-bg, #ffffff)",
+            border: "1px solid var(--slate-200)",
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "0.75rem",
           }}
+          data-testid="shift-mode-switcher-container"
         >
+          <div style={{ display: "flex", alignItems: "center", gap: "0.55rem", flexWrap: "wrap" }}>
+            <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--navy-900)" }}>
+              Workday Handover Stage:
+            </span>
+            <span style={{ fontSize: "0.78rem", color: "var(--slate-500)" }}>
+              {workerActivePhase === "OUTGOING"
+                ? "Shift Concluding — Prepare & submit handover report for incoming crew"
+                : "Shift Commencing — Review & acknowledge incoming handover from departing crew"}
+            </span>
+          </div>
+
           <div
             style={{
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              gap: "1.25rem",
-              flexWrap: "wrap",
+              display: "inline-flex",
+              background: "var(--slate-100)",
+              padding: "0.2rem",
+              borderRadius: "6px",
+              border: "1px solid var(--slate-200)",
+              gap: "0.25rem",
             }}
           >
-            <div style={{ flex: "1 1 320px" }}>
+            <button
+              type="button"
+              className={`btn btn-sm ${workerActivePhase === "INCOMING" ? "btn-navy" : "btn-ghost"}`}
+              style={{
+                padding: "0.35rem 0.85rem",
+                fontSize: "0.8rem",
+                fontWeight: 700,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
+              }}
+              onClick={() => setWorkerActivePhase("INCOMING")}
+              data-testid="toggle-incoming-stage-btn"
+            >
+              <ClipboardCheck size={14} />
+              <span>Incoming Worker (Shift Start)</span>
+            </button>
+            <button
+              type="button"
+              className={`btn btn-sm ${workerActivePhase === "OUTGOING" ? "btn-primary" : "btn-ghost"}`}
+              style={{
+                padding: "0.35rem 0.85rem",
+                fontSize: "0.8rem",
+                fontWeight: 700,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
+              }}
+              onClick={() => setWorkerActivePhase("OUTGOING")}
+              data-testid="toggle-outgoing-stage-btn"
+            >
+              <FilePlus2 size={14} />
+              <span>Outgoing Worker (Shift End)</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Dynamic Operational Duty Status Banner */}
+      {dutyStatus && dutyStatus.has_assignment ? (
+        (() => {
+          const isOutgoingMode = workerActivePhase !== null
+            ? (workerActivePhase === "OUTGOING")
+            : dutyStatus.is_outgoing;
+
+          const suggestedActionUrl = isOutgoingMode
+            ? (dutyStatus.handover?.status === "DRAFT"
+                ? `/handovers/${dutyStatus.handover.id}/edit`
+                : "/handovers/create")
+            : (dutyStatus.handover?.status === "SUBMITTED"
+                ? `/handovers/${dutyStatus.handover.id}/acknowledge`
+                : "/handovers/incoming");
+
+          const suggestedActionLabel = isOutgoingMode
+            ? (dutyStatus.handover?.status === "DRAFT"
+                ? `Continue Handover Draft (${dutyStatus.handover.report_code})`
+                : "Record Tasks & Create Handover")
+            : (dutyStatus.handover?.status === "SUBMITTED"
+                ? `Review & Acknowledge Handover (${dutyStatus.handover.report_code})`
+                : "Review Incoming Handovers");
+
+          return (
+            <div
+              className="duty-status-card"
+              data-testid="shift-duty-banner"
+              style={{
+                marginBottom: "1.5rem",
+                background: isOutgoingMode
+                  ? "linear-gradient(135deg, rgba(200, 16, 46, 0.05) 0%, rgba(229, 168, 35, 0.06) 100%)"
+                  : "linear-gradient(135deg, rgba(10, 25, 47, 0.04) 0%, rgba(0, 122, 61, 0.06) 100%)",
+                border: isOutgoingMode
+                  ? "1px solid rgba(200, 16, 46, 0.3)"
+                  : "1px solid rgba(10, 25, 47, 0.25)",
+                borderLeft: isOutgoingMode
+                  ? "6px solid var(--kq-red-600)"
+                  : "6px solid var(--navy-900)",
+                borderRadius: "10px",
+                padding: "1.25rem 1.5rem",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
+              }}
+            >
               <div
                 style={{
                   display: "flex",
-                  alignItems: "center",
-                  gap: "0.55rem",
-                  marginBottom: "0.45rem",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  gap: "1.25rem",
                   flexWrap: "wrap",
                 }}
               >
-                <span
-                  style={{
-                    backgroundColor: dutyStatus.is_outgoing
-                      ? "var(--kq-red-600)"
-                      : "var(--navy-900)",
-                    color: "#fff",
-                    fontWeight: 800,
-                    fontSize: "0.76rem",
-                    padding: "0.25rem 0.65rem",
-                    borderRadius: "4px",
-                    letterSpacing: "0.04em",
-                    textTransform: "uppercase",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.35rem",
-                  }}
-                  data-testid="duty-role-badge"
-                >
-                  <UserCheck size={14} />
-                  <span>
-                    YOU ARE: {dutyStatus.is_outgoing ? "OUTGOING WORKER" : "INCOMING WORKER"}
-                  </span>
-                </span>
-                {dutyStatus.is_active_now ? (
-                  <span
+                <div style={{ flex: "1 1 320px" }}>
+                  <div
                     style={{
-                      background: "rgba(0, 122, 61, 0.12)",
-                      color: "var(--green-700)",
-                      fontWeight: 700,
-                      fontSize: "0.72rem",
-                      padding: "0.22rem 0.5rem",
-                      borderRadius: "4px",
-                      display: "inline-flex",
+                      display: "flex",
                       alignItems: "center",
-                      gap: "0.25rem",
+                      gap: "0.55rem",
+                      marginBottom: "0.45rem",
+                      flexWrap: "wrap",
                     }}
                   >
                     <span
                       style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: "50%",
-                        backgroundColor: "var(--green-600)",
-                        display: "inline-block",
+                        backgroundColor: isOutgoingMode
+                          ? "var(--kq-red-600)"
+                          : "var(--navy-900)",
+                        color: "#fff",
+                        fontWeight: 800,
+                        fontSize: "0.76rem",
+                        padding: "0.25rem 0.65rem",
+                        borderRadius: "4px",
+                        letterSpacing: "0.04em",
+                        textTransform: "uppercase",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.35rem",
                       }}
-                    />
-                    LIVE SHIFT ACTIVE NOW
-                  </span>
-                ) : (
+                      data-testid="duty-role-badge"
+                    >
+                      <UserCheck size={14} />
+                      <span>
+                        YOU ARE: {isOutgoingMode ? "OUTGOING WORKER" : "INCOMING WORKER"}
+                      </span>
+                    </span>
+                    {dutyStatus.is_active_now ? (
+                      <span
+                        style={{
+                          background: "rgba(0, 122, 61, 0.12)",
+                          color: "var(--green-700)",
+                          fontWeight: 700,
+                          fontSize: "0.72rem",
+                          padding: "0.22rem 0.5rem",
+                          borderRadius: "4px",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.25rem",
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: "50%",
+                            backgroundColor: "var(--green-600)",
+                            display: "inline-block",
+                          }}
+                        />
+                        LIVE SHIFT ACTIVE NOW
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          background: "rgba(229, 168, 35, 0.15)",
+                          color: "var(--kq-gold-800)",
+                          fontWeight: 700,
+                          fontSize: "0.72rem",
+                          padding: "0.22rem 0.5rem",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        SCHEDULED SHIFT
+                      </span>
+                    )}
+                  </div>
+
+                  <h2
+                    style={{
+                      fontSize: "1.15rem",
+                      fontWeight: 700,
+                      color: "var(--navy-900)",
+                      margin: "0 0 0.35rem 0",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.45rem",
+                    }}
+                    data-testid="duty-shift-name"
+                  >
+                    <Plane size={18} color="var(--kq-red-600)" />
+                    <span>{dutyStatus.shift?.shift_name || "Assigned Shift Window"}</span>
+                  </h2>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "1.2rem",
+                      fontSize: "0.82rem",
+                      color: "var(--slate-600)",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
+                      <Clock size={14} color="var(--slate-500)" />
+                      <strong>Shift Time:</strong> {dutyStatus.shift?.shift_date} (
+                      {dutyStatus.shift?.start_time?.slice(0, 5)} – {dutyStatus.shift?.end_time?.slice(0, 5)})
+                    </span>
+                    {dutyStatus.shift?.department_display && (
+                      <span>
+                        <strong>Department:</strong> {dutyStatus.shift.department_display}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Handover Partner Info */}
+                  {dutyStatus.partner_worker && (
+                    <div
+                      style={{
+                        marginTop: "0.75rem",
+                        padding: "0.6rem 0.85rem",
+                        background: "rgba(255, 255, 255, 0.85)",
+                        border: "1px solid var(--slate-200)",
+                        borderRadius: "6px",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.6rem",
+                        fontSize: "0.83rem",
+                        flexWrap: "wrap",
+                      }}
+                      data-testid="duty-partner-info"
+                    >
+                      <span style={{ color: "var(--slate-500)", fontWeight: 600 }}>
+                        {isOutgoingMode ? "Handing Over To (Incoming Crew):" : "Taking Over From (Outgoing Crew):"}
+                      </span>
+                      <strong style={{ color: "var(--navy-900)" }}>
+                        {dutyStatus.partner_worker.full_name}
+                      </strong>
+                      <span style={{ color: "var(--slate-500)", fontSize: "0.78rem" }}>
+                        ({dutyStatus.partner_worker.email} • {dutyStatus.partner_worker.employee_id})
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Quick Action Button */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-end",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    alignSelf: "center",
+                  }}
+                >
+                  <Link
+                    to={suggestedActionUrl}
+                    className={isOutgoingMode ? "btn btn-primary" : "btn btn-navy"}
+                    style={{
+                      padding: "0.7rem 1.15rem",
+                      fontSize: "0.88rem",
+                      fontWeight: 700,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.45rem",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                    }}
+                    data-testid="duty-action-button"
+                  >
+                    <span>{suggestedActionLabel}</span>
+                    <ArrowRight size={16} />
+                  </Link>
+                  {dutyStatus.handover && (
+                    <span style={{ fontSize: "0.75rem", color: "var(--slate-500)" }}>
+                      Current Report: <strong>{dutyStatus.handover.report_code}</strong> ({dutyStatus.handover.status_display})
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })()
+      ) : (
+        /* Standby / Flexible Assignment Banner for unassigned or newly created workers */
+        (user?.role === "OUTGOING_WORKER" || user?.role === "INCOMING_WORKER" || user?.role === "ADMIN") && (
+          <div
+            className="duty-status-card"
+            data-testid="shift-duty-banner"
+            style={{
+              marginBottom: "1.5rem",
+              background: workerActivePhase === "OUTGOING"
+                ? "linear-gradient(135deg, rgba(200, 16, 46, 0.05) 0%, rgba(229, 168, 35, 0.06) 100%)"
+                : "linear-gradient(135deg, rgba(10, 25, 47, 0.04) 0%, rgba(0, 122, 61, 0.06) 100%)",
+              border: workerActivePhase === "OUTGOING"
+                ? "1px solid rgba(200, 16, 46, 0.3)"
+                : "1px solid rgba(10, 25, 47, 0.25)",
+              borderLeft: workerActivePhase === "OUTGOING"
+                ? "6px solid var(--kq-red-600)"
+                : "6px solid var(--navy-900)",
+              borderRadius: "10px",
+              padding: "1.25rem 1.5rem",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                gap: "1.25rem",
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ flex: "1 1 320px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.55rem",
+                    marginBottom: "0.45rem",
+                    flexWrap: "wrap",
+                  }}
+                >
                   <span
                     style={{
-                      background: "rgba(229, 168, 35, 0.15)",
-                      color: "var(--kq-gold-800)",
+                      backgroundColor: workerActivePhase === "OUTGOING"
+                        ? "var(--kq-red-600)"
+                        : "var(--navy-900)",
+                      color: "#fff",
+                      fontWeight: 800,
+                      fontSize: "0.76rem",
+                      padding: "0.25rem 0.65rem",
+                      borderRadius: "4px",
+                      letterSpacing: "0.04em",
+                      textTransform: "uppercase",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.35rem",
+                    }}
+                    data-testid="duty-role-badge"
+                  >
+                    <UserCheck size={14} />
+                    <span>
+                      YOU ARE: {workerActivePhase === "OUTGOING" ? "OUTGOING WORKER" : "INCOMING WORKER"}
+                    </span>
+                  </span>
+                  <span
+                    style={{
+                      background: "rgba(10, 25, 47, 0.08)",
+                      color: "var(--navy-800)",
                       fontWeight: 700,
                       fontSize: "0.72rem",
                       padding: "0.22rem 0.5rem",
                       borderRadius: "4px",
                     }}
                   >
-                    SCHEDULED SHIFT
+                    FLEXIBLE SHIFT DUTY
                   </span>
-                )}
-              </div>
+                </div>
 
-              <h2
-                style={{
-                  fontSize: "1.15rem",
-                  fontWeight: 700,
-                  color: "var(--navy-900)",
-                  margin: "0 0 0.35rem 0",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.45rem",
-                }}
-                data-testid="duty-shift-name"
-              >
-                <Plane size={18} color="var(--kq-red-600)" />
-                <span>{dutyStatus.shift?.shift_name || "Assigned Shift Window"}</span>
-              </h2>
+                <h2
+                  style={{
+                    fontSize: "1.15rem",
+                    fontWeight: 700,
+                    color: "var(--navy-900)",
+                    margin: "0 0 0.35rem 0",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.45rem",
+                  }}
+                  data-testid="duty-shift-name"
+                >
+                  <Plane size={18} color="var(--kq-red-600)" />
+                  <span>General Shift Operations (Ready for Assignment)</span>
+                </h2>
+
+                <p style={{ fontSize: "0.83rem", color: "var(--slate-600)", margin: "0.25rem 0 0 0" }}>
+                  {workerActivePhase === "OUTGOING"
+                    ? "Shift End Stage: Log all maintenance activities and create a new shift handover report for the incoming crew."
+                    : "Shift Start Stage: Review and acknowledge incoming handovers from departing personnel to assume operational continuity."}
+                </p>
+              </div>
 
               <div
                 style={{
                   display: "flex",
-                  alignItems: "center",
-                  gap: "1.2rem",
-                  fontSize: "0.82rem",
-                  color: "var(--slate-600)",
-                  flexWrap: "wrap",
+                  flexDirection: "column",
+                  alignItems: "flex-end",
+                  justifyContent: "center",
+                  gap: "0.5rem",
+                  alignSelf: "center",
                 }}
               >
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
-                  <Clock size={14} color="var(--slate-500)" />
-                  <strong>Shift Time:</strong> {dutyStatus.shift?.shift_date} (
-                  {dutyStatus.shift?.start_time?.slice(0, 5)} – {dutyStatus.shift?.end_time?.slice(0, 5)})
-                </span>
-                {dutyStatus.shift?.department_display && (
-                  <span>
-                    <strong>Department:</strong> {dutyStatus.shift.department_display}
-                  </span>
-                )}
-              </div>
-
-              {/* Handover Partner Info */}
-              {dutyStatus.partner_worker && (
-                <div
-                  style={{
-                    marginTop: "0.75rem",
-                    padding: "0.6rem 0.85rem",
-                    background: "rgba(255, 255, 255, 0.85)",
-                    border: "1px solid var(--slate-200)",
-                    borderRadius: "6px",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.6rem",
-                    fontSize: "0.83rem",
-                    flexWrap: "wrap",
-                  }}
-                  data-testid="duty-partner-info"
-                >
-                  <span style={{ color: "var(--slate-500)", fontWeight: 600 }}>
-                    {dutyStatus.is_outgoing ? "Handing Over To (Incoming Crew):" : "Taking Over From (Outgoing Crew):"}
-                  </span>
-                  <strong style={{ color: "var(--navy-900)" }}>
-                    {dutyStatus.partner_worker.full_name}
-                  </strong>
-                  <span style={{ color: "var(--slate-500)", fontSize: "0.78rem" }}>
-                    ({dutyStatus.partner_worker.email} • {dutyStatus.partner_worker.employee_id})
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Quick Action Button */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-end",
-                justifyContent: "center",
-                gap: "0.5rem",
-                alignSelf: "center",
-              }}
-            >
-              {dutyStatus.suggested_url && (
                 <Link
-                  to={dutyStatus.suggested_url}
-                  className={dutyStatus.is_outgoing ? "btn btn-primary" : "btn btn-navy"}
+                  to={workerActivePhase === "OUTGOING" ? "/handovers/create" : "/handovers/incoming"}
+                  className={workerActivePhase === "OUTGOING" ? "btn btn-primary" : "btn btn-navy"}
                   style={{
                     padding: "0.7rem 1.15rem",
                     fontSize: "0.88rem",
@@ -352,18 +598,13 @@ export const DashboardOverviewPage: React.FC<{
                   }}
                   data-testid="duty-action-button"
                 >
-                  <span>{dutyStatus.suggested_action_label || (dutyStatus.is_outgoing ? "Record Tasks & Create Handover" : "Review Incoming Handovers")}</span>
+                  <span>{workerActivePhase === "OUTGOING" ? "Record Tasks & Create Handover" : "Review Incoming Handovers"}</span>
                   <ArrowRight size={16} />
                 </Link>
-              )}
-              {dutyStatus.handover && (
-                <span style={{ fontSize: "0.75rem", color: "var(--slate-500)" }}>
-                  Current Report: <strong>{dutyStatus.handover.report_code}</strong> ({dutyStatus.handover.status_display})
-                </span>
-              )}
+              </div>
             </div>
           </div>
-        </div>
+        )
       )}
 
       {loading && !data ? (

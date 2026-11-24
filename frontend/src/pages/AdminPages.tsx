@@ -320,6 +320,9 @@ export const CreateEditUserPage: React.FC = () => {
                 <option value="SUPERVISOR">Supervisor</option>
                 <option value="ADMIN">System Administrator</option>
               </select>
+              <small style={{ display: "block", marginTop: "0.35rem", color: "var(--slate-500)", fontSize: "0.78rem" }}>
+                Workers can transition between Incoming (shift start) and Outgoing (shift end) modes directly from their dashboard.
+              </small>
             </div>
 
             <div className="form-group">
