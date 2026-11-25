@@ -426,6 +426,26 @@ class HandoverReportViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = self.request.user
         report = serializer.save()
+
+        # Update shift timings if provided by outgoing worker
+        shift_date = self.request.data.get("shift_date")
+        end_time = self.request.data.get("end_time") or self.request.data.get("shift_end_time")
+        start_time = self.request.data.get("start_time") or self.request.data.get("shift_start_time")
+        if shift_date or end_time or start_time:
+            shift = report.shift
+            shift_fields = []
+            if shift_date:
+                shift.shift_date = shift_date
+                shift_fields.append("shift_date")
+            if end_time:
+                shift.end_time = end_time
+                shift_fields.append("end_time")
+            if start_time:
+                shift.start_time = start_time
+                shift_fields.append("start_time")
+            if shift_fields:
+                shift.save(update_fields=shift_fields)
+
         log_audit_event(
             organisation=user.organisation,
             actor=user,
@@ -448,6 +468,25 @@ class HandoverReportViewSet(viewsets.ModelViewSet):
                 "Only the authoring outgoing worker or a System Administrator can edit this draft."
             )
         updated = serializer.save()
+
+        shift_date = self.request.data.get("shift_date")
+        end_time = self.request.data.get("end_time") or self.request.data.get("shift_end_time")
+        start_time = self.request.data.get("start_time") or self.request.data.get("shift_start_time")
+        if shift_date or end_time or start_time:
+            shift = updated.shift
+            shift_fields = []
+            if shift_date:
+                shift.shift_date = shift_date
+                shift_fields.append("shift_date")
+            if end_time:
+                shift.end_time = end_time
+                shift_fields.append("end_time")
+            if start_time:
+                shift.start_time = start_time
+                shift_fields.append("start_time")
+            if shift_fields:
+                shift.save(update_fields=shift_fields)
+
         log_audit_event(
             organisation=user.organisation,
             actor=user,
@@ -529,6 +568,25 @@ class HandoverReportViewSet(viewsets.ModelViewSet):
             report.status = HandoverStatus.SUBMITTED
             report.submitted_at = now
             report.save(update_fields=["status", "submitted_at", "updated_at"])
+
+            # Update shift end timing if provided by outgoing worker
+            shift_date = request.data.get("shift_date")
+            end_time = request.data.get("end_time") or request.data.get("shift_end_time")
+            start_time = request.data.get("start_time") or request.data.get("shift_start_time")
+            if shift_date or end_time or start_time:
+                shift = report.shift
+                shift_fields = []
+                if shift_date:
+                    shift.shift_date = shift_date
+                    shift_fields.append("shift_date")
+                if end_time:
+                    shift.end_time = end_time
+                    shift_fields.append("end_time")
+                if start_time:
+                    shift.start_time = start_time
+                    shift_fields.append("start_time")
+                if shift_fields:
+                    shift.save(update_fields=shift_fields)
 
             # Assign any unassigned pending/in-progress tasks to the designated incoming worker
             report.tasks.exclude(status=TaskStatus.COMPLETED).filter(
@@ -706,6 +764,21 @@ class HandoverReportViewSet(viewsets.ModelViewSet):
                     "updated_at",
                 ]
             )
+
+            # Update shift start timing when incoming worker keys in start of shift
+            shift_date = request.data.get("shift_date")
+            start_time = request.data.get("start_time") or request.data.get("shift_start_time")
+            if shift_date or start_time:
+                shift = report.shift
+                shift_fields = []
+                if shift_date:
+                    shift.shift_date = shift_date
+                    shift_fields.append("shift_date")
+                if start_time:
+                    shift.start_time = start_time
+                    shift_fields.append("start_time")
+                if shift_fields:
+                    shift.save(update_fields=shift_fields)
 
             unresolved_tasks = list(
                 report.tasks.exclude(status=TaskStatus.COMPLETED)

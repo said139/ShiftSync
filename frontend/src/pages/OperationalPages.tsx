@@ -204,6 +204,11 @@ export const CreateEditHandoverPage: React.FC = () => {
   const [shifts, setShifts] = useState<any[]>([]);
   const [colleagues, setColleagues] = useState<any[]>([]);
   const [selectedShiftId, setSelectedShiftId] = useState<string>(preselectedShiftId);
+  const [shiftDate, setShiftDate] = useState<string>(
+    new Date().toISOString().slice(0, 10)
+  );
+  const [shiftStartTime, setShiftStartTime] = useState<string>("06:00");
+  const [shiftEndTime, setShiftEndTime] = useState<string>("14:00");
   const [incomingWorkerId, setIncomingWorkerId] = useState<string>("");
   const [equipmentStatus, setEquipmentStatus] = useState<string>("OPERATIONAL");
   const [equipmentDetails, setEquipmentDetails] = useState<string>("");
@@ -273,6 +278,11 @@ export const CreateEditHandoverPage: React.FC = () => {
           setReportStatus(rep.status);
           setSelectedShiftId(rep.shift);
           setIncomingWorkerId(rep.designated_incoming_worker);
+          if (rep.shift_details) {
+            if (rep.shift_details.shift_date) setShiftDate(rep.shift_details.shift_date);
+            if (rep.shift_details.start_time) setShiftStartTime(rep.shift_details.start_time.slice(0, 5));
+            if (rep.shift_details.end_time) setShiftEndTime(rep.shift_details.end_time.slice(0, 5));
+          }
           setEquipmentStatus(rep.equipment_status);
           setEquipmentDetails(rep.equipment_details || "");
           setSafetyIssues(rep.safety_issues || "");
@@ -306,6 +316,9 @@ export const CreateEditHandoverPage: React.FC = () => {
           if (initialShift) {
             setSelectedShiftId(initialShift.id);
             setIncomingWorkerId(initialShift.incoming_worker);
+            if (initialShift.shift_date) setShiftDate(initialShift.shift_date);
+            if (initialShift.start_time) setShiftStartTime(initialShift.start_time.slice(0, 5));
+            if (initialShift.end_time) setShiftEndTime(initialShift.end_time.slice(0, 5));
           }
         }
       } catch (err: any) {
@@ -320,8 +333,19 @@ export const CreateEditHandoverPage: React.FC = () => {
   const handleShiftChange = (newShiftId: string) => {
     setSelectedShiftId(newShiftId);
     const found = shifts.find((s) => s.id === newShiftId);
-    if (found && found.incoming_worker) {
-      setIncomingWorkerId(found.incoming_worker);
+    if (found) {
+      if (found.incoming_worker) {
+        setIncomingWorkerId(found.incoming_worker);
+      }
+      if (found.shift_date) {
+        setShiftDate(found.shift_date);
+      }
+      if (found.start_time) {
+        setShiftStartTime(found.start_time.slice(0, 5));
+      }
+      if (found.end_time) {
+        setShiftEndTime(found.end_time.slice(0, 5));
+      }
     }
   };
 
@@ -431,6 +455,9 @@ export const CreateEditHandoverPage: React.FC = () => {
     safety_issues: safetyIssues,
     has_safety_incident: hasSafetyIncident || Boolean(safetyIssues.trim()),
     additional_notes: additionalNotes,
+    shift_date: shiftDate,
+    start_time: shiftStartTime,
+    end_time: shiftEndTime,
     tasks_input: tasks.map((t) => ({
       id: t.id || undefined,
       description: t.description,
@@ -461,6 +488,15 @@ export const CreateEditHandoverPage: React.FC = () => {
     setSaving(true);
     try {
       const payload = buildPayload();
+      if (selectedShiftId) {
+        try {
+          await apiClient.patch(`/shifts/${selectedShiftId}/`, {
+            shift_date: shiftDate,
+            start_time: shiftStartTime,
+            end_time: shiftEndTime,
+          });
+        } catch {}
+      }
       let res;
       if (id) {
         res = await apiClient.patch(`/handovers/${id}/`, payload);
@@ -493,6 +529,15 @@ export const CreateEditHandoverPage: React.FC = () => {
     setSaving(true);
     try {
       const payload = buildPayload();
+      if (selectedShiftId) {
+        try {
+          await apiClient.patch(`/shifts/${selectedShiftId}/`, {
+            shift_date: shiftDate,
+            start_time: shiftStartTime,
+            end_time: shiftEndTime,
+          });
+        } catch {}
+      }
       let targetId = id;
       if (!targetId) {
         const draftRes = await apiClient.post("/handovers/", payload);
@@ -500,7 +545,11 @@ export const CreateEditHandoverPage: React.FC = () => {
       } else {
         await apiClient.patch(`/handovers/${targetId}/`, payload);
       }
-      const subRes = await apiClient.post(`/handovers/${targetId}/submit/`, {});
+      const subRes = await apiClient.post(`/handovers/${targetId}/submit/`, {
+        shift_date: shiftDate,
+        start_time: shiftStartTime,
+        end_time: shiftEndTime,
+      });
       navigate(`/handovers/${subRes.data.id}`);
     } catch (err: any) {
       const d = err.response?.data;
@@ -746,6 +795,64 @@ export const CreateEditHandoverPage: React.FC = () => {
             </span>
           </div>
         )}
+
+        {/* Shift Date & Timing Configuration (Keyed by Outgoing Worker) */}
+        <div
+          className="grid-3"
+          style={{
+            marginTop: "1rem",
+            padding: "0.85rem",
+            background: "linear-gradient(135deg, rgba(200, 16, 46, 0.04) 0%, rgba(248, 250, 252, 1) 100%)",
+            borderRadius: "8px",
+            border: "1px solid var(--kq-red-200, #fecaca)",
+          }}
+        >
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label htmlFor="shift-date-input" className="form-label" style={{ fontWeight: 600 }}>
+              Shift Date
+            </label>
+            <input
+              id="shift-date-input"
+              type="date"
+              className="form-control"
+              value={shiftDate}
+              onChange={(e) => setShiftDate(e.target.value)}
+              data-testid="handover-shift-date-input"
+            />
+          </div>
+
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label htmlFor="shift-start-time-input" className="form-label" style={{ fontWeight: 600 }}>
+              Shift Start Time (Reference)
+            </label>
+            <input
+              id="shift-start-time-input"
+              type="time"
+              className="form-control"
+              value={shiftStartTime}
+              onChange={(e) => setShiftStartTime(e.target.value)}
+              data-testid="handover-shift-start-time-input"
+            />
+          </div>
+
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label htmlFor="shift-end-time-input" className="form-label" style={{ fontWeight: 700, color: "var(--kq-red-600)" }}>
+              Shift End Time (Outgoing Clock-Out)
+            </label>
+            <input
+              id="shift-end-time-input"
+              type="time"
+              className="form-control"
+              style={{ borderColor: "var(--kq-red-600)", fontWeight: 700, color: "var(--kq-red-700)" }}
+              value={shiftEndTime}
+              onChange={(e) => setShiftEndTime(e.target.value)}
+              data-testid="handover-shift-end-time-input"
+            />
+            <span style={{ fontSize: "0.72rem", color: "var(--slate-500)", display: "block", marginTop: "0.2rem" }}>
+              Keyed by Outgoing Worker upon handover completion
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* STEP 2 & 3: RECORD SHIFT TASKS WITH NLP CATEGORISATION & PRIORITY DETECTION */}
@@ -1841,6 +1948,12 @@ export const IncomingHandoverAcknowledgePage: React.FC = () => {
 
   const [assignedHandovers, setAssignedHandovers] = useState<any[]>([]);
   const [selectedReport, setSelectedReport] = useState<any | null>(null);
+  const [incomingShiftDate, setIncomingShiftDate] = useState<string>(
+    new Date().toISOString().slice(0, 10)
+  );
+  const [incomingStartTime, setIncomingStartTime] = useState<string>(
+    new Date().toTimeString().slice(0, 5)
+  );
   const [ackNotes, setAckNotes] = useState("");
   const [confirmedRead, setConfirmedRead] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -1855,6 +1968,14 @@ export const IncomingHandoverAcknowledgePage: React.FC = () => {
         // Opening or viewing the handover report NEVER marks it acknowledged!
         const res = await apiClient.get(`/handovers/${id}/`);
         setSelectedReport(res.data);
+        if (res.data.shift_details) {
+          if (res.data.shift_details.shift_date) {
+            setIncomingShiftDate(res.data.shift_details.shift_date);
+          }
+          if (res.data.shift_details.start_time) {
+            setIncomingStartTime(res.data.shift_details.start_time.slice(0, 5));
+          }
+        }
       } else {
         const res = await apiClient.get("/handovers/", {
           params: { scope: "assigned_to_me" },
@@ -1864,6 +1985,14 @@ export const IncomingHandoverAcknowledgePage: React.FC = () => {
         const firstPending = list.find((h: any) => h.status === "SUBMITTED");
         if (firstPending) {
           setSelectedReport(firstPending);
+          if (firstPending.shift_details) {
+            if (firstPending.shift_details.shift_date) {
+              setIncomingShiftDate(firstPending.shift_details.shift_date);
+            }
+            if (firstPending.shift_details.start_time) {
+              setIncomingStartTime(firstPending.shift_details.start_time.slice(0, 5));
+            }
+          }
         }
       }
     } catch (err: any) {
@@ -1893,8 +2022,20 @@ export const IncomingHandoverAcknowledgePage: React.FC = () => {
     try {
       const res = await apiClient.post(
         `/handovers/${selectedReport.id}/acknowledge/`,
-        { acknowledgment_notes: ackNotes }
+        {
+          acknowledgment_notes: ackNotes,
+          shift_date: incomingShiftDate,
+          start_time: incomingStartTime,
+        }
       );
+      if (selectedReport.shift) {
+        try {
+          await apiClient.patch(`/shifts/${selectedReport.shift}/`, {
+            shift_date: incomingShiftDate,
+            start_time: incomingStartTime,
+          });
+        } catch {}
+      }
       setSelectedReport(res.data);
       navigate(`/handovers/${selectedReport.id}`);
     } catch (err: any) {
@@ -2081,6 +2222,50 @@ export const IncomingHandoverAcknowledgePage: React.FC = () => {
               <p style={{ fontSize: "0.84rem", color: "var(--slate-600)", marginBottom: "0.85rem" }}>
                 Acknowledging this handover records your identity ({user?.full_name}) and UTC timestamp in the immutable audit log. Unfinished tasks (Pending / In Progress) will be carried forward into your shift without being marked completed.
               </p>
+
+              {/* Shift Date & Start Time Entry (Keyed by Incoming Worker) */}
+              <div
+                className="grid-2"
+                style={{
+                  marginBottom: "1rem",
+                  padding: "0.85rem",
+                  background: "rgba(255, 255, 255, 0.85)",
+                  borderRadius: "6px",
+                  border: "1px solid #99f6e4",
+                }}
+              >
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label htmlFor="ack-shift-date" className="form-label" style={{ fontWeight: 600 }}>
+                    Shift Commencing Date
+                  </label>
+                  <input
+                    id="ack-shift-date"
+                    type="date"
+                    className="form-control"
+                    value={incomingShiftDate}
+                    onChange={(e) => setIncomingShiftDate(e.target.value)}
+                    data-testid="ack-shift-date-input"
+                  />
+                </div>
+
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label htmlFor="ack-start-time" className="form-label" style={{ fontWeight: 700, color: "var(--navy-900)" }}>
+                    Shift Start Time (Incoming Worker Clock-In)
+                  </label>
+                  <input
+                    id="ack-start-time"
+                    type="time"
+                    className="form-control"
+                    style={{ borderColor: "var(--teal-600)", fontWeight: 700, color: "var(--navy-900)" }}
+                    value={incomingStartTime}
+                    onChange={(e) => setIncomingStartTime(e.target.value)}
+                    data-testid="ack-start-time-input"
+                  />
+                  <span style={{ fontSize: "0.72rem", color: "var(--slate-500)", display: "block", marginTop: "0.2rem" }}>
+                    Keyed by Incoming Worker upon commencing shift
+                  </span>
+                </div>
+              </div>
 
               <div className="form-group">
                 <label htmlFor="ack-notes-input" className="form-label">

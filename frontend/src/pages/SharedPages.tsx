@@ -34,6 +34,12 @@ export const DashboardOverviewPage: React.FC<{
   const [data, setData] = useState<any | null>(null);
   const [dutyStatus, setDutyStatus] = useState<any | null>(null);
   const [workerActivePhase, setWorkerActivePhase] = useState<"INCOMING" | "OUTGOING" | null>(null);
+  const [quickShiftDate, setQuickShiftDate] = useState<string>(
+    new Date().toISOString().slice(0, 10)
+  );
+  const [quickStartTime, setQuickStartTime] = useState<string>("06:00");
+  const [quickEndTime, setQuickEndTime] = useState<string>("14:00");
+  const [timingSavedMsg, setTimingSavedMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [dateFrom, setDateFrom] = useState<string>("");
@@ -46,8 +52,35 @@ export const DashboardOverviewPage: React.FC<{
       } else {
         setWorkerActivePhase("INCOMING");
       }
+      if (dutyStatus.shift) {
+        if (dutyStatus.shift.shift_date) setQuickShiftDate(dutyStatus.shift.shift_date);
+        if (dutyStatus.shift.start_time) setQuickStartTime(dutyStatus.shift.start_time.slice(0, 5));
+        if (dutyStatus.shift.end_time) setQuickEndTime(dutyStatus.shift.end_time.slice(0, 5));
+      }
     }
   }, [dutyStatus]);
+
+  const handleSaveQuickTiming = async () => {
+    if (!dutyStatus?.shift?.id) return;
+    try {
+      const payload: Record<string, string> = { shift_date: quickShiftDate };
+      if (workerActivePhase === "OUTGOING") {
+        payload.end_time = quickEndTime;
+      } else {
+        payload.start_time = quickStartTime;
+      }
+      await apiClient.patch(`/shifts/${dutyStatus.shift.id}/`, payload);
+      setTimingSavedMsg(
+        workerActivePhase === "OUTGOING"
+          ? `Shift End Time recorded: ${quickEndTime} on ${quickShiftDate}`
+          : `Shift Start Time recorded: ${quickStartTime} on ${quickShiftDate}`
+      );
+      fetchDutyStatus();
+      setTimeout(() => setTimingSavedMsg(null), 4000);
+    } catch {
+      // Non-blocking
+    }
+  };
 
   const fetchDutyStatus = async () => {
     try {
@@ -237,6 +270,80 @@ export const DashboardOverviewPage: React.FC<{
               <FilePlus2 size={14} />
               <span>Outgoing Worker (Shift End)</span>
             </button>
+          </div>
+
+          {/* Interactive Shift Timing Quick Bar */}
+          <div
+            style={{
+              width: "100%",
+              marginTop: "0.6rem",
+              padding: "0.6rem 0.85rem",
+              background: workerActivePhase === "OUTGOING" ? "var(--kq-red-50, #fef2f2)" : "var(--teal-50, #f0fdfa)",
+              border: workerActivePhase === "OUTGOING" ? "1px solid var(--kq-red-200, #fecaca)" : "1px solid #99f6e4",
+              borderRadius: "6px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "0.6rem",
+              fontSize: "0.82rem",
+            }}
+            data-testid="shift-time-picker-bar"
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
+              <span style={{ fontWeight: 700, color: workerActivePhase === "OUTGOING" ? "var(--kq-red-700, #b91c1c)" : "var(--navy-900)" }}>
+                {workerActivePhase === "OUTGOING" ? "📤 Shift Ending Timing:" : "📥 Shift Commencing Timing:"}
+              </span>
+              <label style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
+                <span style={{ color: "var(--slate-600)", fontWeight: 500 }}>Shift Date:</span>
+                <input
+                  type="date"
+                  className="form-control"
+                  style={{ padding: "0.2rem 0.45rem", fontSize: "0.8rem", width: "auto" }}
+                  value={quickShiftDate}
+                  onChange={(e) => setQuickShiftDate(e.target.value)}
+                />
+              </label>
+              {workerActivePhase === "INCOMING" ? (
+                <label style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
+                  <span style={{ fontWeight: 700, color: "var(--navy-900)" }}>Start of Shift Time:</span>
+                  <input
+                    type="time"
+                    className="form-control"
+                    style={{ padding: "0.2rem 0.45rem", fontSize: "0.8rem", width: "auto", fontWeight: 700, borderColor: "var(--teal-600)" }}
+                    value={quickStartTime}
+                    onChange={(e) => setQuickStartTime(e.target.value)}
+                  />
+                </label>
+              ) : (
+                <label style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem" }}>
+                  <span style={{ fontWeight: 700, color: "var(--kq-red-600)" }}>End of Shift Time:</span>
+                  <input
+                    type="time"
+                    className="form-control"
+                    style={{ padding: "0.2rem 0.45rem", fontSize: "0.8rem", width: "auto", fontWeight: 700, borderColor: "var(--kq-red-600)" }}
+                    value={quickEndTime}
+                    onChange={(e) => setQuickEndTime(e.target.value)}
+                  />
+                </label>
+              )}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              {timingSavedMsg && (
+                <span style={{ fontSize: "0.78rem", color: "var(--green-700)", fontWeight: 600 }}>
+                  ✓ {timingSavedMsg}
+                </span>
+              )}
+              <button
+                type="button"
+                className={`btn btn-sm ${workerActivePhase === "OUTGOING" ? "btn-primary" : "btn-navy"}`}
+                style={{ padding: "0.25rem 0.65rem", fontSize: "0.78rem" }}
+                onClick={handleSaveQuickTiming}
+                disabled={!dutyStatus?.shift?.id}
+              >
+                {workerActivePhase === "OUTGOING" ? "Save End Time" : "Save Start Time"}
+              </button>
+            </div>
           </div>
         </div>
       )}

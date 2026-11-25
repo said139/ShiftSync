@@ -408,6 +408,18 @@ class ShiftSyncRequestHandler(http.server.SimpleHTTPRequestHandler):
                 """, (report_code, shift_id, outgoing, incoming, aircraft_tail, flight_no, techlog_ref, handover_type, mel_status, equip, safety, notes, datetime.now().strftime("%Y-%m-%d %H:%M")))
                 report_id = cursor.lastrowid
 
+                # Update shift end time & date keyed in by outgoing worker
+                s_date = data.get("shift_date")
+                s_end = data.get("end_time") or data.get("shift_end_time")
+                s_start = data.get("start_time") or data.get("shift_start_time")
+                if s_date or s_end or s_start:
+                    if s_date and s_end:
+                        cursor.execute("UPDATE shifts SET shift_date = ?, end_time = ? WHERE id = ?", (s_date, s_end, shift_id))
+                    elif s_end:
+                        cursor.execute("UPDATE shifts SET end_time = ? WHERE id = ?", (s_end, shift_id))
+                    elif s_date:
+                        cursor.execute("UPDATE shifts SET shift_date = ? WHERE id = ?", (s_date, shift_id))
+
                 # Save associated tasks
                 for t in tasks:
                     t_name = t.get("task") or t.get("name")
@@ -441,6 +453,21 @@ class ShiftSyncRequestHandler(http.server.SimpleHTTPRequestHandler):
                 SET status = 'Acknowledged', acknowledged_at = ?, acknowledged_by = ?
                 WHERE report_code = ? OR id = ?
                 """, (ack_time, ack_user, report_code, report_code))
+
+                # Update shift start time & date keyed in by incoming worker
+                s_date = data.get("shift_date")
+                s_start = data.get("start_time") or data.get("shift_start_time")
+                if s_date or s_start:
+                    cursor.execute("SELECT shift_id FROM handover_reports WHERE report_code = ? OR id = ?", (report_code, report_code))
+                    r_row = cursor.fetchone()
+                    if r_row:
+                        s_id = r_row[0]
+                        if s_date and s_start:
+                            cursor.execute("UPDATE shifts SET shift_date = ?, start_time = ? WHERE id = ?", (s_date, s_start, s_id))
+                        elif s_start:
+                            cursor.execute("UPDATE shifts SET start_time = ? WHERE id = ?", (s_start, s_id))
+                        elif s_date:
+                            cursor.execute("UPDATE shifts SET shift_date = ? WHERE id = ?", (s_date, s_id))
                 
                 cursor.execute("""
                 INSERT INTO notifications (title, timestamp_text, type, is_read)
