@@ -12,9 +12,11 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Moon,
   Plane,
   Settings,
   Shield,
+  Sun,
   UserCheck,
   UserCog,
   Users,
@@ -57,6 +59,25 @@ export const AppLayout: React.FC = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    return localStorage.getItem("shiftsync-theme") === "dark";
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+      document.documentElement.setAttribute("data-theme", "dark");
+      localStorage.setItem("shiftsync-theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.documentElement.removeAttribute("data-theme");
+      localStorage.setItem("shiftsync-theme", "light");
+    }
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => !prev);
+  };
 
   const fetchUnreadCount = async () => {
     if (!user) return;
@@ -311,6 +332,34 @@ export const AppLayout: React.FC = () => {
               />
               <span>{connected ? "LIVE WS" : "WS OFFLINE"}</span>
             </div>
+
+            {/* Dark Mode Toggle */}
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={toggleDarkMode}
+              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              aria-label={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              data-testid="dark-mode-toggle"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
+                padding: "0.35rem 0.65rem",
+              }}
+            >
+              {darkMode ? (
+                <>
+                  <Sun size={15} color="#f59e0b" />
+                  <span style={{ fontSize: "0.78rem" }}>Light</span>
+                </>
+              ) : (
+                <>
+                  <Moon size={15} color="var(--slate-600)" />
+                  <span style={{ fontSize: "0.78rem" }}>Dark</span>
+                </>
+              )}
+            </button>
 
             <Link
               to="/notifications"

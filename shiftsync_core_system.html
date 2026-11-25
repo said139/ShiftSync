@@ -53,6 +53,19 @@
     .badge-completed { background-color: #ecfdf5; color: #007A3D; border: 1px solid #6ee7b7; font-weight: 700; }
     .badge-pending { background-color: #f8fafc; color: #475569; border: 1px solid #cbd5e1; }
     .badge-inprogress { background-color: #fffbeb; color: #b45309; border: 1px solid #fcd34d; font-weight: 600; }
+
+    /* Dark Mode Theme */
+    html.dark { color-scheme: dark; }
+    html.dark body { background-color: #0b0f17 !important; color: #f1f5f9 !important; }
+    html.dark header, html.dark aside { background-color: #121824 !important; border-color: #242e3d !important; }
+    html.dark .bg-white { background-color: #131926 !important; border-color: #242e3d !important; color: #f1f5f9 !important; }
+    html.dark .bg-slate-50 { background-color: #101622 !important; border-color: #242e3d !important; }
+    html.dark .bg-slate-100 { background-color: #1a2232 !important; border-color: #2e3c54 !important; }
+    html.dark .text-slate-900 { color: #f8fafc !important; }
+    html.dark .text-slate-800 { color: #f1f5f9 !important; }
+    html.dark .text-slate-700, html.dark .text-slate-600 { color: #cbd5e1 !important; }
+    html.dark .border-slate-200, html.dark .border-slate-300 { border-color: #242e3d !important; }
+    html.dark input, html.dark select, html.dark textarea { background-color: #1a2232 !important; color: #f8fafc !important; border-color: #334155 !important; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased selection:bg-slate-900 selection:text-white">
@@ -214,6 +227,12 @@
       </div>
 
       <div class="flex items-center space-x-4">
+        <!-- Dark Mode Toggle Button -->
+        <button onclick="toggleDarkModePrototype()" id="btn-theme-toggle" class="p-2 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition" title="Toggle Dark/Light Mode">
+          <span id="theme-icon-light" class="hidden text-sm">☀️ Light</span>
+          <span id="theme-icon-dark" class="text-sm">🌙 Dark</span>
+        </button>
+
         <!-- Notifications Bell -->
         <button onclick="navigateTo('notifications')" class="relative p-2 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
@@ -1676,6 +1695,24 @@
 
   <!-- JavaScript Prototype Controller -->
   <script>
+    function toggleDarkModePrototype() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('shiftsync-theme', isDark ? 'dark' : 'light');
+      updateThemeIcons(isDark);
+    }
+    function updateThemeIcons(isDark) {
+      const l = document.getElementById('theme-icon-light');
+      const d = document.getElementById('theme-icon-dark');
+      if (l && d) {
+        if (isDark) { l.classList.remove('hidden'); d.classList.add('hidden'); }
+        else { l.classList.add('hidden'); d.classList.remove('hidden'); }
+      }
+    }
+    if (localStorage.getItem('shiftsync-theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+      setTimeout(() => updateThemeIcons(true), 50);
+    }
+
     let currentUser = {
       name: 'Capt. John Doe',
       role: 'Pilot',
